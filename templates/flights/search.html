@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Flight Search - TripEase{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 40px 0;">
+    <h2 class="section-title">Search Flights</h2>
+    
+    <!-- Search Form -->
+    <form class="search-box" method="GET" action="{% url 'flights:search' %}" style="margin-bottom: 40px;">
+        <div class="form-group">
+            <label for="id_source">From</label>
+            {{ form.source }}
+            {% if form.source.errors %}
+                <div class="error-message">{{ form.source.errors }}</div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <label for="id_destination">To</label>
+            {{ form.destination }}
+            {% if form.destination.errors %}
+                <div class="error-message">{{ form.destination.errors }}</div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <label for="id_departure_date">Date</label>
+            {{ form.departure_date }}
+            {% if form.departure_date.errors %}
+                <div class="error-message">{{ form.departure_date.errors }}</div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <label for="id_cabin_class">Class</label>
+            {{ form.cabin_class }}
+        </div>
+        <div class="form-group">
+            <label for="id_passengers">Passengers</label>
+            {{ form.passengers }}
+        </div>
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+    
+    <!-- Flight Results -->
+    {% if search_performed %}
+        {% if flights %}
+            <h3 style="margin-bottom: 20px;">Available Flights ({{ flights|length }})</h3>
+            <div class="flight-results">
+                {% for flight in flights %}
+                    <div class="flight-card">
+                        <div class="flight-header">
+                            <div class="flight-info">
+                                <div class="flight-airline">{{ flight.airline }} - {{ flight.flight_number }}</div>
+                                <div class="flight-route">
+                                    <div class="flight-time">
+                                        <strong>{{ flight.departure_time|date:"H:i" }}</strong>
+                                        <div class="airport-code">{{ flight.source.code }}</div>
+                                        <div class="airport-name">{{ flight.source.city }}</div>
+                                    </div>
+                                    <div class="flight-duration">
+                                        <div class="flight-duration-content">
+                                            <div class="flight-duration-time">{{ flight.get_duration_display }}</div>
+                                            <div class="flight-duration-type">
+                                                {% if flight.is_non_stop %}Non-stop{% else %}1 Stop{% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flight-time">
+                                        <strong>{{ flight.arrival_time|date:"H:i" }}</strong>
+                                        <div class="airport-code">{{ flight.destination.code }}</div>
+                                        <div class="airport-name">{{ flight.destination.city }}</div>
+                                    </div>
+                                </div>
+                                <div class="flight-seats {% if flight.available_seats > 50 %}available{% elif flight.available_seats > 10 %}low{% else %}sold-out{% endif %}">
+                                    {% if flight.available_seats > 50 %}
+                                        ✓ {{ flight.available_seats }} seats available
+                                    {% elif flight.available_seats > 10 %}
+                                        ⚠ Only {{ flight.available_seats }} seats left
+                                    {% else %}
+                                        ✗ Only {{ flight.available_seats }} seats left
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="flight-price-section">
+                                <div class="flight-price">
+                                    <span class="flight-price-currency">₹</span>{{ flight.price|floatformat:0 }}
+                                </div>
+                                <div style="font-size: 0.85rem; color: #64748b; margin-bottom: 12px;">
+                                    per passenger
+                                </div>
+                                <a href="{% url 'flights:detail' flight.id %}?cabin_class={{ cabin_class }}&passengers={{ passengers }}" 
+                                   class="btn btn-primary">Select Flight</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">✈️</div>
+                <h3>No flights found</h3>
+                <p>Try adjusting your search criteria or select a different date.</p>
+                <a href="{% url 'flights:search' %}" class="btn btn-primary">Search Again</a>
+            </div>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}
+

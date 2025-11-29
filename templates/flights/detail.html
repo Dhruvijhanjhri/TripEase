@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Flight Details - TripEase{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 40px 0;">
+    <h2 class="section-title">Flight Details</h2>
+    
+    <div class="flight-card">
+        <div class="flight-header">
+            <div class="flight-info">
+                <div class="flight-airline">{{ flight.airline }} - {{ flight.flight_number }}</div>
+                <div class="flight-route">
+                    <div class="flight-time">
+                        <strong>{{ flight.departure_time|date:"H:i" }}</strong>
+                        <div class="airport-code">{{ flight.source.code }}</div>
+                        <div class="airport-name">{{ flight.source.name }}</div>
+                        <div style="color: #64748b; font-size: 0.85rem; margin-top: 4px;">{{ flight.departure_time|date:"D, M d, Y" }}</div>
+                    </div>
+                    <div class="flight-duration">
+                        <div class="flight-duration-content">
+                            <div class="flight-duration-time">{{ flight.get_duration_display }}</div>
+                            <div class="flight-duration-type">
+                                {% if flight.is_non_stop %}Non-stop{% else %}1 Stop{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flight-time">
+                        <strong>{{ flight.arrival_time|date:"H:i" }}</strong>
+                        <div class="airport-code">{{ flight.destination.code }}</div>
+                        <div class="airport-name">{{ flight.destination.name }}</div>
+                        <div style="color: #64748b; font-size: 0.85rem; margin-top: 4px;">{{ flight.arrival_time|date:"D, M d, Y" }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="border-top: 1px solid #e2e8f0; padding-top: 20px; margin-top: 20px;">
+            <h4>Price Breakdown</h4>
+            <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                <span>Price per passenger ({{ cabin_class|title }}):</span>
+                <strong>₹{{ price|floatformat:0 }}</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                <span>Number of passengers:</span>
+                <strong>{{ passengers }}</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin: 10px 0; font-size: 1.2rem; font-weight: 700; border-top: 2px solid #1e5eff; padding-top: 10px;">
+                <span>Total Price:</span>
+                <strong style="color: #1e5eff;">₹{{ total_price|floatformat:0 }}</strong>
+            </div>
+        </div>
+    </div>
+    
+    {% if user.is_authenticated %}
+        <div style="text-align: center;">
+            <a href="{% url 'bookings:create' flight.id %}?cabin_class={{ cabin_class }}&passengers={{ passengers }}" 
+               class="btn btn-primary" style="font-size: 1.1rem; padding: 14px 30px;">
+                Book Now
+            </a>
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 20px; background: #f8fafc; border-radius: 10px;">
+            <p>Please <a href="{% url 'accounts:login' %}?next={% url 'flights:detail' flight.id %}?cabin_class={{ cabin_class }}&passengers={{ passengers }}">sign in</a> to book this flight.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+

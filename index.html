@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+
+  <head>
+
+    <title>TripEase — Your Trusted Travel Partner</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- Navigation Bar -->
+    <header class="site-header">
+      <div class="container nav">
+        <div class="logo">TripEase</div>
+        <nav class="nav-links" aria-label="Primary">
+          <a href="#home" class="nav-link">Home</a>
+          <a href="#flights" class="nav-link">Flights</a>
+          <a href="#hotels" class="nav-link">Hotels</a>
+          <a href="#packages" class="nav-link">Packages</a>
+          <a href="#contact" class="nav-link">Contact</a>
+        </nav>
+        <div class="auth-buttons">
+          <button id="loginBtn" class="btn btn-outline">Sign In</button>
+          <button id="signupBtn" class="btn btn-primary">Sign Up</button>
+          <button id="logoutBtn" class="btn btn-outline" style="display: none;">Logout</button>
+          <div id="userMenu" class="user-menu" style="display: none;"></div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Section with Background Image and Search Box -->
+    <section id="home" class="hero" role="banner" aria-label="Explore the world with TripEase">
+      <div class="hero-overlay"></div>
+      <div class="container hero-content">
+        <h1 class="hero-title">Plan. Book. Travel. Easier with TripEase.</h1>
+        <p class="hero-subtitle">Find the best flights, hotels, and packages for your next adventure.</p>
+
+        <form class="search-box" aria-label="Search travel options">
+          <div class="form-group">
+            <label for="from">From</label>
+            <input type="text" id="from" name="from" placeholder="City or Airport" aria-label="From city or airport" />
+          </div>
+          <div class="form-group">
+            <label for="to">To</label>
+            <input type="text" id="to" name="to" placeholder="City or Airport" aria-label="To city or airport" />
+          </div>
+          <div class="form-group">
+            <label for="date">Date</label>
+            <input type="date" id="date" name="date" aria-label="Departure date" />
+          </div>
+          <button type="button" class="btn btn-primary" aria-label="Search">Search</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Popular Destinations -->
+    <section id="popular" class="section">
+      <div class="container">
+        <h2 class="section-title">Popular Destinations</h2>
+        <div class="card-grid">
+          <!-- Destination Card 1 -->
+          <article class="card">
+            <img src="1.png" alt="Pune city" class="card-img" />
+            <div class="card-body">
+              <h3 class="card-title">Pune</h3>
+              <p class="card-text">Cafés, culture, and vibrant neighborhoods.</p>
+            </div>
+          </article>
+          <!-- Destination Card 2 -->
+          <article class="card">
+            <img src="2.png" alt="Surat city" class="card-img" />
+            <div class="card-body">
+              <h3 class="card-title">Surat</h3>
+              <p class="card-text">Textiles, cuisine, and riverfront charm.</p>
+            </div>
+          </article>
+          <!-- Destination Card 3 -->
+          <article class="card">
+            <img src="3.png" alt="Kolkata city" class="card-img" />
+            <div class="card-body">
+              <h3 class="card-title">Kolkata</h3>
+              <p class="card-text">Heritage, arts, and iconic flavors.</p>
+            </div>
+          </article>
+          <!-- Destination Card 4 -->
+          <article class="card">
+            <img src="4.png" alt="Jaipur city" class="card-img" />
+            <div class="card-body">
+              <h3 class="card-title">Jaipur</h3>
+              <p class="card-text">Pink City palaces and royal history.</p>
+            </div>
+          </article>
+          <!-- Destination Card 5 -->
+          <article class="card">
+            <img src="5.png" alt="Indore city" class="card-img" />
+            <div class="card-body">
+              <h3 class="card-title">Indore</h3>
+              <p class="card-text">Street food, markets, and heritage.</p>
+            </div>
+          </article>
+          <!-- Destination Card 6 -->
+          <article class="card">
+            <img src="6.png" alt="Bengaluru city" class="card-img" />
+            <div class="card-body">
+              <h3 class="card-title">Bengaluru</h3>
+              <p class="card-text">Parks, tech hubs, and cool cafés.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Offers Section -->
+    <section id="offers" class="section section-alt">
+      <div class="container">
+        <h2 class="section-title">Exclusive Offers</h2>
+        <div class="offers-grid">
+          <div class="offer-card">
+            <img src="7.jpg" alt="Airplane flying above the clouds" />
+            <div class="offer-content">
+              <h3>Up to 30% Off Flights</h3>
+              <p>Save big on top routes this season.</p>
+            </div>
+          </div>
+          <div class="offer-card">
+            <img src="8.jpg" alt="Luxurious hotel lobby" />
+            <div class="offer-content">
+              <h3>Stay 3 Nights, Pay 2</h3>
+              <p>Handpicked hotels at dreamy locations.</p>
+            </div>
+          </div>
+          <div class="offer-card">
+            <img src="9.jpg" alt="Beachside umbrella and sea" />
+            <div class="offer-content">
+              <h3>Holiday Packages</h3>
+              <p>Curated itineraries for every budget.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="section">
+      <div class="container">
+        <h2 class="section-title">What Our Travelers Say</h2>
+        <div class="testimonials">
+          <article class="testimonial">
+            <img class="avatar" src="10.jpg" alt="Customer portrait" />
+            <div class="testimonial-body">
+              <p class="testimonial-text">“TripEase made planning our honeymoon effortless. Great deals and smooth booking!”</p>
+              <p class="testimonial-author">— Aisha K.</p>
+            </div>
+          </article>
+          <article class="testimonial">
+            <img class="avatar" src="11.png" alt="Customer portrait" />
+            <div class="testimonial-body">
+              <p class="testimonial-text">“Loved the hotel recommendations. Everything was just as described.”</p>
+              <p class="testimonial-author">— Daniel R.</p>
+            </div>
+          </article>
+          <article class="testimonial">
+            <img class="avatar" src="12.png" alt="Customer portrait" />
+            <div class="testimonial-body">
+              <p class="testimonial-text">“Reliable and easy to use. My go-to site for quick getaways.”</p>
+              <p class="testimonial-author">— Priya S.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact" class="site-footer">
+      <div class="container footer-grid">
+        <div class="footer-brand">
+          <div class="logo">TripEase</div>
+          <p>Your trusted partner for flights, hotels, and holiday packages.</p>
+        </div>
+        <nav class="footer-links" aria-label="Footer">
+          <a href="#about">About Us</a>
+          <a href="#terms">Terms</a>
+          <a href="#privacy">Privacy</a>
+        </nav>
+        <div class="footer-contact">
+          <p><strong>Email:</strong> support@tripease.example</p>
+          <p><strong>Phone:</strong> +91 9876543210 </p>
+          <p><strong>Address:</strong> 123 Nagasandra, Bengaluru</p>
+        </div>
+      </div>
+      <div class="container footer-bottom">
+        <p>© <span id="year">2025</span> TripEase. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <!-- Authentication Modal -->
+    <div id="authModal" class="modal-overlay" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="modalTitle">Sign In</h2>
+          <button class="modal-close" aria-label="Close modal">&times;</button>
+        </div>
+        
+        <!-- Login Form -->
+        <form id="loginForm" class="auth-form" style="display: block;">
+          <div class="form-group">
+            <label for="loginEmail">Email</label>
+            <input 
+              type="email" 
+              id="loginEmail" 
+              name="email" 
+              placeholder="Enter your email" 
+              required 
+              autocomplete="email"
+            />
+          </div>
+          
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <input 
+              type="password" 
+              id="loginPassword" 
+              name="password" 
+              placeholder="Enter your password" 
+              required 
+              autocomplete="current-password"
+            />
+          </div>
+          
+          <button type="submit" class="btn btn-primary btn-full">Sign In</button>
+          
+          <div class="form-footer">
+            <p>Don't have an account? <a href="#" id="switchToSignup">Sign up here</a></p>
+          </div>
+        </form>
+
+        <!-- Signup Form -->
+        <form id="signupForm" class="auth-form" style="display: none;">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="signupFirstName">First Name</label>
+              <input 
+                type="text" 
+                id="signupFirstName" 
+                name="firstName" 
+                placeholder="First name" 
+                required 
+                autocomplete="given-name"
+              />
+            </div>
+            
+            <div class="form-group">
+              <label for="signupLastName">Last Name</label>
+              <input 
+                type="text" 
+                id="signupLastName" 
+                name="lastName" 
+                placeholder="Last name" 
+                required 
+                autocomplete="family-name"
+              />
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="signupEmail">Email</label>
+            <input 
+              type="email" 
+              id="signupEmail" 
+              name="email" 
+              placeholder="Enter your email" 
+              required 
+              autocomplete="email"
+            />
+          </div>
+          
+          <div class="form-group">
+            <label for="signupPhone">Phone Number</label>
+            <input 
+              type="tel" 
+              id="signupPhone" 
+              name="phone" 
+              placeholder="Enter your phone number" 
+              required 
+              autocomplete="tel"
+            />
+          </div>
+          
+          <div class="form-group">
+            <label for="signupPassword">Password</label>
+            <input 
+              type="password" 
+              id="signupPassword" 
+              name="password" 
+              placeholder="Create a password" 
+              required 
+              autocomplete="new-password"
+            />
+          </div>
+          
+          <div class="form-group">
+            <label for="signupConfirmPassword">Confirm Password</label>
+            <input 
+              type="password" 
+              id="signupConfirmPassword" 
+              name="confirmPassword" 
+              placeholder="Confirm your password" 
+              required 
+              autocomplete="new-password"
+            />
+          </div>
+          
+          <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+          
+          <div class="form-footer">
+            <p>Already have an account? <a href="#" id="switchToLogin">Sign in here</a></p>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="auth.js"></script>
+  </body>
+  </html>

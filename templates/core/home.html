@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Hero Section with Background Image and Search Box -->
+<section id="home" class="hero" role="banner" aria-label="Explore the world with TripEase">
+    <div class="hero-overlay"></div>
+    <div class="container hero-content">
+        <h1 class="hero-title">Plan. Book. Travel. Easier with TripEase.</h1>
+        <p class="hero-subtitle">Find the best flights, hotels, and packages for your next adventure.</p>
+
+        <form class="search-box" method="GET" action="{% url 'flights:search' %}" aria-label="Search travel options">
+            <div class="form-group">
+                <label for="source">From</label>
+                <select name="source" id="source" class="form-control" required>
+                    <option value="">Select departure airport</option>
+                    {% for airport in airports %}
+                        <option value="{{ airport.id }}">{{ airport.name }} ({{ airport.code }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="destination">To</label>
+                <select name="destination" id="destination" class="form-control" required>
+                    <option value="">Select arrival airport</option>
+                    {% for airport in airports %}
+                        <option value="{{ airport.id }}">{{ airport.name }} ({{ airport.code }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="departure_date">Date</label>
+                <input type="date" id="departure_date" name="departure_date" class="form-control" min="{{ today|date:'Y-m-d' }}" required aria-label="Departure date" />
+            </div>
+            <button type="submit" class="btn btn-primary" aria-label="Search">Search</button>
+        </form>
+    </div>
+</section>
+
+<!-- Popular Destinations -->
+<section id="popular" class="section">
+    <div class="container">
+        <h2 class="section-title">Popular Destinations</h2>
+        <div class="card-grid">
+            <article class="card">
+                <img src="{% static 'images/1.png' %}" alt="Pune city" class="card-img" />
+                <div class="card-body">
+                    <h3 class="card-title">Pune</h3>
+                    <p class="card-text">Cafés, culture, and vibrant neighborhoods.</p>
+                </div>
+            </article>
+            <article class="card">
+                <img src="{% static 'images/2.png' %}" alt="Surat city" class="card-img" />
+                <div class="card-body">
+                    <h3 class="card-title">Surat</h3>
+                    <p class="card-text">Textiles, cuisine, and riverfront charm.</p>
+                </div>
+            </article>
+            <article class="card">
+                <img src="{% static 'images/3.png' %}" alt="Kolkata city" class="card-img" />
+                <div class="card-body">
+                    <h3 class="card-title">Kolkata</h3>
+                    <p class="card-text">Heritage, arts, and iconic flavors.</p>
+                </div>
+            </article>
+            <article class="card">
+                <img src="{% static 'images/4.png' %}" alt="Jaipur city" class="card-img" />
+                <div class="card-body">
+                    <h3 class="card-title">Jaipur</h3>
+                    <p class="card-text">Pink City palaces and royal history.</p>
+                </div>
+            </article>
+            <article class="card">
+                <img src="{% static 'images/5.png' %}" alt="Indore city" class="card-img" />
+                <div class="card-body">
+                    <h3 class="card-title">Indore</h3>
+                    <p class="card-text">Street food, markets, and heritage.</p>
+                </div>
+            </article>
+            <article class="card">
+                <img src="{% static 'images/6.png' %}" alt="Bengaluru city" class="card-img" />
+                <div class="card-body">
+                    <h3 class="card-title">Bengaluru</h3>
+                    <p class="card-text">Parks, tech hubs, and cool cafés.</p>
+                </div>
+            </article>
+        </div>
+    </div>
+</section>
+
+<!-- Offers Section -->
+<section id="offers" class="section section-alt">
+    <div class="container">
+        <h2 class="section-title">Exclusive Offers</h2>
+        <div class="offers-grid">
+            <div class="offer-card">
+                <img src="{% static 'images/7.jpg' %}" alt="Airplane flying above the clouds" />
+                <div class="offer-content">
+                    <h3>Up to 30% Off Flights</h3>
+                    <p>Save big on top routes this season.</p>
+                </div>
+            </div>
+            <div class="offer-card">
+                <img src="{% static 'images/8.jpg' %}" alt="Luxurious hotel lobby" />
+                <div class="offer-content">
+                    <h3>Stay 3 Nights, Pay 2</h3>
+                    <p>Handpicked hotels at dreamy locations.</p>
+                </div>
+            </div>
+            <div class="offer-card">
+                <img src="{% static 'images/9.jpg' %}" alt="Beachside umbrella and sea" />
+                <div class="offer-content">
+                    <h3>Holiday Packages</h3>
+                    <p>Curated itineraries for every budget.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section id="testimonials" class="section">
+    <div class="container">
+        <h2 class="section-title">What Our Travelers Say</h2>
+        <div class="testimonials">
+            <article class="testimonial">
+                <img class="avatar" src="{% static 'images/10.jpg' %}" alt="Customer portrait" />
+                <div class="testimonial-body">
+                    <p class="testimonial-text">"TripEase made planning our honeymoon effortless. Great deals and smooth booking!"</p>
+                    <p class="testimonial-author">— Aisha K.</p>
+                </div>
+            </article>
+            <article class="testimonial">
+                <img class="avatar" src="{% static 'images/11.png' %}" alt="Customer portrait" />
+                <div class="testimonial-body">
+                    <p class="testimonial-text">"Loved the hotel recommendations. Everything was just as described."</p>
+                    <p class="testimonial-author">— Daniel R.</p>
+                </div>
+            </article>
+            <article class="testimonial">
+                <img class="avatar" src="{% static 'images/12.png' %}" alt="Customer portrait" />
+                <div class="testimonial-body">
+                    <p class="testimonial-text">"Reliable and easy to use. My go-to site for quick getaways."</p>
+                    <p class="testimonial-author">— Priya S.</p>
+                </div>
+            </article>
+        </div>
+    </div>
+</section>
+{% endblock %}

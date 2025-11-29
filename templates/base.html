@@ -1,0 +1,95 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}TripEase — Your Trusted Travel Partner{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <header class="site-header">
+        <div class="container nav">
+            <div class="logo"><a href="{% url 'core:home' %}" style="text-decoration: none; color: inherit;">TripEase</a></div>
+            <nav class="nav-links" aria-label="Primary">
+                <a href="{% url 'core:home' %}" class="nav-link">Home</a>
+                <a href="{% url 'flights:search' %}" class="nav-link">Flights</a>
+                <a href="#hotels" class="nav-link">Hotels</a>
+                <a href="#packages" class="nav-link">Packages</a>
+                <a href="{% url 'contact:contact' %}" class="nav-link">Contact</a>
+            </nav>
+            <div class="auth-buttons">
+                {% if user.is_authenticated %}
+                    <span class="user-menu">Welcome, {{ user.first_name|default:user.username }}!</span>
+                    <a href="{% url 'bookings:list' %}" class="btn btn-outline">My Bookings</a>
+                    <a href="{% url 'accounts:logout' %}" class="btn btn-outline">Logout</a>
+                {% else %}
+                    <a href="{% url 'accounts:login' %}" class="btn btn-outline">Sign In</a>
+                    <a href="{% url 'accounts:signup' %}" class="btn btn-primary">Sign Up</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Messages -->
+    {% if messages %}
+        <div class="messages-container">
+            {% for message in messages %}
+                <div class="notification notification-{{ message.tags }}">
+                    <span>{{ message }}</span>
+                    <button class="notification-close" onclick="this.parentElement.remove()">&times;</button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    {% block content %}{% endblock %}
+
+    <!-- Footer -->
+    <footer id="contact" class="site-footer">
+        <div class="container footer-grid">
+            <div class="footer-brand">
+                <div class="logo">TripEase</div>
+                <p>Your trusted partner for flights, hotels, and holiday packages.</p>
+            </div>
+            <nav class="footer-links" aria-label="Footer">
+                <a href="#about">About Us</a>
+                <a href="#terms">Terms</a>
+                <a href="#privacy">Privacy</a>
+            </nav>
+            <div class="footer-contact">
+                <p><strong>Email:</strong> support@tripease.example</p>
+                <p><strong>Phone:</strong> +91 9876543210</p>
+                <p><strong>Address:</strong> 123 Nagasandra, Bengaluru</p>
+            </div>
+        </div>
+        <div class="container footer-bottom">
+            <p>© <span id="year">2025</span> TripEase. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Auto-hide notifications after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const notifications = document.querySelectorAll('.notification');
+            notifications.forEach(function(notification) {
+                setTimeout(function() {
+                    notification.style.opacity = '0';
+                    setTimeout(function() {
+                        notification.remove();
+                    }, 300);
+                }, 5000);
+            });
+        });
+
+        // Set current year
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
+

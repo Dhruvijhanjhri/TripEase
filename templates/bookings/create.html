@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Passenger Details - TripEase{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 40px 0;">
+    <h2 class="section-title">Passenger Details</h2>
+    
+    <div class="card" style="padding: 20px; margin-bottom: 30px;">
+        <h3>{{ flight.airline }} - {{ flight.flight_number }}</h3>
+        <div style="color: #475569;">
+            {{ flight.source.code }} → {{ flight.destination.code }} | 
+            {{ flight.departure_time|date:"M d, Y" }} | 
+            {{ cabin_class|title }} | 
+            {{ passengers }} Passenger{{ passengers|pluralize }}
+        </div>
+        <div style="margin-top: 10px; font-size: 1.2rem; font-weight: 700; color: #1e5eff;">
+            Total: ₹{{ total_price|floatformat:0 }}
+        </div>
+    </div>
+    
+    <form method="post" class="auth-form" style="max-width: 600px; margin: 0 auto;">
+        {% csrf_token %}
+        {{ formset.management_form }}
+        
+        <h3 style="margin-bottom: 20px;">Passenger Information</h3>
+        
+        {% for form in formset %}
+            <div style="border: 1px solid #e2e8f0; padding: 20px; margin-bottom: 20px; border-radius: 10px;">
+                <h4 style="margin-bottom: 15px;">Passenger {{ forloop.counter }}</h4>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.first_name.id_for_label }}">First Name</label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}
+                            <div class="error-message">{{ form.first_name.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.last_name.id_for_label }}">Last Name</label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}
+                            <div class="error-message">{{ form.last_name.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.age.id_for_label }}">Age</label>
+                        {{ form.age }}
+                        {% if form.age.errors %}
+                            <div class="error-message">{{ form.age.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.gender.id_for_label }}">Gender</label>
+                        {{ form.gender }}
+                        {% if form.gender.errors %}
+                            <div class="error-message">{{ form.gender.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        
+        <button type="submit" class="btn btn-primary btn-full">Continue to Payment</button>
+    </form>
+</div>
+{% endblock %}
+

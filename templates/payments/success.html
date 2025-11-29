@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payment Success - TripEase{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 40px 0; text-align: center;">
+    <div class="card" style="padding: 40px; max-width: 600px; margin: 0 auto;">
+        <div style="font-size: 4rem; color: #10b981; margin-bottom: 20px;">✓</div>
+        <h2 style="color: #10b981; margin-bottom: 20px;">Payment Successful!</h2>
+        
+        <div style="text-align: left; margin: 30px 0;">
+            <p><strong>Booking Reference:</strong> {{ booking.booking_reference }}</p>
+            <p><strong>Transaction ID:</strong> {{ payment.transaction_id }}</p>
+            <p><strong>Amount Paid:</strong> ₹{{ payment.amount|floatformat:0 }}</p>
+            <p><strong>Payment Method:</strong> {{ payment.get_payment_method_display }}</p>
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <a href="{% url 'bookings:detail' booking.id %}" class="btn btn-primary">View Booking Details</a>
+            <a href="{% url 'bookings:list' %}" class="btn btn-outline" style="margin-left: 10px;">My Bookings</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Bookings - TripEase{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 40px 0;">
+    <h2 class="section-title">My Bookings</h2>
+    
+    {% if bookings %}
+        <div class="flight-results">
+            {% for booking in bookings %}
+                <div class="card" style="padding: 20px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div>
+                            <h3 style="margin: 0 0 10px 0;">{{ booking.flight.airline }} - {{ booking.flight.flight_number }}</h3>
+                            <div style="color: #475569; margin-bottom: 10px;">
+                                {{ booking.flight.source.code }} → {{ booking.flight.destination.code }} | 
+                                {{ booking.flight.departure_time|date:"M d, Y" }} | 
+                                {{ booking.cabin_class|title }}
+                            </div>
+                            <div>
+                                Booking Reference: <strong>{{ booking.booking_reference }}</strong><br>
+                                Status: <strong style="color: {% if booking.booking_status == 'confirmed' %}#10b981{% elif booking.booking_status == 'pending' %}#f59e0b{% else %}#ef4444{% endif %};">
+                                    {{ booking.get_booking_status_display }}
+                                </strong>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 1.3rem; font-weight: 700; color: #1e5eff; margin-bottom: 10px;">
+                                ₹{{ booking.total_price|floatformat:0 }}
+                            </div>
+                            <a href="{% url 'bookings:detail' booking.id %}" class="btn btn-primary">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card" style="padding: 40px; text-align: center;">
+            <h3>No bookings found</h3>
+            <p>Start booking your flights now!</p>
+            <a href="{% url 'flights:search' %}" class="btn btn-primary" style="margin-top: 20px;">Search Flights</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
