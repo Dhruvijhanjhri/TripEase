@@ -8,3 +8,4 @@ urlpatterns = [
     path('<int:flight_id>/', views.flight_detail, name='detail'),
 ]
 
+

@@ -34,3 +34,4 @@ class Payment(models.Model):
     def __str__(self):
         return f"Payment for {self.booking.booking_reference} - {self.payment_status}"
 
+

@@ -70,3 +70,4 @@ class FlightSearchForm(forms.Form):
 
         return cleaned_data
 
+

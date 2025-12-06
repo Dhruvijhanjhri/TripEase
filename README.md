@@ -228,3 +228,4 @@ This project is for educational purposes.
 
 **Built with ❤️ using Django**
 
+

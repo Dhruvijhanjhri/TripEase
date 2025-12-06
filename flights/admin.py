@@ -33,3 +33,4 @@ class FlightAdmin(admin.ModelAdmin):
         }),
     )
 
+

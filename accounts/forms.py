@@ -40,6 +40,14 @@ class SignUpForm(UserCreationForm):
             'autocomplete': 'tel'
         })
     )
+    profile_photo = forms.ImageField(
+        required=False,
+        widget=forms.FileInput(attrs={
+            'class': 'form-control',
+            'accept': 'image/*'
+        }),
+        help_text='Upload your profile picture (optional)'
+    )
     password1 = forms.CharField(
         label='Password',
         widget=forms.PasswordInput(attrs={
@@ -59,7 +67,7 @@ class SignUpForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'email', 'phone', 'password1', 'password2')
+        fields = ('first_name', 'last_name', 'email', 'phone', 'profile_photo', 'password1', 'password2')
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
@@ -71,6 +79,8 @@ class SignUpForm(UserCreationForm):
         user = super().save(commit=False)
         user.email = self.cleaned_data['email']
         user.username = self.cleaned_data['email']  # Use email as username
+        if 'profile_photo' in self.cleaned_data and self.cleaned_data['profile_photo']:
+            user.profile_photo = self.cleaned_data['profile_photo']
         if commit:
             user.save()
         return user
@@ -101,4 +111,38 @@ class LoginForm(AuthenticationForm):
             'autocomplete': 'current-password'
         })
     )
+
+
+class ProfileUpdateForm(forms.ModelForm):
+    """Form for updating user profile"""
+    profile_photo = forms.ImageField(
+        required=False,
+        widget=forms.FileInput(attrs={
+            'class': 'form-control',
+            'accept': 'image/*'
+        }),
+        help_text='Upload or update your profile picture'
+    )
+    
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'email', 'phone', 'profile_photo')
+        widgets = {
+            'first_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'First name'
+            }),
+            'last_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Last name'
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Email address'
+            }),
+            'phone': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Phone number'
+            }),
+        }
 

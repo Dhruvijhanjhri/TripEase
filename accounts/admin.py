@@ -19,3 +19,4 @@ class UserAdmin(BaseUserAdmin):
         ('Additional Info', {'fields': ('phone', 'profile_photo', 'id_document')}),
     )
 
+

@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ package.name }} - TripEase{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 40px 0;">
+    <!-- Package Header -->
+    <div style="margin-bottom: 32px;">
+        <h1 style="font-size: 32px; margin-bottom: 8px;">{{ package.name }}</h1>
+        <div style="display: flex; align-items: center; gap: 16px; color: #6c757d; flex-wrap: wrap;">
+            <span>📍 {{ package.destination }}</span>
+            <span>⏱️ {{ package.duration }}</span>
+            {% if package.original_price > package.price %}
+                <span style="background: #dc3545; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">
+                    Special Offer
+                </span>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Package Image -->
+    <div style="margin-bottom: 32px;">
+        <img src="{% static package.image %}" alt="{{ package.name }}" 
+             style="width: 100%; height: 400px; object-fit: cover; border-radius: 8px;" />
+    </div>
+    
+    <!-- Package Details Grid -->
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 32px; margin-bottom: 32px;">
+        <!-- Left Column: Details -->
+        <div>
+            <h2 style="font-size: 24px; margin-bottom: 16px;">Package Overview</h2>
+            <p style="line-height: 1.6; color: #495057; margin-bottom: 24px;">{{ package.description }}</p>
+            
+            <h3 style="font-size: 20px; margin-bottom: 16px;">Highlights</h3>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 24px;">
+                {% for highlight in package.highlights %}
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="color: #007bff; font-size: 18px;">✓</span>
+                    <span>{{ highlight }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <h3 style="font-size: 20px; margin-bottom: 16px;">What's Included</h3>
+            <div style="background: #f8f9fa; padding: 16px; border-radius: 8px; margin-bottom: 24px;">
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                    {% for inclusion in package.inclusions %}
+                    <li style="padding: 8px 0; border-bottom: 1px solid #e9ecef;">
+                        <span style="color: #28a745; margin-right: 8px;">✓</span>
+                        {{ inclusion }}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            
+            {% if package.itinerary %}
+            <h3 style="font-size: 20px; margin-bottom: 16px;">Itinerary</h3>
+            <div style="display: grid; gap: 16px;">
+                {% for day in package.itinerary %}
+                <div style="background: #f8f9fa; padding: 16px; border-radius: 8px; border-left: 4px solid #007bff;">
+                    <strong style="color: #007bff; font-size: 16px;">{{ day.day }}</strong>
+                    <h4 style="margin: 8px 0; font-size: 18px;">{{ day.title }}</h4>
+                    <p style="color: #495057; margin: 0;">{{ day.description }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Right Column: Booking Card -->
+        <div class="modal-content" style="position: sticky; top: 20px; height: fit-content;">
+            <div style="padding: 24px;">
+                <h3 style="font-size: 20px; margin-bottom: 16px;">Book This Package</h3>
+                
+                <div style="margin-bottom: 24px; padding-top: 16px; border-top: 1px solid #e9ecef;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span>Duration</span>
+                        <span><strong>{{ package.duration }}</strong></span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span>Destination</span>
+                        <span><strong>{{ package.destination }}</strong></span>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 24px; padding-top: 16px; border-top: 1px solid #e9ecef;">
+                    {% if package.original_price > package.price %}
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span style="text-decoration: line-through; color: #6c757d;">Original Price</span>
+                            <span style="text-decoration: line-through; color: #6c757d;">₹{{ package.original_price|floatformat:0 }}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span>Discount</span>
+                            <span style="color: #28a745; font-weight: bold;">
+                                -₹{{ package.discount_amount|floatformat:0 }}
+                            </span>
+                        </div>
+                    {% endif %}
+                    <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 18px; padding-top: 8px; border-top: 1px solid #e9ecef;">
+                        <span>Price per person</span>
+                        <span style="color: #007bff;">₹{{ package.price|floatformat:0 }}</span>
+                    </div>
+                </div>
+                
+                {% if user.is_authenticated %}
+                    <a href="{% url 'contact:contact' %}" class="btn btn-primary btn-full">Book Now</a>
+                {% else %}
+                    <a href="{% url 'accounts:login' %}" class="btn btn-primary btn-full">Login to Book</a>
+                {% endif %}
+                
+                <p style="text-align: center; margin-top: 16px; font-size: 12px; color: #6c757d;">
+                    Free cancellation up to 7 days before travel
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Important Information -->
+    <div style="margin-top: 32px; padding: 24px; background: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
+        <h3 style="font-size: 20px; margin-bottom: 16px;">Important Information</h3>
+        <ul style="color: #856404; line-height: 1.8;">
+            <li>Prices are per person based on double occupancy</li>
+            <li>Single occupancy charges may apply</li>
+            <li>Travel dates are subject to availability</li>
+            <li>Terms and conditions apply</li>
+            <li>For customizations, please contact our support team</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
+

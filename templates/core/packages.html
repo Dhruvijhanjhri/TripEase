@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Holiday Packages - TripEase{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero" style="min-height: 300px;">
+    <div class="hero-overlay"></div>
+    <div class="container hero-content">
+        <h1 class="hero-title">Holiday Packages</h1>
+        <p class="hero-subtitle">Curated itineraries for unforgettable experiences</p>
+    </div>
+</section>
+
+<!-- Search/Filter Section -->
+<section class="section">
+    <div class="container">
+        <div class="modal-content" style="max-width: 600px; margin: 0 auto;">
+            <form method="GET" action="{% url 'core:packages' %}" class="auth-form">
+                <div class="form-group">
+                    <label for="destination">Search by Destination</label>
+                    <input type="text" id="destination" name="destination" class="form-control" 
+                           value="{{ destination_filter }}" placeholder="Enter destination (e.g., Goa, Jaipur)">
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">Search Packages</button>
+                {% if destination_filter %}
+                    <a href="{% url 'core:packages' %}" class="btn btn-outline btn-full" style="margin-top: 8px;">Clear Filter</a>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- Packages Grid -->
+<section class="section section-alt">
+    <div class="container">
+        <h2 class="section-title">
+            {% if destination_filter %}
+                Packages in {{ destination_filter }}
+            {% else %}
+                All Packages
+            {% endif %}
+        </h2>
+        
+        {% if packages %}
+        <div class="card-grid">
+            {% for package in packages %}
+            <article class="card" style="cursor: pointer; position: relative;" 
+                     onclick="window.location='{% url 'core:package_detail' package.id %}'">
+                {% if package.original_price > package.price %}
+                <div style="position: absolute; top: 12px; right: 12px; background: #dc3545; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; z-index: 1;">
+                    {{ package.discount_percent }}% OFF
+                </div>
+                {% endif %}
+                <img src="{% static package.image %}" alt="{{ package.name }}" class="card-img" style="height: 200px; object-fit: cover;" />
+                <div class="card-body">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                        <h3 class="card-title">{{ package.name }}</h3>
+                    </div>
+                    <p style="color: #6c757d; font-size: 14px; margin-bottom: 12px;">
+                        <strong>📍</strong> {{ package.destination }} | <strong>⏱️</strong> {{ package.duration }}
+                    </p>
+                    <p class="card-text" style="font-size: 14px; margin-bottom: 16px;">{{ package.description }}</p>
+                    
+                    <div style="margin-bottom: 16px;">
+                        <strong style="font-size: 12px; color: #6c757d;">Highlights:</strong>
+                        <div style="margin-top: 8px;">
+                            {% for highlight in package.highlights %}
+                                <span style="display: inline-block; background: #e9ecef; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-right: 4px; margin-bottom: 4px;">
+                                    {{ highlight }}
+                                </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid #e9ecef;">
+                        <div>
+                            {% if package.original_price > package.price %}
+                                <span style="text-decoration: line-through; color: #6c757d; font-size: 14px;">₹{{ package.original_price|floatformat:0 }}</span>
+                                <br>
+                            {% endif %}
+                            <span style="font-size: 24px; font-weight: bold; color: #007bff;">₹{{ package.price|floatformat:0 }}</span>
+                            <span style="font-size: 14px; color: #6c757d;">/person</span>
+                        </div>
+                        <span style="background: #28a745; color: white; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold;">
+                            Book Now
+                        </span>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 40px 0;">
+            <p style="font-size: 18px; color: #6c757d;">No packages found. Please try a different destination.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Why Choose Our Packages -->
+<section class="section">
+    <div class="container">
+        <h2 class="section-title">Why Choose TripEase Packages?</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; margin-top: 32px;">
+            <div style="text-align: center; padding: 24px; background: #f8f9fa; border-radius: 8px;">
+                <div style="font-size: 48px; margin-bottom: 16px;">✈️</div>
+                <h3 style="font-size: 18px; margin-bottom: 8px;">Best Prices</h3>
+                <p style="color: #6c757d; font-size: 14px;">Competitive pricing with no hidden charges</p>
+            </div>
+            <div style="text-align: center; padding: 24px; background: #f8f9fa; border-radius: 8px;">
+                <div style="font-size: 48px; margin-bottom: 16px;">🏨</div>
+                <h3 style="font-size: 18px; margin-bottom: 8px;">Handpicked Hotels</h3>
+                <p style="color: #6c757d; font-size: 14px;">Carefully selected accommodations for your comfort</p>
+            </div>
+            <div style="text-align: center; padding: 24px; background: #f8f9fa; border-radius: 8px;">
+                <div style="font-size: 48px; margin-bottom: 16px;">🎯</div>
+                <h3 style="font-size: 18px; margin-bottom: 8px;">Expert Guides</h3>
+                <p style="color: #6c757d; font-size: 14px;">Professional local guides for authentic experiences</p>
+            </div>
+            <div style="text-align: center; padding: 24px; background: #f8f9fa; border-radius: 8px;">
+                <div style="font-size: 48px; margin-bottom: 16px;">🛡️</div>
+                <h3 style="font-size: 18px; margin-bottom: 8px;">24/7 Support</h3>
+                <p style="color: #6c757d; font-size: 14px;">Round-the-clock assistance during your trip</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+

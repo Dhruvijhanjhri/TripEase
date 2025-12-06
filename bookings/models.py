@@ -60,3 +60,4 @@ class Booking(models.Model):
             self.booking_reference = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
         super().save(*args, **kwargs)
 
+

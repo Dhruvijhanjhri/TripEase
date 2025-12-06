@@ -25,3 +25,4 @@ class PassengerAdmin(admin.ModelAdmin):
     list_filter = ('gender', 'booking__booking_status')
     search_fields = ('first_name', 'last_name', 'booking__booking_reference')
 
+

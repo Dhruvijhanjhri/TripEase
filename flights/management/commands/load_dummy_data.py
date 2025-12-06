@@ -29,6 +29,12 @@ class Command(BaseCommand):
             {'code': 'AMD', 'name': 'Sardar Vallabhbhai Patel International Airport', 'city': 'Ahmedabad'},
             {'code': 'COK', 'name': 'Cochin International Airport', 'city': 'Kochi'},
             {'code': 'IXC', 'name': 'Chandigarh Airport', 'city': 'Chandigarh'},
+            {'code': 'IDR', 'name': 'Devi Ahilya Bai Holkar Airport', 'city': 'Indore'},
+            {'code': 'LKO', 'name': 'Chaudhary Charan Singh International Airport', 'city': 'Lucknow'},
+            {'code': 'VNS', 'name': 'Lal Bahadur Shastri International Airport', 'city': 'Varanasi'},
+            {'code': 'PAT', 'name': 'Jay Prakash Narayan Airport', 'city': 'Patna'},
+            {'code': 'GAU', 'name': 'Lokpriya Gopinath Bordoloi International Airport', 'city': 'Guwahati'},
+            {'code': 'TRV', 'name': 'Trivandrum International Airport', 'city': 'Thiruvananthapuram'},
         ]
         
         # Airlines
@@ -63,32 +69,21 @@ class Command(BaseCommand):
         flight_count = 0
         airport_codes = list(airports_dict.keys())
         
+        # Generate all possible routes (excluding same airport)
+        all_routes = []
+        for source_code in airport_codes:
+            for dest_code in airport_codes:
+                if source_code != dest_code:
+                    all_routes.append((source_code, dest_code))
+        
+        self.stdout.write(f'Total routes to create: {len(all_routes)}')
+        
         # Generate flights for the next 30 days
         for day in range(30):
             current_date = timezone.now().date() + timedelta(days=day)
             
-            # Create 3-5 flights per day between major routes
-            major_routes = [
-                ('BLR', 'DEL'), ('DEL', 'BLR'),
-                ('BOM', 'DEL'), ('DEL', 'BOM'),
-                ('BLR', 'BOM'), ('BOM', 'BLR'),
-                ('CCU', 'DEL'), ('DEL', 'CCU'),
-                ('MAA', 'DEL'), ('DEL', 'MAA'),
-                ('HYD', 'BLR'), ('BLR', 'HYD'),
-                ('PNQ', 'DEL'), ('DEL', 'PNQ'),
-                ('GOI', 'BOM'), ('BOM', 'GOI'),
-                ('JAI', 'DEL'), ('DEL', 'JAI'),
-                ('AMD', 'BOM'), ('BOM', 'AMD'),
-            ]
-            
-            # Add some random routes too
-            for _ in range(10):
-                source = random.choice(airport_codes)
-                destination = random.choice([c for c in airport_codes if c != source])
-                major_routes.append((source, destination))
-            
-            # Create flights for major routes
-            for source_code, dest_code in major_routes[:15]:  # Limit to 15 routes per day
+            # Create flights for ALL routes - ensure at least 1-2 flights per route per day
+            for source_code, dest_code in all_routes:
                 source = airports_dict[source_code]
                 destination = airports_dict[dest_code]
                 
@@ -96,7 +91,7 @@ class Command(BaseCommand):
                 if source == destination:
                     continue
                 
-                # Create 1-2 flights per route per day
+                # Create 1-2 flights per route per day (guaranteed at least 1)
                 num_flights = random.randint(1, 2)
                 
                 for flight_num in range(num_flights):
@@ -118,12 +113,12 @@ class Command(BaseCommand):
                     business_price = int(base_price * 2.5)
                     first_class_price = int(base_price * 5)
                     
-                    # Flight number - make it unique by including date and route
+                    # Flight number - make it unique by including date, route, and flight number
                     airline = random.choice(airlines)
                     airline_code = airline[:2].upper() if len(airline) >= 2 else 'AI'
                     route_code = f"{source_code}{dest_code}"
                     flight_num = random.randint(100, 999)
-                    flight_number = f"{airline_code}-{flight_num}-{route_code}-{day}"
+                    flight_number = f"{airline_code}-{flight_num}-{route_code}-{day}-{flight_num}"
                     
                     # Check if flight already exists
                     if Flight.objects.filter(

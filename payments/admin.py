@@ -11,3 +11,4 @@ class PaymentAdmin(admin.ModelAdmin):
     ordering = ('-payment_date',)
     readonly_fields = ('payment_date', 'updated_at')
 
+

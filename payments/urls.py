@@ -8,3 +8,4 @@ urlpatterns = [
     path('<int:booking_id>/success/', views.payment_success, name='success'),
 ]
 
+

@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Search Hotels - TripEase{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero" style="min-height: 300px;">
+    <div class="hero-overlay"></div>
+    <div class="container hero-content">
+        <h1 class="hero-title">Find Your Perfect Stay</h1>
+        <p class="hero-subtitle">Discover amazing hotels at great prices</p>
+    </div>
+</section>
+
+<!-- Hotel Search Form -->
+<section class="section">
+    <div class="container">
+        <div class="modal-content" style="max-width: 800px; margin: 0 auto;">
+            <form method="GET" action="{% url 'core:hotels_search' %}" class="auth-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="city">City</label>
+                        <select name="city" id="city" class="form-control">
+                            <option value="">Select a city</option>
+                            {% for city_option in cities %}
+                                <option value="{{ city_option.name }}" {% if city_option.name == city %}selected{% endif %}>{{ city_option.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="check_in">Check-in</label>
+                        <input type="date" id="check_in" name="check_in" class="form-control" 
+                               value="{{ check_in }}" min="{{ today|date:'Y-m-d' }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="check_out">Check-out</label>
+                        <input type="date" id="check_out" name="check_out" class="form-control" 
+                               value="{{ check_out }}" min="{{ today|date:'Y-m-d' }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="guests">Guests</label>
+                        <input type="number" id="guests" name="guests" class="form-control" 
+                               value="{{ guests }}" min="1" max="10" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">Search Hotels</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- Hotels Results -->
+{% if hotels %}
+<section class="section section-alt">
+    <div class="container">
+        <h2 class="section-title">Available Hotels in {{ city }}</h2>
+        <div class="card-grid">
+            {% for hotel in hotels %}
+            <article class="card" style="cursor: pointer;" onclick="window.location='{% url 'core:hotel_detail' hotel.id %}?city={{ city }}&check_in={{ check_in }}&check_out={{ check_out }}&guests={{ guests }}'">
+                <img src="{% static hotel.image %}" alt="{{ hotel.name }}" class="card-img" style="height: 200px; object-fit: cover;" />
+                <div class="card-body">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                        <h3 class="card-title">{{ hotel.name }}</h3>
+                        <span style="background: #007bff; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">
+                            ⭐ {{ hotel.rating }}
+                        </span>
+                    </div>
+                    <p class="card-text" style="font-size: 14px; color: #6c757d; margin-bottom: 12px;">{{ hotel.description }}</p>
+                    <div style="margin-bottom: 12px;">
+                        {% for amenity in hotel.amenities %}
+                            <span style="display: inline-block; background: #e9ecef; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-right: 4px; margin-bottom: 4px;">
+                                {{ amenity }}
+                            </span>
+                        {% endfor %}
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px;">
+                        <div>
+                            <span style="font-size: 24px; font-weight: bold; color: #007bff;">₹{{ hotel.price_per_night }}</span>
+                            <span style="font-size: 14px; color: #6c757d;">/night</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% elif city %}
+<section class="section">
+    <div class="container">
+        <div style="text-align: center; padding: 40px 0;">
+            <p style="font-size: 18px; color: #6c757d;">No hotels found. Please try a different city or date.</p>
+        </div>
+    </div>
+</section>
+{% else %}
+<!-- Popular Hotels -->
+<section class="section section-alt">
+    <div class="container">
+        <h2 class="section-title">Popular Hotels</h2>
+        <div class="card-grid">
+            <article class="card">
+                <img src="{% static 'images/8.jpg' %}" alt="Luxury Hotel" class="card-img" style="height: 200px; object-fit: cover;" />
+                <div class="card-body">
+                    <h3 class="card-title">Grand Plaza Hotel</h3>
+                    <p class="card-text">Luxury accommodation in the heart of the city with world-class amenities.</p>
+                    <div style="margin-top: 12px;">
+                        <span style="font-size: 20px; font-weight: bold; color: #007bff;">₹2,500</span>
+                        <span style="font-size: 14px; color: #6c757d;">/night</span>
+                    </div>
+                </div>
+            </article>
+            <article class="card">
+                <img src="{% static 'images/9.jpg' %}" alt="Beach Resort" class="card-img" style="height: 200px; object-fit: cover;" />
+                <div class="card-body">
+                    <h3 class="card-title">Riverside Retreat</h3>
+                    <p class="card-text">Peaceful stay by the river with scenic views and modern facilities.</p>
+                    <div style="margin-top: 12px;">
+                        <span style="font-size: 20px; font-weight: bold; color: #007bff;">₹1,800</span>
+                        <span style="font-size: 14px; color: #6c757d;">/night</span>
+                    </div>
+                </div>
+            </article>
+            <article class="card">
+                <img src="{% static 'images/7.jpg' %}" alt="City Hotel" class="card-img" style="height: 200px; object-fit: cover;" />
+                <div class="card-body">
+                    <h3 class="card-title">City Center Inn</h3>
+                    <p class="card-text">Comfortable and affordable accommodation in the city center.</p>
+                    <div style="margin-top: 12px;">
+                        <span style="font-size: 20px; font-weight: bold; color: #007bff;">₹1,500</span>
+                        <span style="font-size: 14px; color: #6c757d;">/night</span>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}
+

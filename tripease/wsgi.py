@@ -10,3 +10,4 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tripease.settings')
 
 application = get_wsgi_application()
 
+
