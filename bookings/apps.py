@@ -6,3 +6,4 @@ class BookingsConfig(AppConfig):
     name = 'bookings'
 
 
+

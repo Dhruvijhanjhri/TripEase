@@ -95,3 +95,4 @@ def booking_list(request):
     return render(request, 'bookings/list.html', context)
 
 
+

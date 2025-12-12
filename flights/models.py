@@ -81,3 +81,4 @@ class Flight(models.Model):
             return f"{minutes}m"
 
 
+

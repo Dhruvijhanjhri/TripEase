@@ -6,3 +6,4 @@ class ContactConfig(AppConfig):
     name = 'contact'
 
 
+

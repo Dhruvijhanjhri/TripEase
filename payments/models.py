@@ -35,3 +35,4 @@ class Payment(models.Model):
         return f"Payment for {self.booking.booking_reference} - {self.payment_status}"
 
 
+

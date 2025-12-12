@@ -31,3 +31,4 @@ class ContactMessage(models.Model):
         return f"{self.subject} - {self.email}"
 
 
+

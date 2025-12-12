@@ -78,3 +78,4 @@ def payment_success(request, booking_id):
     return render(request, 'payments/success.html', context)
 
 
+
