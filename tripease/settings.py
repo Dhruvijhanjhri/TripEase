@@ -18,7 +18,10 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-this-in-produc
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['dhruvijhanjhrinew.pythonanywhere.com','localhost', '127.0.0.1']
+# Extend allowed hosts via env without losing local/pythonanywhere defaults
+_default_hosts = ['dhruvijhanjhrinew.pythonanywhere.com', 'localhost', '127.0.0.1']
+_extra_hosts = os.environ.get('ALLOWED_HOSTS', '')
+ALLOWED_HOSTS = [h.strip() for h in (_default_hosts + _extra_hosts.split(',')) if h.strip()]
 
 
 # Application definition
