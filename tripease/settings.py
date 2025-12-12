@@ -4,6 +4,7 @@ Django settings for TripEase project.
 
 from pathlib import Path
 import os
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -18,10 +19,14 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-this-in-produc
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# Extend allowed hosts via env without losing local/pythonanywhere defaults
-_default_hosts = ['dhruvijhanjhrinew.pythonanywhere.com', 'localhost', '127.0.0.1']
-_extra_hosts = os.environ.get('ALLOWED_HOSTS', '')
-ALLOWED_HOSTS = [h.strip() for h in (_default_hosts + _extra_hosts.split(',')) if h.strip()]
+# Allowed hosts: defaults for local/pythonanywhere/render, overridable via env
+_default_hosts = ['localhost', '127.0.0.1', 'dhruvijhanjhrinew.pythonanywhere.com', 'tripease-y0yf.onrender.com']
+_env_hosts = os.getenv('ALLOWED_HOSTS', '')
+ALLOWED_HOSTS = [h.strip() for h in (_env_hosts.split(',') if _env_hosts else _default_hosts) if h.strip()]
+
+# Trusted origins for CSRF when running in production
+if not DEBUG:
+    CSRF_TRUSTED_ORIGINS = ['https://tripease-y0yf.onrender.com']
 
 
 # Application definition
@@ -77,24 +82,18 @@ WSGI_APPLICATION = 'tripease.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+_database_url = os.getenv('DATABASE_URL') or os.getenv('SUPABASE_DB_URL')
+if _database_url:
+    DATABASES = {
+        'default': dj_database_url.parse(_database_url, conn_max_age=600, ssl_require=True)
     }
-}
-
-# For PostgreSQL (uncomment when deploying)
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': os.environ.get('DB_NAME', 'tripease'),
-#         'USER': os.environ.get('DB_USER', 'postgres'),
-#         'PASSWORD': os.environ.get('DB_PASSWORD', ''),
-#         'HOST': os.environ.get('DB_HOST', 'localhost'),
-#         'PORT': os.environ.get('DB_PORT', '5432'),
-#     }
-# }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Password validation
