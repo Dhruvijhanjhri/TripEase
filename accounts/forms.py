@@ -79,6 +79,10 @@ class SignUpForm(UserCreationForm):
         user = super().save(commit=False)
         user.email = self.cleaned_data['email']
         user.username = self.cleaned_data['email']  # Use email as username
+        user.first_name = self.cleaned_data['first_name']
+        user.last_name = self.cleaned_data['last_name']
+        user.phone = self.cleaned_data['phone']
+        # Password is already set by UserCreationForm's save method
         if 'profile_photo' in self.cleaned_data and self.cleaned_data['profile_photo']:
             user.profile_photo = self.cleaned_data['profile_photo']
         if commit:

@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+import uuid
 
 
 class User(AbstractUser):
@@ -8,6 +9,7 @@ class User(AbstractUser):
     phone = models.CharField(max_length=15, blank=True)
     profile_photo = models.ImageField(upload_to='profile_photos/', blank=True, null=True)
     id_document = models.FileField(upload_to='id_documents/', blank=True, null=True)
+    user_id = models.UUIDField(null=True, blank=True, unique=True, editable=False, help_text='Supabase Auth user ID (UUID)')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
