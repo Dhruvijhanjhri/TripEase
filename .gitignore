@@ -46,7 +46,8 @@ Thumbs.db
 .env
 .env.local
 
-
+# Ignore datasets
+data/*.csv
 
 
 
