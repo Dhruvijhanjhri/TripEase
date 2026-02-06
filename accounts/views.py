@@ -3,7 +3,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
-from .forms import SignUpForm, LoginForm, ProfileUpdateForm
+from .forms import SignUpForm, LoginForm, ProfileUpdateForm, PasswordResetRequestForm
 from .models import User
 import logging
 import base64
@@ -270,5 +270,40 @@ def profile_view(request):
         form = ProfileUpdateForm(instance=request.user)
     
     return render(request, 'accounts/profile.html', {'form': form})
+
+
+def password_reset_view(request):
+    """
+    Password reset request view using Supabase Auth.
+
+    This view only triggers Supabase's password reset email flow.
+    Django's built-in password reset email is not used.
+    """
+    if request.method == 'POST':
+        form = PasswordResetRequestForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+
+            # Always respond with a generic message, regardless of outcome
+            if SUPABASE_AVAILABLE:
+                try:
+                    supabase = get_supabase_client()
+                    # Trigger Supabase password reset email.
+                    # Supabase will handle the actual password change flow.
+                    supabase.auth.reset_password_for_email(email)
+                    logger.info(f"Supabase password reset email requested for {email}")
+                except Exception as e:
+                    # Log the error but do not expose details to the user.
+                    logger.warning(f"Supabase password reset failed for {email}: {str(e)}")
+
+            messages.info(
+                request,
+                'If an account with that email exists, a password reset link has been sent.'
+            )
+            return redirect('accounts:login')
+    else:
+        form = PasswordResetRequestForm()
+
+    return render(request, 'accounts/password_reset.html', {'form': form})
 
 

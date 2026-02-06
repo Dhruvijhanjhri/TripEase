@@ -181,9 +181,9 @@ MESSAGE_TAGS = {
 # SUPABASE_ANON_KEY=your-anon-key-here
 # SUPABASE_SERVICE_ROLE_KEY=your-service-role-key-here (optional, for admin operations)
 
-SUPABASE_URL = os.environ.get('SUPABASE_URL', 'https://cakngwyybeqlxdolbdqh.supabase.co')
-SUPABASE_ANON_KEY = os.environ.get('SUPABASE_ANON_KEY', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNha25nd3l5YmVxbHhkb2xiZHFoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU1NDA1OTksImV4cCI6MjA4MTExNjU5OX0.3hJG4rwakV7w0_PRth7JtkHKAb60GVSjngVAL1SAZe4')
-SUPABASE_SERVICE_ROLE_KEY = os.environ.get('SUPABASE_SERVICE_ROLE_KEY', '')
+SUPABASE_URL = os.environ.get('SUPABASE_URL')
+SUPABASE_ANON_KEY = os.environ.get('SUPABASE_ANON_KEY')
+SUPABASE_SERVICE_ROLE_KEY = os.environ.get('SUPABASE_SERVICE_ROLE_KEY')
 
 # Enable Supabase integration only if keys are configured
 SUPABASE_ENABLED = bool(SUPABASE_URL and SUPABASE_ANON_KEY)

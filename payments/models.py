@@ -36,3 +36,6 @@ class Payment(models.Model):
 
 
 
+
+
+

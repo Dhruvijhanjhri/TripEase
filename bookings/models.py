@@ -62,3 +62,6 @@ class Booking(models.Model):
 
 
 
+
+
+

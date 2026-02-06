@@ -1,5 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.core.exceptions import ValidationError
+from django.contrib.auth.password_validation import validate_password
 from .models import User
 
 
@@ -149,4 +151,60 @@ class ProfileUpdateForm(forms.ModelForm):
                 'placeholder': 'Phone number'
             }),
         }
+
+
+class PasswordResetRequestForm(forms.Form):
+    """Form for requesting a password reset via Supabase."""
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter your email',
+            'autocomplete': 'email'
+        })
+    )
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        # Do not reveal whether the email exists; just validate format.
+        if not email:
+            raise ValidationError('Please enter a valid email address.')
+        return email
+
+
+class PasswordResetConfirmForm(forms.Form):
+    """Form for setting a new password after Supabase reset link."""
+    new_password1 = forms.CharField(
+        label='New password',
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter new password',
+            'autocomplete': 'new-password'
+        })
+    )
+    new_password2 = forms.CharField(
+        label='Confirm new password',
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Confirm new password',
+            'autocomplete': 'new-password'
+        })
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        password1 = cleaned_data.get('new_password1')
+        password2 = cleaned_data.get('new_password2')
+
+        if password1 and password2 and password1 != password2:
+            raise ValidationError('The two password fields didn’t match.')
+
+        if password1:
+            try:
+                validate_password(password1)
+            except ValidationError as e:
+                self.add_error('new_password1', e)
+
+        return cleaned_data
+
 
