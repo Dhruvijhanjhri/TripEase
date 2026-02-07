@@ -5,5 +5,10 @@ gunicorn>=21.2.0
 dj-database-url>=2.2.0
 supabase>=2.0.0
 
+# ML (Step 5: training scripts in /ml and /ml_models)
+pandas>=1.5.0
+scikit-learn>=1.2.0
+joblib>=1.2.0
+
 
 
