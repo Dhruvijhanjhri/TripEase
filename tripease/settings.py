@@ -83,18 +83,27 @@ WSGI_APPLICATION = 'tripease.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 _database_url = os.getenv('DATABASE_URL') or os.getenv('SUPABASE_DB_URL')
-if _database_url:
-    DATABASES = {
-        'default': dj_database_url.parse(_database_url, conn_max_age=600, ssl_require=True)
+# if _database_url:
+#     DATABASES = {
+#         'default': dj_database_url.parse(_database_url, conn_max_age=600, ssl_require=True)
+#     }
+# else:
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.sqlite3',
+#             'NAME': BASE_DIR / 'db.sqlite3',
+#         }
+#     }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'tripease_db',
+        'USER': 'tripease_user',
+        'PASSWORD': 'password123',
+        'HOST': 'localhost',
+        'PORT': '3306',
     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
-
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
