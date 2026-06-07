@@ -1,15 +1,11 @@
 from django.urls import path
 from . import views
 
-app_name = 'flights'
+app_name = "flights"
 
 urlpatterns = [
-    path('search/', views.flight_search, name='search'),
-    path('<int:flight_id>/', views.flight_detail, name='detail'),
+    path("search/", views.flight_search, name="search"),
+
+    # NEW
+    path("flight/<int:flight_id>/", views.flight_detail, name="flight_detail"),
 ]
-
-
-
-
-
-

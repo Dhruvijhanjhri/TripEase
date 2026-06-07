@@ -30,6 +30,7 @@ class Passenger(models.Model):
 
 class Booking(models.Model):
     """Booking model"""
+
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('confirmed', 'Confirmed'),
@@ -37,13 +38,43 @@ class Booking(models.Model):
         ('completed', 'Completed'),
     ]
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bookings')
-    flight = models.ForeignKey(Flight, on_delete=models.CASCADE, related_name='bookings')
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='bookings'
+    )
+
+    flight = models.ForeignKey(
+        Flight,
+        on_delete=models.CASCADE,
+        related_name='bookings'
+    )
+
     cabin_class = models.CharField(max_length=20)
+
     number_of_passengers = models.IntegerField()
-    total_price = models.DecimalField(max_digits=10, decimal_places=2)
-    booking_status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-    booking_reference = models.CharField(max_length=20, unique=True)
+
+    total_price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2
+    )
+
+    travel_date = models.DateField(
+        null=True,
+        blank=True
+    )
+
+    booking_status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='pending'
+    )
+
+    booking_reference = models.CharField(
+        max_length=20,
+        unique=True
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -57,11 +88,12 @@ class Booking(models.Model):
         if not self.booking_reference:
             import random
             import string
-            self.booking_reference = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+
+            self.booking_reference = ''.join(
+                random.choices(
+                    string.ascii_uppercase + string.digits,
+                    k=8
+                )
+            )
+
         super().save(*args, **kwargs)
-
-
-
-
-
-

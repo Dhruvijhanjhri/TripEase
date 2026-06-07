@@ -55,14 +55,14 @@
     
     {% if user.is_authenticated %}
         <div style="text-align: center;">
-            <a href="{% url 'bookings:create' flight.id %}?cabin_class={{ cabin_class }}&passengers={{ passengers }}" 
-               class="btn btn-primary" style="font-size: 1.1rem; padding: 14px 30px;">
+            <a href="{% url 'bookings:create' flight.id %}?cabin_class={{ cabin_class }}&passengers={{ passengers }}&departure_date={{ departure_date }}" 
+                class="btn btn-primary" style="font-size: 1.1rem; padding: 14px 30px;">
                 Book Now
             </a>
         </div>
     {% else %}
         <div style="text-align: center; padding: 20px; background: #f8fafc; border-radius: 10px;">
-            <p>Please <a href="{% url 'accounts:login' %}?next={% url 'flights:detail' flight.id %}?cabin_class={{ cabin_class }}&passengers={{ passengers }}">sign in</a> to book this flight.</p>
+            <p>Please <a href="{% url 'accounts:login' %}?next={% url 'flights:detail' flight.id %}?cabin_class={{ cabin_class }}&passengers={{ passengers }}&departure_date={{ departure_date }}">sign in</a> to book this flight.</p>
         </div>
     {% endif %}
 </div>

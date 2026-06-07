@@ -96,12 +96,8 @@ _database_url = os.getenv('DATABASE_URL') or os.getenv('SUPABASE_DB_URL')
 #     }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'tripease_db',
-        'USER': 'tripease_user',
-        'PASSWORD': 'password123',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
