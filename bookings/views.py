@@ -12,38 +12,103 @@ from .forms import PassengerFormSet
 
 @login_required
 def create_booking(request, flight_id):
-    """Create booking view"""
+    """Create booking"""
 
-    flight = get_object_or_404(Flight, id=flight_id)
+    flight = get_object_or_404(
+        Flight,
+        id=flight_id
+    )
 
-    cabin_class = request.GET.get('cabin_class', 'economy')
-    passengers = int(request.GET.get('passengers', 1))
+    cabin_class = request.GET.get(
+    'cabin_class',
+    'economy'
+    ).strip()
 
-    # Get selected travel date
-    departure_date = request.GET.get('departure_date')
+    passengers = int(
+        request.GET.get(
+            'passengers',
+            1
+        )
+    )
+
+    departure_date = request.GET.get(
+        'departure_date'
+    )
+
+    is_via = request.GET.get(
+    'is_via',
+    ''
+    ).strip()
+
+    second_leg_id = request.GET.get(
+    'second_leg_id',
+    ''
+    ).strip()
+
+    second_leg = None
 
     travel_date = None
 
     if departure_date:
         try:
             travel_date = datetime.strptime(
-                departure_date,
+                departure_date.strip(),
                 "%Y-%m-%d"
             ).date()
         except:
             travel_date = None
 
-    price = flight.get_price(cabin_class)
-    total_price = price * passengers
+    # -------------------------
+    # PRICE CALCULATION FIX
+    # -------------------------
+
+    if is_via and second_leg_id:
+
+        second_leg = get_object_or_404(
+            Flight,
+            id=second_leg_id
+        )
+
+        first_leg_price = flight.get_price(
+            cabin_class
+        )
+
+        second_leg_price = second_leg.get_price(
+            cabin_class
+        )
+
+        price = (
+            first_leg_price +
+            second_leg_price
+        )
+
+    else:
+
+        price = flight.get_price(
+            cabin_class
+        )
+
+    total_price = (
+        price * passengers
+    )
+
+    # -------------------------
+    # POST REQUEST
+    # -------------------------
 
     if request.method == 'POST':
 
-        formset = PassengerFormSet(request.POST)
+        formset = PassengerFormSet(
+            request.POST
+        )
 
         if formset.is_valid():
 
-            # Check seats
-            if flight.available_seats < passengers:
+            # seat check
+            if (
+                flight.available_seats
+                < passengers
+            ):
                 messages.error(
                     request,
                     'Not enough seats available.'
@@ -54,10 +119,24 @@ def create_booking(request, flight_id):
                     flight_id=flight_id
                 )
 
+            if second_leg:
+                if (
+                    second_leg.available_seats
+                    < passengers
+                ):
+                    messages.error(
+                        request,
+                        'Not enough seats on connecting flight.'
+                    )
+
+                    return redirect(
+                        'flights:flight_detail',
+                        flight_id=flight_id
+                    )
+
             try:
                 with transaction.atomic():
 
-                    # Create booking
                     booking = Booking.objects.create(
                         user=request.user,
                         flight=flight,
@@ -68,21 +147,27 @@ def create_booking(request, flight_id):
                         booking_status='pending'
                     )
 
-                    # Create passengers
                     for form in formset:
+
                         if form.cleaned_data:
+
                             Passenger.objects.create(
                                 booking=booking,
                                 **form.cleaned_data
                             )
 
-                    # Reduce seats
+                    # reduce seats
                     flight.available_seats -= passengers
                     flight.save()
 
+                    if second_leg:
+                        second_leg.available_seats -= passengers
+                        second_leg.save()
+
                     messages.success(
                         request,
-                        f'Booking created successfully! Reference: {booking.booking_reference}'
+                        f'Booking created successfully! '
+                        f'Reference: {booking.booking_reference}'
                     )
 
                     return redirect(
@@ -91,23 +176,31 @@ def create_booking(request, flight_id):
                     )
 
             except Exception as e:
+
                 messages.error(
                     request,
                     f'Error creating booking: {str(e)}'
                 )
 
     else:
+
         formset = PassengerFormSet(
-            initial=[{} for _ in range(passengers)]
+            initial=[
+                {}
+                for _ in range(passengers)
+            ]
         )
 
     context = {
         'flight': flight,
+        'second_leg': second_leg,
         'cabin_class': cabin_class,
         'passengers': passengers,
         'price': price,
         'total_price': total_price,
         'formset': formset,
+        'is_via': is_via,
+        'second_leg_id': second_leg_id,
     }
 
     return render(

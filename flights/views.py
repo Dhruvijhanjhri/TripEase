@@ -286,15 +286,16 @@ def flight_detail(request, flight_id):
         )
 
     context = {
-        "flight": flight,
-        "second_leg": second_leg,
-        "cabin_class": cabin_class.title(),
-        "passengers": passengers,
-        "departure_date": departure_date,
-        "total_price": total_price,
-        "total_duration": total_duration,
-        "is_via": is_via,
-    }
+    'flight': flight,
+    'second_leg': second_leg,
+    'is_via': is_via,
+    'price': total_price,
+    'total_price': total_price,
+    'cabin_class': cabin_class,
+    'passengers': passengers,
+    'departure_date': departure_date,
+    'total_duration': total_duration,
+}
 
     return render(
         request,

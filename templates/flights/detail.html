@@ -221,14 +221,14 @@ Flight Details
     <!-- BOOK NOW -->
     <div style="margin-top:30px;">
 
-        <a href="{% url 'bookings:create' flight.id %}?cabin_class={{ cabin_class }}&passengers={{ passengers }}">
-
+        <a href="{% url 'bookings:create' flight.id %}?cabin_class={{ cabin_class }}&passengers={{ passengers }}&departure_date={{ departure_date }}{% if is_via %}&is_via=1&second_leg_id={{ second_leg.id }}{% endif %}">
+            
             <button type="button">
                 Book Now
             </button>
-
         </a>
 
+            
     </div>
 
 </div>
