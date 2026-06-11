@@ -79,9 +79,3 @@ class Flight(models.Model):
             return f"{hours}h"
         else:
             return f"{minutes}m"
-
-
-
-
-
-

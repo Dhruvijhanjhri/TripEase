@@ -1,18 +1,18 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+from datetime import datetime, timedelta
 
-import flights
 from .models import Flight
 from .forms import FlightSearchForm
-from django.shortcuts import render, get_object_or_404
 
 
 def flight_search(request):
-    """Flight search view"""
 
     form = FlightSearchForm(request.GET or None)
 
-    flights = []
+    direct_flights = []
+    via_flights = []
     search_performed = False
+
     cabin_class = "economy"
     passengers = 1
 
@@ -21,92 +21,284 @@ def flight_search(request):
         source = form.cleaned_data["source"]
         destination = form.cleaned_data["destination"]
         departure_date = form.cleaned_data["departure_date"]
-        cabin_class = form.cleaned_data.get("cabin_class", "economy")
-        passengers = form.cleaned_data.get("passengers", 1)
+        cabin_class = form.cleaned_data["cabin_class"]
+        passengers = form.cleaned_data["passengers"]
 
         search_performed = True
 
-        # Prevent same source and destination
         if source == destination:
-            form.add_error(None, "Source and destination cannot be the same")
+
+            form.add_error(
+                None,
+                "Source and destination cannot be same"
+            )
 
         else:
-            flights = Flight.objects.filter(
-            source=source,
-            destination=destination,
-            available_seats__gte=passengers
-        ).order_by("departure_time")[:20]
 
+            # ==================================
+            # DIRECT FLIGHTS
+            # ==================================
 
-        # Dynamically update dates to searched date
-        for flight in flights:
-            flight.departure_time = flight.departure_time.replace(
-                year=departure_date.year,
-                month=departure_date.month,
-                day=departure_date.day
+            direct_flights = list(
+                Flight.objects.filter(
+                    source=source,
+                    destination=destination,
+                    available_seats__gte=passengers
+                )
+                .order_by("departure_time")[:20]
             )
 
-            flight.arrival_time = flight.arrival_time.replace(
-                year=departure_date.year,
-                month=departure_date.month,
-                day=departure_date.day
-            )
+            for flight in direct_flights:
 
-            flight.price = flight.get_price(cabin_class)
+                flight.display_departure = (
+                    flight.departure_time.replace(
+                        year=departure_date.year,
+                        month=departure_date.month,
+                        day=departure_date.day
+                    )
+                )
 
-            # Add price dynamically
-            for flight in flights:
-                flight.price = flight.get_price(cabin_class)
+                flight.display_arrival = (
+                    flight.arrival_time.replace(
+                        year=departure_date.year,
+                        month=departure_date.month,
+                        day=departure_date.day
+                    )
+                )
+
+                flight.price = (
+                    flight.get_price(cabin_class)
+                    * passengers
+                )
+
+            # ==================================
+            # VIA FLIGHTS (REALISTIC)
+            # ==================================
+
+            first_legs = Flight.objects.filter(
+                source=source,
+                available_seats__gte=passengers
+            ).exclude(
+                destination=destination
+            ).order_by("departure_time")[:20]
+
+            for first_leg in first_legs:
+
+                layover_min = 60
+                layover_max = 480
+
+                earliest_departure = (
+                    first_leg.arrival_time
+                    + timedelta(minutes=layover_min)
+                )
+
+                latest_departure = (
+                    first_leg.arrival_time
+                    + timedelta(minutes=layover_max)
+                )
+
+                second_leg = Flight.objects.filter(
+                    source=first_leg.destination,
+                    destination=destination,
+                    available_seats__gte=passengers,
+                    departure_time__gte=earliest_departure,
+                    departure_time__lte=latest_departure
+                ).order_by("departure_time").first()
+
+                if second_leg:
+
+                    total_price = (
+                        first_leg.get_price(cabin_class)
+                        +
+                        second_leg.get_price(cabin_class)
+                    ) * passengers
+
+                    total_duration = int(
+                        (
+                            second_leg.arrival_time
+                            -
+                            first_leg.departure_time
+                        ).total_seconds() / 60
+                    )
+
+                    via_flights.append({
+                        "first_leg": first_leg,
+                        "second_leg": second_leg,
+                        "total_price": total_price,
+                        "total_duration": total_duration,
+                    })
+
+            via_flights = via_flights[:10]
 
     context = {
         "form": form,
-        "flights": flights,
+        "direct_flights": direct_flights,
+        "via_flights": via_flights,
         "search_performed": search_performed,
         "cabin_class": cabin_class,
         "passengers": passengers,
     }
 
-    return render(request, "flights/search.html", context)
+    return render(
+        request,
+        "flights/search.html",
+        context
+    )
+
 
 def flight_detail(request, flight_id):
-    """Show detailed information about a flight"""
 
-    flight = get_object_or_404(Flight, id=flight_id)
+    flight = get_object_or_404(
+        Flight,
+        id=flight_id
+    )
 
-    cabin_class = request.GET.get("cabin_class", "economy")
-    passengers = request.GET.get("passengers", 1)
-    departure_date = request.GET.get("departure_date")
+    cabin_class = request.GET.get(
+        "cabin_class",
+        "economy"
+    ).strip()
 
-    # Update displayed date if searched date exists
+    passengers = int(
+        request.GET.get(
+            "passengers",
+            1
+        )
+    )
+
+    departure_date = request.GET.get(
+        "departure_date",
+        ""
+    ).strip()
+
+    is_via = request.GET.get(
+        "is_via"
+    )
+
+    second_leg = None
+    total_price = 0
+    total_duration = 0
+
+    selected_date = None
+
     if departure_date:
-        from datetime import datetime
 
         selected_date = datetime.strptime(
             departure_date,
             "%Y-%m-%d"
         ).date()
 
-        flight.departure_time = flight.departure_time.replace(
-            year=selected_date.year,
-            month=selected_date.month,
-            day=selected_date.day
+    # ==================================
+    # VIA FLIGHT DETAILS
+    # ==================================
+
+    if is_via:
+
+        second_leg_id = request.GET.get(
+            "second_leg_id"
         )
 
-        flight.arrival_time = flight.arrival_time.replace(
-            year=selected_date.year,
-            month=selected_date.month,
-            day=selected_date.day
+        if second_leg_id:
+
+            second_leg = get_object_or_404(
+                Flight,
+                id=second_leg_id
+            )
+
+        if selected_date:
+
+            flight.departure_time = (
+                flight.departure_time.replace(
+                    year=selected_date.year,
+                    month=selected_date.month,
+                    day=selected_date.day
+                )
+            )
+
+            flight.arrival_time = (
+                flight.arrival_time.replace(
+                    year=selected_date.year,
+                    month=selected_date.month,
+                    day=selected_date.day
+                )
+            )
+
+            if second_leg:
+
+                second_leg.departure_time = (
+                    second_leg.departure_time.replace(
+                        year=selected_date.year,
+                        month=selected_date.month,
+                        day=selected_date.day
+                    )
+                )
+
+                second_leg.arrival_time = (
+                    second_leg.arrival_time.replace(
+                        year=selected_date.year,
+                        month=selected_date.month,
+                        day=selected_date.day
+                    )
+                )
+
+        total_price = (
+            flight.get_price(cabin_class)
+            +
+            second_leg.get_price(cabin_class)
+        ) * passengers
+
+        total_duration = (
+            flight.duration_minutes
+            +
+            second_leg.duration_minutes
         )
 
-    price = flight.get_price(cabin_class)
+    # ==================================
+    # DIRECT FLIGHT DETAILS
+    # ==================================
+
+    else:
+
+        if selected_date:
+
+            flight.departure_time = (
+                flight.departure_time.replace(
+                    year=selected_date.year,
+                    month=selected_date.month,
+                    day=selected_date.day
+                )
+            )
+
+            flight.arrival_time = (
+                flight.arrival_time.replace(
+                    year=selected_date.year,
+                    month=selected_date.month,
+                    day=selected_date.day
+                )
+            )
+
+        total_price = (
+            flight.get_price(cabin_class)
+            * passengers
+        )
+
+        total_duration = (
+            flight.duration_minutes
+        )
 
     context = {
         "flight": flight,
-        "price": price,
-        "cabin_class": cabin_class,
+        "second_leg": second_leg,
+        "cabin_class": cabin_class.title(),
         "passengers": passengers,
         "departure_date": departure_date,
+        "total_price": total_price,
+        "total_duration": total_duration,
+        "is_via": is_via,
     }
 
-    return render(request, "flights/detail.html", context)
-    
+    return render(
+        request,
+        "flights/detail.html",
+        context
+    )
+

@@ -1,202 +1,153 @@
 from flights.models import Airport, Flight
-from datetime import datetime, timedelta
-from random import randint, choice
-from decimal import Decimal
 from django.utils import timezone
+from datetime import timedelta
+from decimal import Decimal
+import random
+import uuid
 
-# Hub airports
+print("Generating realistic flight schedules...")
+
+# Clear old flights
+Flight.objects.all().delete()
+
 HUBS = ['DEL', 'BOM', 'BLR', 'HYD', 'MAA', 'CCU']
 
-# Airlines
-AIRLINES = {
-    'Indigo': '6E',
-    'Air India': 'AI',
-    'Akasa Air': 'QP',
-    'SpiceJet': 'SG',
-    'Air India Express': 'IX'
-}
-
-# Existing flight numbers
-existing_numbers = set(
-    Flight.objects.values_list(
-        'flight_number',
-        flat=True
-    )
-)
-
-
-def generate_unique_flight_number(
-    airline_code
-):
-    """Generate unique flight number fast"""
-
-    while True:
-        number = (
-            f"{airline_code}-"
-            f"{randint(1000,9999)}"
-        )
-
-        if number not in existing_numbers:
-            existing_numbers.add(number)
-            return number
-
+AIRLINES = [
+    ("6E", "Indigo"),
+    ("AI", "Air India"),
+    ("SG", "SpiceJet"),
+    ("QP", "Akasa Air"),
+    ("IX", "Air India Express"),
+    ("UK", "Vistara"),
+]
 
 airports = {
     airport.code: airport
     for airport in Airport.objects.all()
 }
 
-created_count = 0
+today = timezone.now()
+
 new_flights = []
-
-print("Generating routes...")
-
-# Only 15 days
-DAYS_TO_GENERATE = 15
+created_count = 0
 
 for source_code, source_airport in airports.items():
 
-    # Route logic
+    # Hub logic
     if source_code in HUBS:
         destinations = [
             code for code in airports.keys()
             if code != source_code
         ]
     else:
-        destinations = [
-            hub for hub in HUBS
-            if hub != source_code
-            and hub in airports
-        ]
+        destinations = HUBS.copy()
 
     for destination_code in destinations:
 
-        destination_airport = (
-            airports[destination_code]
-        )
+        if source_code == destination_code:
+            continue
 
-        for day in range(
-            DAYS_TO_GENERATE
-        ):
+        destination_airport = airports[destination_code]
 
-            base_date = (
-                timezone.now() +
-                timedelta(days=day)
-            )
+        # Next 90 days
+        for day in range(90):
 
-            flights_per_day = randint(
-                1, 2
-            )
+            travel_date = today + timedelta(days=day)
 
-            for _ in range(
-                flights_per_day
-            ):
+            # 2–4 flights/day
+            flights_per_day = random.randint(2, 4)
 
-                airline = choice(
-                    list(AIRLINES.keys())
-                )
+            for _ in range(flights_per_day):
 
-                airline_code = (
-                    AIRLINES[airline]
-                )
-
-                departure_hour = randint(
-                    5, 22
-                )
-
-                departure_minute = choice(
+                departure_hour = random.randint(5, 22)
+                departure_minute = random.choice(
                     [0, 15, 30, 45]
                 )
 
-                departure_time = (
-                    timezone.make_aware(
-                        datetime(
-                            base_date.year,
-                            base_date.month,
-                            base_date.day,
-                            departure_hour,
-                            departure_minute
-                        )
+                departure_time = timezone.make_aware(
+                    timezone.datetime(
+                        travel_date.year,
+                        travel_date.month,
+                        travel_date.day,
+                        departure_hour,
+                        departure_minute
                     )
                 )
 
-                duration = randint(
-                    60, 240
-                )
+                duration = random.randint(60, 240)
 
                 arrival_time = (
                     departure_time +
-                    timedelta(
-                        minutes=duration
-                    )
+                    timedelta(minutes=duration)
                 )
 
-                base_price = randint(
-                    2500, 9000
+                base_price = random.randint(
+                    2500,
+                    9000
                 )
 
-                flight = Flight(
-                    flight_number=
-                    generate_unique_flight_number(
-                        airline_code
-                    ),
+                code_prefix, airline = random.choice(
+                    AIRLINES
+                )
 
-                    airline=airline,
+                # GUARANTEED UNIQUE
+                unique_id = uuid.uuid4().hex[:8]
 
-                    source=
-                    source_airport,
-
-                    destination=
-                    destination_airport,
-
-                    departure_time=
-                    departure_time,
-
-                    arrival_time=
-                    arrival_time,
-
-                    duration_minutes=
-                    duration,
-
-                    economy_price=
-                    Decimal(base_price),
-
-                    business_price=
-                    Decimal(base_price * 2.2),
-
-                    first_class_price=
-                    Decimal(base_price * 4),
-
-                    total_seats=180,
-
-                    available_seats=
-                    randint(30, 180),
-
-                    is_non_stop=True
+                flight_number = (
+                    f"{code_prefix}-"
+                    f"{source_code}"
+                    f"{destination_code}-"
+                    f"{unique_id}"
                 )
 
                 new_flights.append(
-                    flight
+                    Flight(
+                        flight_number=flight_number,
+                        airline=airline,
+                        source=source_airport,
+                        destination=destination_airport,
+                        departure_time=departure_time,
+                        arrival_time=arrival_time,
+                        duration_minutes=duration,
+                        economy_price=Decimal(base_price),
+                        business_price=Decimal(
+                            base_price * 1.8
+                        ),
+                        first_class_price=Decimal(
+                            base_price * 3
+                        ),
+                        total_seats=180,
+                        available_seats=random.randint(
+                            40,
+                            180
+                        ),
+                        is_non_stop=True
+                    )
                 )
 
                 created_count += 1
 
+                # Batch insert for speed
+                if len(new_flights) >= 1000:
+                    Flight.objects.bulk_create(
+                        new_flights,
+                        batch_size=1000
+                    )
+                    print(
+                        f"Created {created_count} flights..."
+                    )
+                    new_flights = []
 
-print(
-    f"Creating {created_count} flights..."
-)
+# Insert remaining
+if new_flights:
+    Flight.objects.bulk_create(
+        new_flights,
+        batch_size=1000
+    )
 
-# BULK INSERT (super fast)
-Flight.objects.bulk_create(
-    new_flights,
-    batch_size=1000
-)
-
-print("\nDone!")
+print("Done!")
+print("Created:", created_count)
 print(
-    f"Created {created_count} flights"
-)
-print(
-    "Total flights:",
+    "Total Flights:",
     Flight.objects.count()
 )
