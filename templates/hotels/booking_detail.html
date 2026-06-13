@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2>
+        Hotel Booking Details
+    </h2>
+
+    <hr>
+
+    <div class="card p-4 shadow-sm">
+
+        <h4>
+            Booking Reference:
+            {{ booking.booking_reference }}
+        </h4>
+
+        <p>
+            <strong>Hotel:</strong>
+            {{ booking.hotel.name }}
+        </p>
+
+        <p>
+            <strong>Room:</strong>
+            {{ booking.room.room_name }}
+        </p>
+
+        <p>
+            <strong>Location:</strong>
+            {{ booking.hotel.city }},
+            {{ booking.hotel.state }}
+        </p>
+
+        <p>
+            <strong>Check In:</strong>
+            {{ booking.check_in_date }}
+        </p>
+
+        <p>
+            <strong>Check Out:</strong>
+            {{ booking.check_out_date }}
+        </p>
+
+        <p>
+            <strong>Guests:</strong>
+            {{ booking.guests }}
+        </p>
+
+        <p>
+            <strong>Rooms:</strong>
+            {{ booking.rooms_count }}
+        </p>
+
+        <h3>
+            ₹{{ booking.total_price }}
+        </h3>
+
+        <a
+            href="{% url 'payments:hotel_payment' booking.id %}"
+            class="btn btn-success"
+        >
+            Complete Payment
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

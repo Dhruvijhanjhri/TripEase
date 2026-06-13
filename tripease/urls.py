@@ -14,6 +14,7 @@ urlpatterns = [
     path('bookings/', include('bookings.urls')),
     path('payments/', include('payments.urls')),
     path('contact/', include('contact.urls')),
+    path('hotels/', include('hotels.urls')),
 ]
 
 # Serve media files in development
