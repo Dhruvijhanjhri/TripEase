@@ -1,4 +1,7 @@
 from django import forms
+from django.forms import modelformset_factory
+
+from .models import HotelGuest
 
 
 class HotelSearchForm(forms.Form):
@@ -55,3 +58,42 @@ class HotelSearchForm(forms.Form):
             }
         )
     )
+
+
+class HotelGuestForm(forms.ModelForm):
+
+    class Meta:
+        model = HotelGuest
+
+        fields = [
+            "full_name",
+            "age",
+            "gender"
+        ]
+
+        widgets = {
+            "full_name": forms.TextInput(
+                attrs={
+                    "class": "form-control"
+                }
+            ),
+
+            "age": forms.NumberInput(
+                attrs={
+                    "class": "form-control"
+                }
+            ),
+
+            "gender": forms.Select(
+                attrs={
+                    "class": "form-control"
+                }
+            ),
+        }
+
+
+HotelGuestFormSet = modelformset_factory(
+    HotelGuest,
+    form=HotelGuestForm,
+    extra=1
+)
