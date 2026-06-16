@@ -1,5 +1,4 @@
 from datetime import datetime
-from django.db.models import Q
 
 from django.shortcuts import (
     render,
@@ -13,21 +12,18 @@ from django.contrib.auth.decorators import (
 
 from django.contrib import messages
 
-from .models import (
-    Hotel,
-    Room,
-    HotelBooking,
-    HotelGuest
-)
+from .models import Hotel
+from .models import Room
+from .models import HotelBooking
+from .models import HotelGuest
 
 from .forms import HotelSearchForm
+from .forms import HotelGuestFormSet
 
-
-# ==========================================
-# HOTEL SEARCH
-# ==========================================
 
 def hotel_search(request):
+    print("NEW HOTEL SEARCH RUNNING")
+    """Search hotels"""
 
     form = HotelSearchForm(
         request.GET or None
@@ -60,31 +56,26 @@ def hotel_search(request):
             "rooms"
         ]
 
-        hotels_queryset = Hotel.objects.filter(
-
-            Q(city__icontains=destination) |
-
-            Q(state__icontains=destination) |
-
-            Q(area__icontains=destination) |
-
-            Q(search_keywords__icontains=destination)
-
+        hotels = Hotel.objects.filter(
+            search_keywords__icontains=destination
         ).prefetch_related(
             "rooms"
         )
 
         filtered_hotels = []
 
-        for hotel in hotels_queryset:
+        for hotel in hotels:
 
-            room = hotel.rooms.filter(
-                available_rooms__gt=0
+            available_room = hotel.rooms.filter(
+                available_rooms__gte=rooms,
+                max_guests__gte=guests
             ).first()
 
-            if room:
+            if available_room:
 
-                hotel.display_room = room
+                hotel.display_room = (
+                    available_room
+                )
 
                 filtered_hotels.append(
                     hotel
@@ -105,11 +96,11 @@ def hotel_search(request):
     )
 
 
-# ==========================================
-# HOTEL DETAIL
-# ==========================================
-
-def hotel_detail(request, hotel_id):
+def hotel_detail(
+    request,
+    hotel_id
+):
+    """Hotel detail page"""
 
     hotel = get_object_or_404(
         Hotel,
@@ -122,23 +113,7 @@ def hotel_detail(request, hotel_id):
 
     context = {
         "hotel": hotel,
-        "rooms": rooms,
-
-        "check_in": request.GET.get(
-            "check_in"
-        ),
-
-        "check_out": request.GET.get(
-            "check_out"
-        ),
-
-        "guests": request.GET.get(
-            "guests"
-        ),
-
-        "rooms_count": request.GET.get(
-            "rooms"
-        )
+        "rooms": rooms
     }
 
     return render(
@@ -148,15 +123,12 @@ def hotel_detail(request, hotel_id):
     )
 
 
-# ==========================================
-# HOTEL BOOKING
-# ==========================================
-
 @login_required
 def hotel_booking(
     request,
     room_id
 ):
+    """Create hotel booking"""
 
     room = get_object_or_404(
         Room,
@@ -171,26 +143,19 @@ def hotel_booking(
         "check_out"
     )
 
-    guests = request.GET.get(
-        "guests"
+    guests = int(
+        request.GET.get(
+            "guests",
+            1
+        )
     )
 
-    rooms_count = request.GET.get(
-        "rooms"
+    rooms_count = int(
+        request.GET.get(
+            "rooms",
+            1
+        )
     )
-
-   
-    # safer conversion
-    try:
-        guests = int(guests)
-    except (TypeError, ValueError):
-        guests = 1
-
-
-    try:
-        rooms_count = int(rooms_count)
-    except (TypeError, ValueError):
-        rooms_count = 1
 
     nights = 1
 
@@ -222,18 +187,6 @@ def hotel_booking(
 
     if request.method == "POST":
 
-        if not check_in_date or not check_out_date:
-
-            messages.error(
-                request,
-                "Please select check-in and check-out dates."
-            )
-
-            return redirect(
-                "hotels:detail",
-                hotel_id=room.hotel.id
-            )
-
         if room.available_rooms < rooms_count:
 
             messages.error(
@@ -247,24 +200,17 @@ def hotel_booking(
             )
 
         booking = HotelBooking.objects.create(
-
             user=request.user,
-
             hotel=room.hotel,
-
             room=room,
-
             check_in_date=check_in_date,
-
             check_out_date=check_out_date,
-
             guests=guests,
-
             rooms_count=rooms_count,
-
             total_price=total_price
         )
 
+        # reduce room count
         room.available_rooms -= (
             rooms_count
         )
@@ -298,15 +244,12 @@ def hotel_booking(
     )
 
 
-# ==========================================
-# BOOKING DETAIL
-# ==========================================
-
 @login_required
 def hotel_booking_detail(
     request,
     booking_id
 ):
+    """Hotel booking details"""
 
     booking = get_object_or_404(
         HotelBooking,
@@ -323,4 +266,3 @@ def hotel_booking_detail(
         "hotels/booking_detail.html",
         context
     )
-

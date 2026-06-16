@@ -233,18 +233,17 @@ def booking_detail(request, booking_id):
 
 @login_required
 def booking_list(request):
-    """User booking list"""
 
-    bookings = Booking.objects.filter(
+    from hotels.models import HotelBooking
+
+    hotel_bookings = HotelBooking.objects.filter(
         user=request.user
-    ).order_by('-created_at')
-
-    context = {
-        'bookings': bookings,
-    }
+    )
 
     return render(
         request,
         'bookings/list.html',
-        context
+        {
+            'hotel_bookings': hotel_bookings
+        }
     )
