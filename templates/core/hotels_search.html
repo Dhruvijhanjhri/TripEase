@@ -17,7 +17,7 @@
 <section class="section">
     <div class="container">
         <div class="modal-content" style="max-width: 800px; margin: 0 auto;">
-            <form method="GET" action="{% url 'core:hotels_search' %}" class="auth-form">
+            <form method="GET" action="{% url 'hotels:search' %}" class="auth-form">
                 <div class="form-row">
                     <div class="form-group">
                         <label for="city">City</label>
@@ -60,7 +60,7 @@
         <h2 class="section-title">Available Hotels in {{ city }}</h2>
         <div class="card-grid">
             {% for hotel in hotels %}
-            <article class="card" style="cursor: pointer;" onclick="window.location='{% url 'core:hotel_detail' hotel.id %}?city={{ city }}&check_in={{ check_in }}&check_out={{ check_out }}&guests={{ guests }}'">
+            <article class="card" style="cursor: pointer;" onclick="window.location='{% url 'core:detail' hotel.id %}?city={{ city }}&check_in={{ check_in }}&check_out={{ check_out }}&guests={{ guests }}'">
                 <img src="{% static hotel.image %}" alt="{{ hotel.name }}" class="card-img" style="height: 200px; object-fit: cover;" />
                 <div class="card-body">
                     <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">

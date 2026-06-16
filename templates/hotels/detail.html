@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+{{ hotel.name }}
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="row">
+
+        <div class="col-lg-7">
+
+            <img
+                src="{% if hotel.image_url %}{{ hotel.image_url }}{% else %}https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200{% endif %}"
+                class="img-fluid rounded shadow"
+                style="
+                    width:100%;
+                    height:450px;
+                    object-fit:cover;
+                "
+            >
+
+        </div>
+
+        <div class="col-lg-5">
+
+            <h1 class="fw-bold">
+                {{ hotel.name }}
+            </h1>
+
+            <p class="text-muted fs-5">
+                {{ hotel.area }},
+                {{ hotel.city }},
+                {{ hotel.state }}
+            </p>
+
+            <div class="mb-3">
+
+                <span class="badge bg-warning text-dark p-2">
+                    ⭐ {{ hotel.star_rating }}
+                </span>
+
+                <span class="badge bg-success p-2">
+                    {{ hotel.user_rating }} Rating
+                </span>
+
+            </div>
+
+            <h3 class="text-primary fw-bold">
+                Starting from ₹{{ rooms.first.price_per_night }}
+            </h3>
+
+        </div>
+
+    </div>
+
+    <hr class="my-5">
+
+    <h2 class="fw-bold mb-4">
+        Available Rooms
+    </h2>
+
+    <div class="row">
+
+        {% for room in rooms %}
+
+        <div class="col-md-6 col-lg-4 mb-4">
+
+            <div class="card shadow border-0 h-100">
+
+                <div class="card-body">
+
+                    <h5 class="fw-bold text-capitalize">
+                        {{ room.room_type }}
+                    </h5>
+
+                    <p>
+                        Max Guests:
+                        {{ room.max_guests }}
+                    </p>
+
+                    <h4 class="text-primary">
+                        ₹{{ room.price_per_night }}
+                    </h4>
+
+                    <a
+                        href="{% url 'hotels:booking' room.id %}?check_in={{ check_in }}&check_out={{ check_out }}&guests={{ guests }}&rooms={{ rooms_count }}"
+                        class="btn btn-primary w-100"
+                    >
+                        Book Now
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}

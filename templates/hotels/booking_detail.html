@@ -1,68 +1,122 @@
 {% extends 'base.html' %}
 
+{% block title %}
+Booking Confirmed
+{% endblock %}
+
 {% block content %}
 
-<div class="container mt-4">
+<div class="container py-5">
 
-    <h2>
-        Hotel Booking Details
-    </h2>
+    <div class="text-center mb-5">
 
-    <hr>
-
-    <div class="card p-4 shadow-sm">
-
-        <h4>
-            Booking Reference:
-            {{ booking.booking_reference }}
-        </h4>
-
-        <p>
-            <strong>Hotel:</strong>
-            {{ booking.hotel.name }}
-        </p>
-
-        <p>
-            <strong>Room:</strong>
-            {{ booking.room.room_name }}
-        </p>
-
-        <p>
-            <strong>Location:</strong>
-            {{ booking.hotel.city }},
-            {{ booking.hotel.state }}
-        </p>
-
-        <p>
-            <strong>Check In:</strong>
-            {{ booking.check_in_date }}
-        </p>
-
-        <p>
-            <strong>Check Out:</strong>
-            {{ booking.check_out_date }}
-        </p>
-
-        <p>
-            <strong>Guests:</strong>
-            {{ booking.guests }}
-        </p>
-
-        <p>
-            <strong>Rooms:</strong>
-            {{ booking.rooms_count }}
-        </p>
-
-        <h3>
-            ₹{{ booking.total_price }}
-        </h3>
-
-        <a
-            href="{% url 'payments:hotel_payment' booking.id %}"
-            class="btn btn-success"
+        <div
+            style="
+                width:90px;
+                height:90px;
+                background:#16a34a;
+                color:white;
+                border-radius:50%;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                margin:auto;
+                font-size:40px;
+            "
         >
-            Complete Payment
-        </a>
+            ✓
+        </div>
+
+        <h1 class="fw-bold mt-4 text-success">
+            Booking Confirmed!
+        </h1>
+
+        <p class="text-muted fs-5">
+            Your hotel booking has been successfully confirmed.
+        </p>
+
+    </div>
+
+    <div class="card shadow-lg border-0 p-4 mx-auto"
+         style="max-width:800px; border-radius:20px;">
+
+        <div class="row">
+
+            <div class="col-md-6">
+
+                <h3 class="fw-bold mb-4">
+                    Hotel Details
+                </h3>
+
+                <p>
+                    <strong>Hotel:</strong>
+                    {{ booking.hotel.name }}
+                </p>
+
+                <p>
+                    <strong>Location:</strong>
+                    {{ booking.hotel.city }},
+                    {{ booking.hotel.state }}
+                </p>
+
+                <p>
+                    <strong>Room Type:</strong>
+                    {{ booking.room.room_name }}
+                </p>
+
+                <p>
+                    <strong>Booking ID:</strong>
+                    {{ booking.booking_reference }}
+                </p>
+
+            </div>
+
+            <div class="col-md-6">
+
+                <h3 class="fw-bold mb-4">
+                    Stay Details
+                </h3>
+
+                <p>
+                    <strong>Check-in:</strong>
+                    {{ booking.check_in_date }}
+                </p>
+
+                <p>
+                    <strong>Check-out:</strong>
+                    {{ booking.check_out_date }}
+                </p>
+
+                <p>
+                    <strong>Guests:</strong>
+                    {{ booking.guests }}
+                </p>
+
+                <p>
+                    <strong>Rooms:</strong>
+                    {{ booking.rooms_count }}
+                </p>
+
+                <h4 class="text-primary fw-bold mt-4">
+                    Total Paid:
+                    ₹{{ booking.total_price }}
+                </h4>
+
+            </div>
+
+        </div>
+
+        <div class="text-center mt-4">
+
+            <a
+                href="{% url 'hotels:search' %}"
+                class="btn btn-primary px-5 py-3"
+                style="border-radius:12px;"
+            >
+                Book Another Hotel
+            </a>
+
+        </div>
 
     </div>
 

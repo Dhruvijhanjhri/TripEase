@@ -1,0 +1,266 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Hotels - TripEase
+{% endblock %}
+
+{% block content %}
+
+<section
+    style="
+        background: linear-gradient(135deg,#1e3c72,#2a5298);
+        min-height: 380px;
+        padding: 80px 0;
+        color: white;
+        text-align: center;
+    "
+>
+    <div class="container">
+
+
+    <h1
+        style="
+            font-size:48px;
+            font-weight:700;
+            margin-bottom:15px;
+        "
+    >
+        Find Your Perfect Stay
+    </h1>
+
+    <p
+        style="
+            font-size:18px;
+            opacity:0.9;
+            margin-bottom:40px;
+        "
+    >
+        Hotels across India at best prices
+    </p>
+
+    <!-- SEARCH BOX -->
+    <div
+        style="
+            background:white;
+            border-radius:25px;
+            padding:35px;
+            box-shadow:0 15px 35px rgba(0,0,0,0.15);
+            max-width:1100px;
+            margin:auto;
+        "
+    >
+
+        <form method="GET" action="{% url 'hotels:search' %}">
+
+            <div class="row g-3">
+
+                <div class="col-md-3">
+                    <label class="fw-bold text-dark mb-2 d-block">
+                        Destination
+                    </label>
+                    {{ form.destination }}
+                </div>
+
+                <div class="col-md-2">
+                    <label class="fw-bold text-dark mb-2 d-block">
+                        Check-in
+                    </label>
+                    {{ form.check_in }}
+                </div>
+
+                <div class="col-md-2">
+                    <label class="fw-bold text-dark mb-2 d-block">
+                        Check-out
+                    </label>
+                    {{ form.check_out }}
+                </div>
+
+                <div class="col-md-2">
+                    <label class="fw-bold text-dark mb-2 d-block">
+                        Guests
+                    </label>
+                    {{ form.guests }}
+                </div>
+
+                <div class="col-md-1">
+                    <label class="fw-bold text-dark mb-2 d-block">
+                        Rooms
+                    </label>
+                    {{ form.rooms }}
+                </div>
+
+                <div class="col-md-2 d-flex align-items-end">
+                    <button
+                        type="submit"
+                        class="btn btn-primary w-100"
+                        style="
+                            padding:14px;
+                            border-radius:14px;
+                            font-weight:600;
+                        "
+                    >
+                        Search
+                    </button>
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+</section>
+
+<!-- HOTEL RESULTS -->
+
+<section class="container my-5">
+
+{% if search_performed %}
+
+
+<h2 class="fw-bold mb-4">
+    Hotels Found
+</h2>
+
+{% if hotels %}
+
+    <div class="row">
+
+        {% for hotel in hotels %}
+
+        <div class="col-lg-4 col-md-6 mb-4">
+
+            <div
+                class="card border-0 shadow-lg h-100 hotel-card"
+                style="
+                    border-radius:20px;
+                    overflow:hidden;
+                "
+            >
+
+                <!-- HOTEL IMAGE -->
+                <img
+                    src="{% if hotel.image_url %}{{ hotel.image_url }}{% else %}https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200{% endif %}"
+                    alt="{{ hotel.name }}"
+                    style="
+                        height:240px;
+                        width:100%;
+                        object-fit:cover;
+                    "
+                >
+
+                <div class="card-body d-flex flex-column">
+
+                    <div class="d-flex justify-content-between">
+
+                        <h5 class="fw-bold">
+                            {{ hotel.name }}
+                        </h5>
+
+                        <span
+                            class="badge bg-warning text-dark"
+                            style="padding:8px 10px;"
+                        >
+                            ⭐ {{ hotel.star_rating }}
+                        </span>
+
+                    </div>
+
+                    <p class="text-muted mb-2">
+                        {{ hotel.area }},
+                        {{ hotel.city }},
+                        {{ hotel.state }}
+                    </p>
+
+                    <p class="text-success fw-semibold">
+                        {{ hotel.user_rating }}
+                        ({{ hotel.total_reviews }} reviews)
+                    </p>
+
+                    <div class="mb-3">
+
+                        {% if hotel.breakfast_available %}
+                        <span class="badge bg-success">
+                            Breakfast Included
+                        </span>
+                        {% endif %}
+
+                        {% if hotel.free_cancellation %}
+                        <span class="badge bg-primary">
+                            Free Cancellation
+                        </span>
+                        {% endif %}
+
+                        {% if hotel.couple_friendly %}
+                        <span class="badge bg-danger">
+                            Couple Friendly
+                        </span>
+                        {% endif %}
+
+                    </div>
+
+                    <div class="mt-auto">
+
+                        <h4 class="text-primary fw-bold">
+                            ₹{{ hotel.display_room.price_per_night }}
+                            <small class="text-muted">
+                                /night
+                            </small>
+                        </h4>
+
+                        <a
+                            href="{% url 'hotels:detail' hotel.id %}?check_in={{ request.GET.check_in }}&check_out={{ request.GET.check_out }}&guests={{ request.GET.guests }}&rooms={{ request.GET.rooms }}"
+                            class="btn btn-primary w-100 mt-3"
+                        >
+                            View Details
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+{% else %}
+
+    <div class="alert alert-warning">
+        No hotels found for this city.
+    </div>
+
+{% endif %}
+
+{% endif %}
+
+</section>
+
+<style>
+
+.hotel-card{
+    transition:0.3s;
+}
+
+.hotel-card:hover{
+    transform:translateY(-8px);
+}
+
+input,
+select{
+    width:100%;
+    padding:12px;
+    border:1px solid #d1d5db;
+    border-radius:12px;
+}
+
+</style>
+
+{% endblock %}

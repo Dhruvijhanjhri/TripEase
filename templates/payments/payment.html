@@ -1,116 +1,255 @@
 {% extends 'base.html' %}
-{% load static %}
-
-{% block title %}Payment - TripEase{% endblock %}
 
 {% block content %}
-<div class="container" style="padding: 40px 0;">
-    <h2 class="section-title">Complete Payment</h2>
-    
-    <div class="card" style="padding: 20px; margin-bottom: 30px;">
-        <h3>Booking Summary</h3>
-        <div style="color: #475569; margin: 10px 0;">
-            {{ booking.flight.airline }} - {{ booking.flight.flight_number }}<br>
-            {{ booking.flight.source.code }} → {{ booking.flight.destination.code }}<br>
-            {{ booking.number_of_passengers }} Passenger{{ booking.number_of_passengers|pluralize }}
-        </div>
-        <div style="font-size: 1.5rem; font-weight: 700; color: #1e5eff; margin-top: 15px;">
-            Total Amount: ₹{{ booking.total_price|floatformat:0 }}
-        </div>
+
+<div class="container mt-5">
+
+    <h2>Complete Payment</h2>
+
+    <div
+    class="card shadow-sm"
+    style="
+        padding:35px;
+        border-radius:20px;
+        border:none;
+    "
+>
+
+        <h4>Booking Summary</h4>
+
+        <p>
+            <strong>Booking Reference:</strong>
+            {{ booking.booking_reference }}
+        </p>
+
+        <p>
+            <strong>Total Amount:</strong>
+            ₹{{ booking.total_price }}
+        </p>
+
+        <hr style="margin:30px 0;">
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <h4>Select Payment Method</h4>
+
+            <div>
+                {% for radio in form.payment_method %}
+                    <label style="display:block; margin-bottom:10px;">
+                        {{ radio.tag }}
+                        {{ radio.choice_label }}
+                    </label>
+                {% endfor %}
+            </div>
+
+            <!-- UPI -->
+            <div id="upi-section" style="display:none; margin-top:20px;">
+                <label>UPI ID</label>
+                <input
+                    type="text"
+                    class="form-control"
+                    placeholder="example@upi"
+                >
+            </div>
+
+            <!-- Card -->
+            <div id="card-section" style="display:none; margin-top:20px;">
+
+                <label>Card Number</label>
+                <input
+                    type="text"
+                    class="form-control mb-3"
+                    placeholder="1234 5678 9012 3456"
+                >
+
+                <label>Cardholder Name</label>
+                <input
+                    type="text"
+                    class="form-control mb-3"
+                    placeholder="John Doe"
+                >
+
+                <label>Expiry (MM/YY)</label>
+                <input
+                    type="text"
+                    class="form-control mb-3"
+                    placeholder="12/28"
+                >
+
+                <label>CVV</label>
+                <input
+                    type="password"
+                    class="form-control"
+                    placeholder="123"
+                >
+
+            </div>
+
+            <!-- Net Banking -->
+           
+<div
+    id="netbanking-section"
+    style="
+        display:none;
+        margin-top:25px;
+    "
+>
+
+    <label
+        style="
+            font-weight:600;
+            margin-bottom:10px;
+            display:block;
+        "
+    >
+        Select Your Bank
+    </label>
+
+    <select
+        class="form-control"
+        style="
+            padding:14px;
+            border-radius:12px;
+            font-size:16px;
+        "
+    >
+
+        <option>
+            Select Bank
+        </option>
+
+        <!-- Public Sector Banks -->
+        <option>State Bank of India (SBI)</option>
+        <option>Punjab National Bank (PNB)</option>
+        <option>Bank of Baroda (BOB)</option>
+        <option>Canara Bank</option>
+        <option>Union Bank of India</option>
+        <option>Bank of India</option>
+        <option>Indian Bank</option>
+        <option>Central Bank of India</option>
+        <option>UCO Bank</option>
+        <option>Punjab & Sind Bank</option>
+        <option>Indian Overseas Bank</option>
+        <option>Bank of Maharashtra</option>
+
+        <!-- Private Banks -->
+        <option>HDFC Bank</option>
+        <option>ICICI Bank</option>
+        <option>Axis Bank</option>
+        <option>Kotak Mahindra Bank</option>
+        <option>IDFC First Bank</option>
+        <option>IndusInd Bank</option>
+        <option>Yes Bank</option>
+        <option>Federal Bank</option>
+        <option>South Indian Bank</option>
+        <option>Karur Vysya Bank</option>
+        <option>RBL Bank</option>
+        <option>Bandhan Bank</option>
+        <option>CSB Bank</option>
+        <option>City Union Bank</option>
+        <option>Dhanlaxmi Bank</option>
+        <option>Karnataka Bank</option>
+        <option>Tamilnad Mercantile Bank</option>
+
+        <!-- Small Finance Banks -->
+        <option>AU Small Finance Bank</option>
+        <option>Ujjivan Small Finance Bank</option>
+        <option>Equitas Small Finance Bank</option>
+        <option>Jana Small Finance Bank</option>
+        <option>Suryoday Small Finance Bank</option>
+        <option>ESAF Small Finance Bank</option>
+
+        <!-- Payment Banks -->
+        <option>Airtel Payments Bank</option>
+        <option>India Post Payments Bank</option>
+        <option>Paytm Payments Bank</option>
+        <option>Fino Payments Bank</option>
+
+    </select>
+
+</div>
+
+            <button
+                type="submit"
+                class="btn btn-primary mt-4"
+            >
+                Pay ₹{{ booking.total_price }}
+            </button>
+
+        </form>
+
     </div>
-    
-    <form method="post" class="auth-form" style="max-width: 500px; margin: 0 auto;">
-        {% csrf_token %}
-        
-        <h3 style="margin-bottom: 20px;">Select Payment Method</h3>
-        
-        <div style="margin-bottom: 20px;">
-            {{ form.payment_method }}
-            {% if form.payment_method.errors %}
-                <div class="error-message">{{ form.payment_method.errors }}</div>
-            {% endif %}
-        </div>
-        
-        <!-- UPI Fields -->
-        <div id="upi_fields" style="display: none; margin-bottom: 20px;">
-            <div class="form-group">
-                <label for="{{ form.upi_id.id_for_label }}">UPI ID</label>
-                {{ form.upi_id }}
-                {% if form.upi_id.errors %}
-                    <div class="error-message">{{ form.upi_id.errors }}</div>
-                {% endif %}
-            </div>
-        </div>
-        
-        <!-- Card Fields -->
-        <div id="card_fields" style="display: none; margin-bottom: 20px;">
-            <div class="form-group">
-                <label for="{{ form.card_number.id_for_label }}">Card Number</label>
-                {{ form.card_number }}
-            </div>
-            <div class="form-group">
-                <label for="{{ form.card_name.id_for_label }}">Cardholder Name</label>
-                {{ form.card_name }}
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="{{ form.card_expiry.id_for_label }}">Expiry (MM/YY)</label>
-                    {{ form.card_expiry }}
-                </div>
-                <div class="form-group">
-                    <label for="{{ form.card_cvv.id_for_label }}">CVV</label>
-                    {{ form.card_cvv }}
-                </div>
-            </div>
-        </div>
-        
-        <!-- Net Banking Fields -->
-        <div id="netbanking_fields" style="display: none; margin-bottom: 20px;">
-            <div class="form-group">
-                <label for="{{ form.bank_name.id_for_label }}">Select Bank</label>
-                {{ form.bank_name }}
-            </div>
-        </div>
-        
-        <button type="submit" class="btn btn-primary btn-full">Pay ₹{{ booking.total_price|floatformat:0 }}</button>
-    </form>
+
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const paymentMethod = document.querySelectorAll('input[name="payment_method"]');
-    const upiFields = document.getElementById('upi_fields');
-    const cardFields = document.getElementById('card_fields');
-    const netbankingFields = document.getElementById('netbanking_fields');
-    
-    function toggleFields() {
-        upiFields.style.display = 'none';
-        cardFields.style.display = 'none';
-        netbankingFields.style.display = 'none';
-        
-        const selected = document.querySelector('input[name="payment_method"]:checked');
-        if (selected) {
-            if (selected.value === 'upi') {
-                upiFields.style.display = 'block';
-            } else if (selected.value === 'card') {
-                cardFields.style.display = 'block';
-            } else if (selected.value === 'netbanking') {
-                netbankingFields.style.display = 'block';
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const paymentMethods =
+            document.querySelectorAll(
+                'input[name="payment_method"]'
+            );
+
+        const upiSection =
+            document.getElementById(
+                "upi-section"
+            );
+
+        const cardSection =
+            document.getElementById(
+                "card-section"
+            );
+
+        const netbankingSection =
+            document.getElementById(
+                "netbanking-section"
+            );
+
+        paymentMethods.forEach(
+            function (method) {
+
+                method.addEventListener(
+                    "change",
+                    function () {
+
+                        upiSection.style.display = "none";
+                        cardSection.style.display = "none";
+                        netbankingSection.style.display = "none";
+
+                        if (
+                            this.value === "upi"
+                        ) {
+                            upiSection.style.display =
+                                "block";
+                        }
+
+                        else if (
+                            this.value === "card"
+                        ) {
+                            cardSection.style.display =
+                                "block";
+                        }
+
+                        else if (
+                            this.value ===
+                            "netbanking"
+                        ) {
+                            netbankingSection.style.display =
+                                "block";
+                        }
+
+                    }
+                );
             }
-        }
+        );
     }
-    
-    paymentMethod.forEach(radio => {
-        radio.addEventListener('change', toggleFields);
-    });
-    
-    toggleFields();
-});
+);
+
 </script>
+
 {% endblock %}
-
-
-
-
-
-

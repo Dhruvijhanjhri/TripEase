@@ -1,96 +1,57 @@
 from django import forms
-from django.forms import formset_factory
-
-from .models import HotelGuest
 
 
 class HotelSearchForm(forms.Form):
-    """Hotel search form"""
 
     destination = forms.CharField(
-        max_length=100,
+        required=True,
         widget=forms.TextInput(
             attrs={
-                'class': 'form-control',
-                'placeholder': 'City, Area or Hotel Name'
+                "class": "form-control",
+                "placeholder": "Enter city",
+                "style": "height:55px;"
             }
         )
     )
 
-    check_in_date = forms.DateField(
+    check_in = forms.DateField(
         widget=forms.DateInput(
             attrs={
-                'type': 'date',
-                'class': 'form-control'
+                "type": "date",
+                "class": "form-control",
+                "style": "height:55px;"
             }
         )
     )
 
-    check_out_date = forms.DateField(
+    check_out = forms.DateField(
         widget=forms.DateInput(
             attrs={
-                'type': 'date',
-                'class': 'form-control'
+                "type": "date",
+                "class": "form-control",
+                "style": "height:55px;"
             }
         )
     )
 
     guests = forms.IntegerField(
+        initial=2,
         min_value=1,
-        initial=1,
         widget=forms.NumberInput(
             attrs={
-                'class': 'form-control'
+                "class": "form-control",
+                "style": "height:55px;"
             }
         )
     )
 
     rooms = forms.IntegerField(
-        min_value=1,
         initial=1,
+        min_value=1,
         widget=forms.NumberInput(
             attrs={
-                'class': 'form-control'
+                "class": "form-control",
+                "style": "height:55px;"
             }
         )
     )
-
-
-class HotelGuestForm(forms.ModelForm):
-    """Guest details form"""
-
-    class Meta:
-        model = HotelGuest
-
-        fields = [
-            'full_name',
-            'age',
-            'gender'
-        ]
-
-        widgets = {
-            'full_name': forms.TextInput(
-                attrs={
-                    'class': 'form-control',
-                    'placeholder': 'Guest Full Name'
-                }
-            ),
-
-            'age': forms.NumberInput(
-                attrs={
-                    'class': 'form-control'
-                }
-            ),
-
-            'gender': forms.Select(
-                attrs={
-                    'class': 'form-control'
-                }
-            )
-        }
-
-
-HotelGuestFormSet = formset_factory(
-    HotelGuestForm,
-    extra=1
-)
