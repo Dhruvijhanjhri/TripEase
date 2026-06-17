@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-Booking Confirmed
+Hotel Booking Details
 {% endblock %}
 
 {% block content %}
@@ -33,11 +33,11 @@ Booking Confirmed
         </div>
 
         <h1 class="fw-bold text-success mt-4">
-            Booking Confirmed!
+            Booking {% if booking.booking_status == "confirmed" %}Confirmed{% elif booking.booking_status == "cancelled" %}Cancelled{% else %}Pending{% endif %}!
         </h1>
 
         <p class="text-muted fs-5">
-            Your hotel booking has been successfully confirmed.
+            Your hotel booking details are shown below.
         </p>
 
     </div>
@@ -158,7 +158,7 @@ Booking Confirmed
 
         </div>
 
-        {% if booking.booking_status == "confirmed" %}
+        {% if booking.booking_status != "cancelled" %}
 
         <hr>
 

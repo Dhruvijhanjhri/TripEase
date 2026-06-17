@@ -18,8 +18,11 @@ from .models import Room
 from .models import HotelBooking
 from .models import HotelGuest
 
+from payments.models import Payment
+
 from .forms import HotelSearchForm
 from .forms import HotelGuestFormSet
+from .forms import HotelPaymentForm
 
 
 def hotel_search(request):
@@ -310,27 +313,54 @@ def hotel_payment(
         booking.check_in_date
     ).days
 
-    if request.method == "POST":
+    if nights <= 0:
+        nights = 1
 
-        booking.booking_status = (
-            "confirmed"
-        )
-
-        booking.save()
-
-        messages.success(
+    if hasattr(booking, 'payment'):
+        messages.info(
             request,
-            "Payment successful!"
+            'Payment already processed.'
         )
 
         return redirect(
-            "hotels:booking_detail",
+            'hotels:booking_detail',
             booking_id=booking.id
         )
 
+    if request.method == "POST":
+
+        form = HotelPaymentForm(request.POST)
+
+        if form.is_valid():
+            payment_method = form.cleaned_data['payment_method']
+
+            payment = Payment.objects.create(
+                hotel_booking=booking,
+                amount=booking.total_price,
+                payment_method=payment_method,
+                payment_status='success',
+                transaction_id=f'HOTEL{booking.id:06d}'
+            )
+
+            booking.booking_status = "confirmed"
+            booking.save()
+
+            messages.success(
+                request,
+                "Payment successful!"
+            )
+
+            return redirect(
+                "hotels:booking_detail",
+                booking_id=booking.id
+            )
+    else:
+        form = HotelPaymentForm()
+
     context = {
         "booking": booking,
-        "nights": nights
+        "nights": nights,
+        "form": form,
     }
 
     return render(
@@ -352,6 +382,17 @@ def cancel_booking(
     )
 
     if request.method == "POST":
+
+        if booking.booking_status == "cancelled":
+            messages.info(
+                request,
+                "Booking is already cancelled."
+            )
+
+            return redirect(
+                "hotels:booking_detail",
+                booking_id=booking.id
+            )
 
         booking.booking_status = "cancelled"
         booking.save()

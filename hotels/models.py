@@ -221,7 +221,7 @@ class HotelBooking(models.Model):
     booking_status = models.CharField(
         max_length=20,
         choices=BOOKING_STATUS_CHOICES,
-        default='confirmed'
+        default='pending'
     )
 
     special_request = models.TextField(
