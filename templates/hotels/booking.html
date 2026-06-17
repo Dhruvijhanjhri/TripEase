@@ -138,6 +138,8 @@ Hotel Booking
                 </div>
 
                 <form method="POST">
+                    <input type="hidden" name="guests" value="{{ guests }}">
+                    <input type="hidden" name="rooms_count" value="{{ rooms_count }}">
                     {% csrf_token %}
 
                     <button

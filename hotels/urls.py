@@ -6,26 +6,38 @@ app_name = "hotels"
 urlpatterns = [
 
     path(
-        "",
+        '',
         views.hotel_search,
-        name="search"
+        name='search'
     ),
 
     path(
-        "hotel/<int:hotel_id>/",
+        'detail/<int:hotel_id>/',
         views.hotel_detail,
-        name="detail"
+        name='detail'
     ),
 
     path(
-        "booking/<int:room_id>/",
+        'booking/<int:room_id>/',
         views.hotel_booking,
-        name="booking"
+        name='booking'
     ),
 
     path(
-        "booking-detail/<int:booking_id>/",
+        'payment/<int:booking_id>/',
+        views.hotel_payment,
+        name='payment'
+    ),
+
+    path(
+        'booking-detail/<int:booking_id>/',
         views.hotel_booking_detail,
-        name="booking_detail"
+        name='booking_detail'
+    ),
+
+    path(
+        'cancel-booking/<int:booking_id>/',
+        views.cancel_booking,
+        name='cancel_booking'
     ),
 ]

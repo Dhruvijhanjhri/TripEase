@@ -207,8 +207,10 @@ class HotelBooking(models.Model):
 
     check_out_date = models.DateField()
 
+    # total guests in booking
     guests = models.IntegerField(default=1)
 
+    # number of rooms booked
     rooms_count = models.IntegerField(default=1)
 
     total_price = models.DecimalField(
@@ -219,7 +221,7 @@ class HotelBooking(models.Model):
     booking_status = models.CharField(
         max_length=20,
         choices=BOOKING_STATUS_CHOICES,
-        default='pending'
+        default='confirmed'
     )
 
     special_request = models.TextField(
@@ -227,19 +229,50 @@ class HotelBooking(models.Model):
         null=True
     )
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
 
     def save(self, *args, **kwargs):
+
+        # generate booking reference
         if not self.booking_reference:
             self.booking_reference = str(
                 uuid.uuid4()
             ).replace("-", "")[:10].upper()
 
+        # validate guest capacity
+        max_capacity = (
+            self.room.max_guests *
+            self.rooms_count
+        )
+
+        if self.guests > max_capacity:
+            raise ValueError(
+                f"Maximum {max_capacity} guests allowed "
+                f"for {self.rooms_count} room(s)"
+            )
+
         super().save(*args, **kwargs)
 
-    def __str__(self):
-        return self.booking_reference
+    @property
+    def total_nights(self):
+        return (
+            self.check_out_date -
+            self.check_in_date
+        ).days
 
+    @property
+    def max_guest_capacity(self):
+        return (
+            self.room.max_guests *
+            self.rooms_count
+        )
+
+    def __str__(self):
+        return (
+            f"{self.booking_reference}"
+        )
 
 class HotelGuest(models.Model):
     """Guest Details"""

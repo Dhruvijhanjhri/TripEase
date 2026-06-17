@@ -1,4 +1,5 @@
 from datetime import datetime
+from django.db.models import Q
 
 from django.shortcuts import (
     render,
@@ -22,8 +23,6 @@ from .forms import HotelGuestFormSet
 
 
 def hotel_search(request):
-    print("NEW HOTEL SEARCH RUNNING")
-    """Search hotels"""
 
     form = HotelSearchForm(
         request.GET or None
@@ -36,39 +35,25 @@ def hotel_search(request):
 
         search_performed = True
 
-        destination = form.cleaned_data[
-            "destination"
-        ].strip().lower()
-
-        check_in = form.cleaned_data[
-            "check_in"
-        ]
-
-        check_out = form.cleaned_data[
-            "check_out"
-        ]
-
-        guests = form.cleaned_data[
-            "guests"
-        ]
-
-        rooms = form.cleaned_data[
-            "rooms"
-        ]
-
-        hotels = Hotel.objects.filter(
-            search_keywords__icontains=destination
-        ).prefetch_related(
-            "rooms"
+        destination = (
+            form.cleaned_data["destination"]
+            .strip()
+            .lower()
         )
+
+        hotels_queryset = Hotel.objects.filter(
+            Q(city__icontains=destination) |
+            Q(state__icontains=destination) |
+            Q(area__icontains=destination) |
+            Q(search_keywords__icontains=destination)
+        ).prefetch_related("rooms")
 
         filtered_hotels = []
 
-        for hotel in hotels:
+        for hotel in hotels_queryset:
 
             available_room = hotel.rooms.filter(
-                available_rooms__gte=rooms,
-                max_guests__gte=guests
+                available_rooms__gt=0
             ).first()
 
             if available_room:
@@ -95,12 +80,7 @@ def hotel_search(request):
         context
     )
 
-
-def hotel_detail(
-    request,
-    hotel_id
-):
-    """Hotel detail page"""
+def hotel_detail(request, hotel_id):
 
     hotel = get_object_or_404(
         Hotel,
@@ -113,7 +93,11 @@ def hotel_detail(
 
     context = {
         "hotel": hotel,
-        "rooms": rooms
+        "rooms": rooms,
+        "check_in": request.GET.get("check_in"),
+        "check_out": request.GET.get("check_out"),
+        "guests": request.GET.get("guests"),
+        "rooms_count": request.GET.get("rooms"),
     }
 
     return render(
@@ -124,11 +108,7 @@ def hotel_detail(
 
 
 @login_required
-def hotel_booking(
-    request,
-    room_id
-):
-    """Create hotel booking"""
+def hotel_booking(request, room_id):
 
     room = get_object_or_404(
         Room,
@@ -136,48 +116,65 @@ def hotel_booking(
     )
 
     check_in = request.GET.get(
-        "check_in"
+        "check_in",
+        ""
     )
 
     check_out = request.GET.get(
-        "check_out"
+        "check_out",
+        ""
     )
 
-    guests = int(
-        request.GET.get(
-            "guests",
-            1
+    guests = request.GET.get(
+        "guests",
+        "1"
+    )
+
+    rooms_count = request.GET.get(
+        "rooms",
+        "1"
+    )
+
+    try:
+        guests = int(guests)
+    except:
+        guests = 1
+
+    try:
+        rooms_count = int(
+            rooms_count
         )
-    )
-
-    rooms_count = int(
-        request.GET.get(
-            "rooms",
-            1
-        )
-    )
-
-    nights = 1
+    except:
+        rooms_count = 1
 
     check_in_date = None
     check_out_date = None
+    nights = 1
 
     if check_in and check_out:
 
-        check_in_date = datetime.strptime(
-            check_in,
-            "%Y-%m-%d"
-        ).date()
+        try:
 
-        check_out_date = datetime.strptime(
-            check_out,
-            "%Y-%m-%d"
-        ).date()
+            check_in_date = datetime.strptime(
+                check_in,
+                "%Y-%m-%d"
+            ).date()
 
-        nights = (
-            check_out_date -
-            check_in_date
-        ).days
+            check_out_date = datetime.strptime(
+                check_out,
+                "%Y-%m-%d"
+            ).date()
+
+            nights = (
+                check_out_date -
+                check_in_date
+            ).days
+
+            if nights <= 0:
+                nights = 1
+
+        except:
+            nights = 1
 
     total_price = (
         room.price_per_night *
@@ -187,11 +184,46 @@ def hotel_booking(
 
     if request.method == "POST":
 
-        if room.available_rooms < rooms_count:
+        guests = int(
+            request.POST.get(
+                "guests",
+                guests
+            )
+        )
+
+        rooms_count = int(
+            request.POST.get(
+                "rooms_count",
+                rooms_count
+            )
+        )
+
+        if (
+            room.available_rooms
+            < rooms_count
+        ):
 
             messages.error(
                 request,
                 "Not enough rooms available."
+            )
+
+            return redirect(
+                "hotels:detail",
+                hotel_id=room.hotel.id
+            )
+
+        max_allowed_guests = (
+            room.max_guests *
+            rooms_count
+        )
+
+        if guests > max_allowed_guests:
+
+            messages.error(
+                request,
+                f"Maximum {max_allowed_guests} guests allowed "
+                f"for {rooms_count} room(s)."
             )
 
             return redirect(
@@ -207,23 +239,17 @@ def hotel_booking(
             check_out_date=check_out_date,
             guests=guests,
             rooms_count=rooms_count,
-            total_price=total_price
+            total_price=total_price,
+            booking_status="pending"
         )
 
-        # reduce room count
         room.available_rooms -= (
             rooms_count
         )
-
         room.save()
 
-        messages.success(
-            request,
-            "Hotel booked successfully!"
-        )
-
         return redirect(
-            "hotels:booking_detail",
+            "hotels:payment",
             booking_id=booking.id
         )
 
@@ -234,7 +260,7 @@ def hotel_booking(
         "nights": nights,
         "total_price": total_price,
         "check_in": check_in,
-        "check_out": check_out
+        "check_out": check_out,
     }
 
     return render(
@@ -265,4 +291,83 @@ def hotel_booking_detail(
         request,
         "hotels/booking_detail.html",
         context
+    )
+
+@login_required
+def hotel_payment(
+    request,
+    booking_id
+):
+
+    booking = get_object_or_404(
+        HotelBooking,
+        id=booking_id,
+        user=request.user
+    )
+
+    nights = (
+        booking.check_out_date -
+        booking.check_in_date
+    ).days
+
+    if request.method == "POST":
+
+        booking.booking_status = (
+            "confirmed"
+        )
+
+        booking.save()
+
+        messages.success(
+            request,
+            "Payment successful!"
+        )
+
+        return redirect(
+            "hotels:booking_detail",
+            booking_id=booking.id
+        )
+
+    context = {
+        "booking": booking,
+        "nights": nights
+    }
+
+    return render(
+        request,
+        "hotels/payment.html",
+        context
+    )
+
+@login_required
+def cancel_booking(
+    request,
+    booking_id
+):
+
+    booking = get_object_or_404(
+        HotelBooking,
+        id=booking_id,
+        user=request.user
+    )
+
+    if request.method == "POST":
+
+        booking.booking_status = "cancelled"
+        booking.save()
+
+        booking.room.available_rooms += (
+            booking.rooms_count
+        )
+
+        booking.room.save()
+
+        messages.success(
+            request,
+            "Booking cancelled successfully."
+        )
+
+    return redirect(
+        "hotels:booking_detail",
+        booking_id=booking.id
     )

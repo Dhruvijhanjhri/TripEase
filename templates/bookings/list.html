@@ -1,19 +1,180 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+My Bookings - TripEase
+{% endblock %}
 
 {% block content %}
 
-<h1 style="color:red; text-align:center;">
-NEW BOOKINGS PAGE WORKING
-</h1>
+<div class="container py-5">
 
-{% for booking in hotel_bookings %}
+    <h2 class="fw-bold mb-4">
+        My Bookings
+    </h2>
 
-<div style="border:1px solid black; padding:20px; margin:20px;">
-    <h3>{{ booking.hotel.name }}</h3>
-    <p>{{ booking.hotel.city }}</p>
-    <p>₹{{ booking.total_price }}</p>
+    {% if flight_bookings or hotel_bookings %}
+
+        <div class="row">
+
+            <!-- FLIGHT BOOKINGS -->
+            {% for booking in flight_bookings %}
+
+            <div class="col-lg-6 mb-4">
+
+                <div class="card shadow border-0 h-100">
+
+                    <div class="card-body">
+
+                        <span class="badge bg-primary mb-3">
+                            Flight Booking
+                        </span>
+
+                        <h4 class="fw-bold">
+                            {{ booking.flight.airline }}
+                        </h4>
+
+                        <p class="text-muted">
+                            {{ booking.flight.source.city }}
+                            →
+                            {{ booking.flight.destination.city }}
+                        </p>
+
+                        <p>
+                            <strong>Date:</strong>
+                            {{ booking.travel_date }}
+                        </p>
+
+                        <p>
+                            <strong>Passengers:</strong>
+                            {{ booking.number_of_passengers }}
+                        </p>
+
+                        <p>
+                            <strong>Booking Ref:</strong>
+                            {{ booking.booking_reference }}
+                        </p>
+
+                        <h4 class="text-primary fw-bold">
+                            ₹{{ booking.total_price }}
+                        </h4>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+
+            <!-- HOTEL BOOKINGS -->
+            {% for booking in hotel_bookings %}
+
+            <div class="col-lg-6 mb-4">
+
+                <div class="card shadow border-0 h-100">
+
+                    <div class="card-body">
+
+                        <span class="badge bg-success mb-3">
+                            Hotel Booking
+
+                            <div style="margin-bottom:10px;">
+
+                                {% if booking.booking_status == "confirmed" %}
+
+                                    <span
+                                        style="
+                                            background:#10b981;
+                                            color:white;
+                                            padding:4px 10px;
+                                            border-radius:20px;
+                                            font-size:12px;
+                                        "
+                                    >
+                                        Confirmed
+                                    </span>
+
+                                {% elif booking.booking_status == "cancelled" %}
+
+                                    <span
+                                        style="
+                                            background:#ef4444;
+                                            color:white;
+                                            padding:4px 10px;
+                                            border-radius:20px;
+                                            font-size:12px;
+                                        "
+                                    >
+                                        Cancelled
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+                            </span>
+
+                        <h4 class="fw-bold">
+                            {{ booking.hotel.name }}
+                        </h4>
+
+                        <p class="text-muted">
+                            {{ booking.hotel.city }}
+                        </p>
+
+                        <p>
+                            <strong>Room:</strong>
+                            {{ booking.room.room_name }}
+                        </p>
+
+                        <p>
+                            <strong>Guests:</strong>
+                            {{ booking.guests }}
+                        </p>
+
+                        <p>
+                            <strong>Rooms:</strong>
+                            {{ booking.rooms_count }}
+                        </p>
+
+                        <p>
+                            <strong>Check-in:</strong>
+                            {{ booking.check_in_date }}
+                        </p>
+
+                        <p>
+                            <strong>Check-out:</strong>
+                            {{ booking.check_out_date }}
+                        </p>
+
+                        <p>
+                            <strong>Booking Ref:</strong>
+                            {{ booking.booking_reference }}
+                        </p>
+
+                        <h4 class="text-primary fw-bold">
+                            ₹{{ booking.total_price }}
+                        </h4>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="alert alert-info">
+            No bookings found.
+        </div>
+
+    {% endif %}
+
 </div>
-
-{% endfor %}
 
 {% endblock %}

@@ -1,0 +1,325 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Hotel Payment
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-7">
+
+            <div class="card shadow-lg border-0 rounded-4">
+
+                <div
+                    class="p-4 text-white"
+                    style="
+                    background: linear-gradient(
+                    135deg,
+                    #2563eb,
+                    #1d4ed8
+                    );
+                    "
+                >
+                    <h2>
+                        Complete Payment
+                    </h2>
+
+                    <p class="mb-0">
+                        Secure payment for your booking
+                    </p>
+                </div>
+
+                <div class="card-body p-4">
+                    <h1>{{ booking }}</h1>
+                    <h1>{{ booking.hotel.name }}</h1>
+
+                    <h3>
+                        {{ booking.hotel.name }}
+                    </h3>
+
+                    <p class="text-muted">
+                        {{ booking.hotel.area }},
+                        {{ booking.hotel.city }}
+                    </p>
+
+                    <hr>
+
+                    <h5>
+                        Booking Details
+                    </h5>
+
+                    <div class="row">
+
+                        <div class="col-md-6">
+
+                            <p>
+                                <strong>Room:</strong>
+                                {{ booking.room.room_name }}
+                            </p>
+
+                            <p>
+                                <strong>Guests:</strong>
+                                {{ booking.guests }}
+                            </p>
+
+                            <p>
+                                <strong>Rooms:</strong>
+                                {{ booking.rooms_count }}
+                            </p>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <p>
+                                <strong>Check-in:</strong>
+                                {{ booking.check_in_date }}
+                            </p>
+
+                            <p>
+                                <strong>Check-out:</strong>
+                                {{ booking.check_out_date }}
+                            </p>
+
+                            <p>
+                                <strong>Nights:</strong>
+                                {{ nights }}
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <hr>
+
+                    <!-- Payment Method -->
+
+<h5 class="fw-bold mb-4">
+    Select Payment Method
+</h5>
+
+<form method="POST">
+
+    {% csrf_token %}
+
+    <!-- UPI -->
+
+    <div class="payment-option mb-3 p-3 border rounded">
+
+        <div class="form-check">
+
+            <input
+                class="form-check-input"
+                type="radio"
+                name="payment_method"
+                value="upi"
+                id="upi"
+                checked
+                onclick="showPayment('upi-box')"
+            >
+
+            <label
+                class="form-check-label fw-semibold"
+                for="upi"
+            >
+                UPI
+            </label>
+
+        </div>
+
+        <div
+            id="upi-box"
+            class="mt-3"
+        >
+            <input
+                type="text"
+                class="form-control"
+                placeholder="Enter UPI ID (example@upi)"
+            >
+        </div>
+
+    </div>
+
+
+    <!-- CARD -->
+
+    <div class="payment-option mb-3 p-3 border rounded">
+
+        <div class="form-check">
+
+            <input
+                class="form-check-input"
+                type="radio"
+                name="payment_method"
+                value="card"
+                id="card"
+                onclick="showPayment('card-box')"
+            >
+
+            <label
+                class="form-check-label fw-semibold"
+                for="card"
+            >
+                Credit / Debit Card
+            </label>
+
+        </div>
+
+        <div
+            id="card-box"
+            class="mt-3 d-none"
+        >
+
+            <input
+                type="text"
+                class="form-control mb-2"
+                placeholder="Card Number"
+            >
+
+            <div class="row">
+
+                <div class="col-md-6">
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        placeholder="MM/YY"
+                    >
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <input
+                        type="password"
+                        class="form-control"
+                        placeholder="CVV"
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- NET BANKING -->
+
+    <div class="payment-option mb-3 p-3 border rounded">
+
+        <div class="form-check">
+
+            <input
+                class="form-check-input"
+                type="radio"
+                name="payment_method"
+                value="netbanking"
+                id="bank"
+                onclick="showPayment('bank-box')"
+            >
+
+            <label
+                class="form-check-label fw-semibold"
+                for="bank"
+            >
+                Net Banking
+            </label>
+
+        </div>
+
+        <div
+            id="bank-box"
+            class="mt-3 d-none"
+        >
+
+            <select class="form-select">
+
+                <option>
+                    Select Bank
+                </option>
+
+                <option>
+                    SBI
+                </option>
+
+                <option>
+                    HDFC Bank
+                </option>
+
+                <option>
+                    ICICI Bank
+                </option>
+
+                <option>
+                    Axis Bank
+                </option>
+
+            </select>
+
+        </div>
+
+    </div>
+
+    <hr>
+
+    <!-- TOTAL -->
+
+    <div class="text-center mt-4">
+
+        <h2
+            class="fw-bold text-success"
+        >
+            ₹{{ booking.total_price }}
+        </h2>
+
+        <p class="text-muted">
+            Total Amount Payable
+        </p>
+
+        <button
+            class="btn btn-success px-5 py-3"
+            style="
+                border-radius:14px;
+                font-size:18px;
+                font-weight:600;
+            "
+        >
+            Pay Now
+        </button>
+
+    </div>
+
+</form>
+
+<script>
+
+function showPayment(id) {
+
+    document
+        .querySelectorAll(
+            '#upi-box, #card-box, #bank-box'
+        )
+        .forEach(box => {
+
+            box.classList.add(
+                'd-none'
+            )
+
+        })
+
+    document
+        .getElementById(id)
+        .classList.remove(
+            'd-none'
+        )
+}
+
+</script>
+
+{% endblock %}

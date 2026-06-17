@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}
 Booking Confirmed
@@ -8,26 +9,30 @@ Booking Confirmed
 
 <div class="container py-5">
 
-    <div class="text-center mb-5">
+<!-- Success Card -->
+
+<div class="card shadow border-0 mb-4">
+
+    <div class="card-body text-center p-5">
 
         <div
             style="
                 width:90px;
                 height:90px;
-                background:#16a34a;
-                color:white;
                 border-radius:50%;
+                background:#dcfce7;
                 display:flex;
                 align-items:center;
                 justify-content:center;
                 margin:auto;
-                font-size:40px;
+                font-size:45px;
+                color:#16a34a;
             "
         >
             ✓
         </div>
 
-        <h1 class="fw-bold mt-4 text-success">
+        <h1 class="fw-bold text-success mt-4">
             Booking Confirmed!
         </h1>
 
@@ -37,16 +42,68 @@ Booking Confirmed
 
     </div>
 
-    <div class="card shadow-lg border-0 p-4 mx-auto"
-         style="max-width:800px; border-radius:20px;">
+</div>
+
+<h3 class="fw-bold mb-3">
+    Hotel Booking
+</h3>
+
+<p class="mb-4">
+
+    <strong>Status:</strong>
+
+    {% if booking.booking_status == "confirmed" %}
+
+        <span
+            style="
+                background:#dcfce7;
+                color:#15803d;
+                padding:6px 12px;
+                border-radius:20px;
+                font-weight:600;
+                margin-left:8px;
+            "
+        >
+            Confirmed
+        </span>
+
+    {% elif booking.booking_status == "cancelled" %}
+
+        <span
+            style="
+                background:#fee2e2;
+                color:#dc2626;
+                padding:6px 12px;
+                border-radius:20px;
+                font-weight:600;
+                margin-left:8px;
+            "
+        >
+            Cancelled
+        </span>
+
+    {% else %}
+
+        <span
+            style="
+                background:#fef3c7;
+                color:#d97706;
+                padding:6px 12px;
+                border-radius:20px;
+                font-weight:600;
+                margin-left:8px;
+            "
+        >
+            Pending
+        </span>
+
+    {% endif %}
+
+</p>
 
         <div class="row">
 
             <div class="col-md-6">
-
-                <h3 class="fw-bold mb-4">
-                    Hotel Details
-                </h3>
 
                 <p>
                     <strong>Hotel:</strong>
@@ -55,36 +112,12 @@ Booking Confirmed
 
                 <p>
                     <strong>Location:</strong>
-                    {{ booking.hotel.city }},
-                    {{ booking.hotel.state }}
+                    {{ booking.hotel.city }}
                 </p>
 
                 <p>
                     <strong>Room Type:</strong>
                     {{ booking.room.room_name }}
-                </p>
-
-                <p>
-                    <strong>Booking ID:</strong>
-                    {{ booking.booking_reference }}
-                </p>
-
-            </div>
-
-            <div class="col-md-6">
-
-                <h3 class="fw-bold mb-4">
-                    Stay Details
-                </h3>
-
-                <p>
-                    <strong>Check-in:</strong>
-                    {{ booking.check_in_date }}
-                </p>
-
-                <p>
-                    <strong>Check-out:</strong>
-                    {{ booking.check_out_date }}
                 </p>
 
                 <p>
@@ -97,28 +130,143 @@ Booking Confirmed
                     {{ booking.rooms_count }}
                 </p>
 
-                <h4 class="text-primary fw-bold mt-4">
-                    Total Paid:
+            </div>
+
+            <div class="col-md-6">
+
+                <p>
+                    <strong>Check-in:</strong>
+                    {{ booking.check_in_date }}
+                </p>
+
+                <p>
+                    <strong>Check-out:</strong>
+                    {{ booking.check_out_date }}
+                </p>
+
+                <p>
+                    <strong>Total Amount:</strong>
                     ₹{{ booking.total_price }}
-                </h4>
+                </p>
+
+                <p>
+                    <strong>Booking ID:</strong>
+                    {{ booking.booking_reference }}
+                </p>
 
             </div>
 
         </div>
 
-        <div class="text-center mt-4">
+        {% if booking.booking_status == "confirmed" %}
 
-            <a
-                href="{% url 'hotels:search' %}"
-                class="btn btn-primary px-5 py-3"
-                style="border-radius:12px;"
+        <hr>
+
+        <form
+            method="POST"
+            action="{% url 'hotels:cancel_booking' booking.id %}"
+        >
+
+            {% csrf_token %}
+
+            <button
+                type="submit"
+                class="btn btn-danger"
+                onclick="return confirm('Are you sure you want to cancel this booking?');"
             >
-                Book Another Hotel
-            </a>
+                Cancel Booking
+            </button>
 
-        </div>
+        </form>
+
+        {% endif %}
 
     </div>
+
+</div>
+
+
+<!-- Important Check-in Information -->
+
+<div
+    class="card border-0 shadow-lg"
+    style="
+        border-left:8px solid #2563eb;
+        background:#eff6ff;
+    "
+>
+
+    <div class="card-body p-4">
+
+        <h4 class="fw-bold text-primary mb-3">
+            Important Check-in Information
+        </h4>
+
+        <ul
+            style="
+                line-height:2;
+                font-size:16px;
+            "
+        >
+
+            <li>
+                Please carry a
+                <strong>valid government ID proof</strong>
+                for all guests during check-in.
+            </li>
+
+            <li>
+                Accepted IDs:
+                Aadhaar Card,
+                PAN Card,
+                Passport,
+                Driving License,
+                Voter ID.
+            </li>
+
+            <li>
+                <strong>Check-in time:</strong>
+                12:00 PM
+            </li>
+
+            <li>
+                <strong>Check-out time:</strong>
+                10:00 AM
+            </li>
+
+            <li>
+                Early check-in and late checkout
+                are subject to hotel availability.
+            </li>
+
+            <li>
+                Couple-friendly hotels require
+                both guests to carry valid ID proof.
+            </li>
+
+            <li>
+                Please reach the hotel at least
+                30 minutes before check-in.
+            </li>
+
+        </ul>
+
+    </div>
+
+</div>
+
+
+<div class="text-center mt-5">
+
+    <a
+        href="{% url 'bookings:list' %}"
+        class="btn btn-primary px-5 py-3"
+    >
+        View My Bookings
+    </a>
+
+</div>
+
 
 </div>
 
