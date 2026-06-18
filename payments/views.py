@@ -2,11 +2,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db import transaction
+import uuid
+
 from bookings.models import Booking
 from .models import Payment
 from .forms import PaymentForm
-import random
-import string
 
 
 @login_required
@@ -43,56 +43,30 @@ def payment_view(request, booking_id):
 
                 with transaction.atomic():
 
-                    transaction_id = ''.join(
-                        random.choices(
-                            string.ascii_uppercase +
-                            string.digits,
-                            k=12
-                        )
-                    )
-
-                    payment_success = (
-                        random.random() > 0.1
-                    )
+                    transaction_id = uuid.uuid4().hex[:12].upper()
 
                     payment = Payment.objects.create(
                         booking=booking,
                         amount=booking.total_price,
                         payment_method=payment_method,
-                        payment_status='success'
-                        if payment_success
-                        else 'failed',
+                        payment_status='success',
                         transaction_id=transaction_id
-                        if payment_success
-                        else None
                     )
 
-                    if payment_success:
+                    booking.booking_status = 'confirmed'
+                    booking.save()
 
-                        booking.booking_status = (
-                            'confirmed'
-                        )
+                    messages.success(
+                        request,
+                        f'Payment successful! '
+                        f'Transaction ID: '
+                        f'{transaction_id}'
+                    )
 
-                        booking.save()
-
-                        messages.success(
-                            request,
-                            f'Payment successful! '
-                            f'Transaction ID: '
-                            f'{transaction_id}'
-                        )
-
-                        return redirect(
-                            'payments:success',
-                            booking_id=booking_id
-                        )
-
-                    else:
-
-                        messages.error(
-                            request,
-                            'Payment failed.'
-                        )
+                    return redirect(
+                        'payments:success',
+                        booking_id=booking_id
+                    )
 
             except Exception as e:
 

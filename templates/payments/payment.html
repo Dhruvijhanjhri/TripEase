@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}
-Hotel Payment
+Flight Payment
 {% endblock %}
 
 {% block content %}
@@ -10,338 +10,154 @@ Hotel Payment
 
     <div class="row justify-content-center">
 
-        <div class="col-lg-7">
+        <div class="col-lg-8">
 
-            <div
-                class="card border-0 shadow-lg"
-                style="
-                    border-radius:25px;
-                    overflow:hidden;
-                "
-            >
+            <div class="card border-0 shadow-lg" style="border-radius:24px; overflow:hidden;">
 
-                <!-- Header -->
-
-                <div
-                    style="
-                        background:linear-gradient(
-                        135deg,
-                        #2563eb,
-                        #1d4ed8
-                        );
-                        color:white;
-                        padding:30px;
-                    "
-                >
-
-                    <h2 class="fw-bold mb-2">
-                        Complete Payment
-                    </h2>
-
-                    <p class="mb-0 opacity-75">
-                        Secure payment for your booking
-                    </p>
-
+                <div class="p-4 text-white" style="background:linear-gradient(135deg,#0f172a,#2563eb);">
+                    <h2 class="fw-bold mb-2">Complete Flight Payment</h2>
+                    <p class="mb-0">Secure payment for your flight booking</p>
                 </div>
 
-
-                <div class="card-body p-5">
-
-                    <!-- Hotel Info -->
+                <div class="card-body p-4 p-md-5">
 
                     <div class="mb-4">
-
-                        <h3 class="fw-bold">
-                            {{ booking.hotel.name }}
-                        </h3>
-
-                        <p class="text-muted">
-                            {{ booking.hotel.area }},
-                            {{ booking.hotel.city }}
+                        <div class="text-muted small mb-1">Flight</div>
+                        <h3 class="fw-bold mb-1">{{ booking.flight.airline }} - {{ booking.flight.flight_number }}</h3>
+                        <p class="text-muted mb-0">
+                            {{ booking.flight.source.code }} → {{ booking.flight.destination.code }}
                         </p>
-
                     </div>
 
-                    <hr>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="p-3 rounded-4 bg-light h-100">
+                                <p class="mb-2"><strong>Route:</strong> {{ booking.flight.source.code }} → {{ booking.flight.destination.code }}</p>
+                                <p class="mb-2"><strong>Travel Date:</strong> {{ booking.travel_date|date:"M d, Y" }}</p>
+                                <p class="mb-0"><strong>Cabin Class:</strong> {{ booking.cabin_class|title }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 rounded-4 bg-light h-100">
+                                <p class="mb-2"><strong>Passengers:</strong> {{ booking.number_of_passengers }}</p>
+                                <p class="mb-2"><strong>Booking Reference:</strong> {{ booking.booking_reference }}</p>
+                                <p class="mb-0"><strong>Total Amount:</strong> ₹{{ booking.total_price|floatformat:0 }}</p>
+                            </div>
+                        </div>
+                    </div>
 
-                    <!-- Booking Details -->
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            Please review the selected payment method.
+                        </div>
+                    {% endif %}
 
-                    <div class="mb-4">
+                    <form method="POST" novalidate>
+                        {% csrf_token %}
 
-                        <h5 class="fw-bold mb-3">
-                            Booking Details
-                        </h5>
+                        <h5 class="fw-bold mb-3">Select Payment Method</h5>
 
-                        <div class="row">
-
-                            <div class="col-6">
-
-                                <p>
-                                    <strong>Room:</strong>
-                                    {{ booking.room.room_name }}
-                                </p>
-
-                                <p>
-                                    <strong>Guests:</strong>
-                                    {{ booking.guests }}
-                                </p>
-
-                                <p>
-                                    <strong>Rooms:</strong>
-                                    {{ booking.rooms_count }}
-                                </p>
-
+                        <div class="payment-method-list">
+                            <div class="payment-option p-3 rounded-4 border mb-3">
+                                <label class="d-flex align-items-center gap-3 mb-0 w-100" for="payment-upi">
+                                    <input class="form-check-input payment-method-radio" type="radio" name="payment_method" id="payment-upi" value="upi" checked>
+                                    <span class="fw-semibold">UPI</span>
+                                </label>
+                                <div class="payment-fields mt-3" data-payment-panel="upi">
+                                    <label class="form-label">UPI ID</label>
+                                    <input type="text" class="form-control" name="upi_id" placeholder="example@upi" value="{{ form.upi_id.value|default_if_none:'' }}">
+                                </div>
                             </div>
 
-                            <div class="col-6">
-
-                                <p>
-                                    <strong>Check-in:</strong>
-                                    {{ booking.check_in_date }}
-                                </p>
-
-                                <p>
-                                    <strong>Check-out:</strong>
-                                    {{ booking.check_out_date }}
-                                </p>
-
-                                <p>
-                                    <strong>Nights:</strong>
-                                    {{ booking.total_nights }}
-                                </p>
-
+                            <div class="payment-option p-3 rounded-4 border mb-3">
+                                <label class="d-flex align-items-center gap-3 mb-0 w-100" for="payment-card">
+                                    <input class="form-check-input payment-method-radio" type="radio" name="payment_method" id="payment-card" value="card">
+                                    <span class="fw-semibold">Card</span>
+                                </label>
+                                <div class="payment-fields mt-3 d-none" data-payment-panel="card">
+                                    <div class="mb-3">
+                                        <label class="form-label">Card Number</label>
+                                        <input type="text" class="form-control" name="card_number" placeholder="1234 5678 9012 3456" value="{{ form.card_number.value|default_if_none:'' }}">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Cardholder Name</label>
+                                        <input type="text" class="form-control" name="cardholder_name" placeholder="Name on card" value="{{ form.cardholder_name.value|default_if_none:'' }}">
+                                    </div>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Expiry</label>
+                                            <input type="text" class="form-control" name="card_expiry" placeholder="MM/YY" value="{{ form.card_expiry.value|default_if_none:'' }}">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">CVV</label>
+                                            <input type="password" class="form-control" name="card_cvv" placeholder="CVV" value="{{ form.card_cvv.value|default_if_none:'' }}">
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
+                            <div class="payment-option p-3 rounded-4 border mb-3">
+                                <label class="d-flex align-items-center gap-3 mb-0 w-100" for="payment-netbanking">
+                                    <input class="form-check-input payment-method-radio" type="radio" name="payment_method" id="payment-netbanking" value="netbanking">
+                                    <span class="fw-semibold">Net Banking</span>
+                                </label>
+                                <div class="payment-fields mt-3 d-none" data-payment-panel="netbanking">
+                                    <label class="form-label">Bank</label>
+                                    <select class="form-select" name="bank_name">
+                                        {% for value, label in form.fields.bank_name.choices %}
+                                            <option value="{{ value }}" {% if form.bank_name.value == value %}selected{% endif %}>{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="payment-option p-3 rounded-4 border mb-3">
+                                <label class="d-flex align-items-center gap-3 mb-0 w-100" for="payment-wallet">
+                                    <input class="form-check-input payment-method-radio" type="radio" name="payment_method" id="payment-wallet" value="wallet">
+                                    <span class="fw-semibold">Wallet</span>
+                                </label>
+                                <div class="payment-fields mt-3 d-none" data-payment-panel="wallet">
+                                    <label class="form-label">Wallet</label>
+                                    <select class="form-select" name="wallet_name">
+                                        {% for value, label in form.fields.wallet_name.choices %}
+                                            <option value="{{ value }}" {% if form.wallet_name.value == value %}selected{% endif %}>{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
                         </div>
 
-                    </div>
-
-                    <hr>
-
-                    <h5 class="fw-bold mb-3">
-    Select Payment Method
-</h5>
-
-<div class="mb-4">
-
-    <div class="form-check mb-3">
-        <input
-            class="form-check-input payment-method"
-            type="radio"
-            name="payment_method"
-            value="upi"
-            checked
-        >
-        <label class="form-check-label">
-            UPI
-        </label>
-    </div>
-
-    <div id="upi-box" class="payment-box mb-3">
-        <input
-            type="text"
-            class="form-control"
-            placeholder="Enter UPI ID"
-        >
-    </div>
-
-
-    <div class="form-check mb-3">
-        <input
-            class="form-check-input payment-method"
-            type="radio"
-            name="payment_method"
-            value="card"
-        >
-        <label class="form-check-label">
-            Credit / Debit Card
-        </label>
-    </div>
-
-    <div
-        id="card-box"
-        class="payment-box mb-3"
-        style="display:none;"
-    >
-        <input
-            type="text"
-            class="form-control mb-2"
-            placeholder="Card Number"
-        >
-
-        <input
-            type="text"
-            class="form-control mb-2"
-            placeholder="Card Holder Name"
-        >
-
-        <div class="row">
-            <div class="col">
-                <input
-                    type="text"
-                    class="form-control"
-                    placeholder="MM/YY"
-                >
-            </div>
-
-            <div class="col">
-                <input
-                    type="password"
-                    class="form-control"
-                    placeholder="CVV"
-                >
-            </div>
-        </div>
-    </div>
-
-
-    <div class="form-check mb-3">
-        <input
-            class="form-check-input payment-method"
-            type="radio"
-            name="payment_method"
-            value="bank"
-        >
-        <label class="form-check-label">
-            Net Banking
-        </label>
-    </div>
-
-    <div
-        id="bank-box"
-        class="payment-box mb-3"
-        style="display:none;"
-    >
-        <select class="form-select">
-            <option>Select Bank</option>
-            <option>SBI</option>
-            <option>HDFC</option>
-            <option>ICICI</option>
-            <option>Axis Bank</option>
-        </select>
-    </div>
-
-
-    <div class="form-check mb-3">
-        <input
-            class="form-check-input payment-method"
-            type="radio"
-            name="payment_method"
-            value="wallet"
-        >
-        <label class="form-check-label">
-            Wallet
-        </label>
-    </div>
-
-    <div
-        id="wallet-box"
-        class="payment-box"
-        style="display:none;"
-    >
-        <select class="form-select">
-            <option>Paytm</option>
-            <option>PhonePe</option>
-            <option>Amazon Pay</option>
-        </select>
-    </div>
-
-</div>
-
-                    <hr>
-
-                    <!-- Total -->
-
-                    <div class="text-center mt-4">
-
-                        <h2
-                            class="fw-bold text-success"
-                        >
-                            ₹{{ booking.total_price }}
-                        </h2>
-
-                        <p class="text-muted">
-                            Total Amount Payable
-                        </p>
-
-                        <form method="POST">
-
-                            {% csrf_token %}
-
-                            <button
-                                class="btn btn-success px-5 py-3"
-                                style="
-                                    border-radius:14px;
-                                    font-size:18px;
-                                    font-weight:600;
-                                "
-                            >
-                                Pay Now
-                            </button>
-
-                        </form>
-
-                    </div>
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-success btn-lg py-3 fw-semibold" style="border-radius:14px;">Pay Now</button>
+                        </div>
+                    </form>
 
                 </div>
-
             </div>
-
         </div>
-
     </div>
-
-</div>
-
 </div>
 
 <script>
+document.addEventListener('DOMContentLoaded', function () {
+    const radios = document.querySelectorAll('.payment-method-radio');
+    const panels = document.querySelectorAll('.payment-fields');
 
-const methods =
-document.querySelectorAll(
-'.payment-method'
-);
+    function updatePanels() {
+        const selected = document.querySelector('.payment-method-radio:checked');
+        const activeValue = selected ? selected.value : 'upi';
 
-methods.forEach(method => {
-
-    method.addEventListener(
-    'change',
-    function() {
-
-        document
-        .querySelectorAll(
-        '.payment-box'
-        )
-        .forEach(box => {
-
-            box.style.display =
-            'none';
-
+        panels.forEach(function (panel) {
+            panel.classList.toggle('d-none', panel.dataset.paymentPanel !== activeValue);
         });
+    }
 
-        if(this.value === 'upi')
-            document.getElementById(
-            'upi-box'
-            ).style.display='block';
-
-        if(this.value === 'card')
-            document.getElementById(
-            'card-box'
-            ).style.display='block';
-
-        if(this.value === 'bank')
-            document.getElementById(
-            'bank-box'
-            ).style.display='block';
-
-        if(this.value === 'wallet')
-            document.getElementById(
-            'wallet-box'
-            ).style.display='block';
+    radios.forEach(function (radio) {
+        radio.addEventListener('change', updatePanels);
     });
 
+    updatePanels();
 });
-
 </script>
 
 {% endblock %}
