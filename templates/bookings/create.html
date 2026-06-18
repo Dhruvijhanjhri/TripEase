@@ -8,15 +8,22 @@
     <h2 class="section-title">Passenger Details</h2>
     
     <div class="card" style="padding: 20px; margin-bottom: 30px;">
-        <h3>{{ flight.airline }} - {{ flight.flight_number }}</h3>
+        <h3>{{ flight.airline }}</h3>
+        <p>{{ flight.get_display_flight_number }}</p>
         <div style="color: #475569;">
-            {{ flight.source.code }} → {{ flight.destination.code }} | 
-            {{ flight.departure_time|date:"M d, Y" }} | 
-            {{ cabin_class|title }} | 
+            Route: {{ flight.source.code }} → {{ flight.destination.code }} |
+            Travel Date: {{ travel_date|date:"M d, Y" }} |
+            Cabin: {{ cabin_class|title }} |
             {{ passengers }} Passenger{{ passengers|pluralize }}
         </div>
         <div style="margin-top: 10px; font-size: 1.2rem; font-weight: 700; color: #1e5eff;">
             Total: ₹{{ total_price|floatformat:0 }}
+        </div>
+        <div style="margin-top: 8px; color: #475569;">
+            Seats: {{ seat_display }}
+        </div>
+        <div style="margin-top: 8px; color: #475569;">
+            Journey Time: {{ duration_display }}
         </div>
     </div>
     

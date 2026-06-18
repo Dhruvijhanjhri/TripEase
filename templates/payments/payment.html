@@ -23,7 +23,8 @@ Flight Payment
 
                     <div class="mb-4">
                         <div class="text-muted small mb-1">Flight</div>
-                        <h3 class="fw-bold mb-1">{{ booking.flight.airline }} - {{ booking.flight.flight_number }}</h3>
+                        <h3 class="fw-bold mb-1">{{ booking.flight.airline }}</h3>
+                        <p class="mb-1">{{ booking.flight.get_display_flight_number }}</p>
                         <p class="text-muted mb-0">
                             {{ booking.flight.source.code }} → {{ booking.flight.destination.code }}
                         </p>
@@ -33,7 +34,7 @@ Flight Payment
                         <div class="col-md-6">
                             <div class="p-3 rounded-4 bg-light h-100">
                                 <p class="mb-2"><strong>Route:</strong> {{ booking.flight.source.code }} → {{ booking.flight.destination.code }}</p>
-                                <p class="mb-2"><strong>Travel Date:</strong> {{ booking.travel_date|date:"M d, Y" }}</p>
+                                <p class="mb-2"><strong>Travel Date:</strong> {{ booking.travel_date|date:"D, M d, Y" }}</p>
                                 <p class="mb-0"><strong>Cabin Class:</strong> {{ booking.cabin_class|title }}</p>
                             </div>
                         </div>
@@ -41,6 +42,7 @@ Flight Payment
                             <div class="p-3 rounded-4 bg-light h-100">
                                 <p class="mb-2"><strong>Passengers:</strong> {{ booking.number_of_passengers }}</p>
                                 <p class="mb-2"><strong>Booking Reference:</strong> {{ booking.booking_reference }}</p>
+                                <p class="mb-2"><strong>Duration:</strong> {{ booking.flight.get_duration_display }}</p>
                                 <p class="mb-0"><strong>Total Amount:</strong> ₹{{ booking.total_price|floatformat:0 }}</p>
                             </div>
                         </div>

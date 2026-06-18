@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.db import transaction
 
 from flights.models import Flight
+from flights.realism import format_duration_minutes, get_route_price
 from .models import Booking, Passenger
 from .forms import PassengerFormSet
 
@@ -69,11 +70,15 @@ def create_booking(request, flight_id):
             id=second_leg_id
         )
 
-        first_leg_price = flight.get_price(
+        first_leg_price = get_route_price(
+            flight.source.code,
+            flight.destination.code,
             cabin_class
         )
 
-        second_leg_price = second_leg.get_price(
+        second_leg_price = get_route_price(
+            second_leg.source.code,
+            second_leg.destination.code,
             cabin_class
         )
 
@@ -84,13 +89,26 @@ def create_booking(request, flight_id):
 
     else:
 
-        price = flight.get_price(
+        price = get_route_price(
+            flight.source.code,
+            flight.destination.code,
             cabin_class
         )
 
     total_price = (
         price * passengers
     )
+
+    if second_leg:
+        duration_minutes = int(
+            (
+                second_leg.arrival_time - flight.departure_time
+            ).total_seconds() / 60
+        )
+    else:
+        duration_minutes = flight.duration_minutes
+
+    duration_display = format_duration_minutes(duration_minutes)
 
     # -------------------------
     # POST REQUEST
@@ -201,6 +219,11 @@ def create_booking(request, flight_id):
         'formset': formset,
         'is_via': is_via,
         'second_leg_id': second_leg_id,
+        'departure_date': departure_date,
+        'travel_date': travel_date,
+        'duration_display': duration_display,
+        'seat_display': flight.get_seat_display(),
+        'flight_number_display': flight.get_display_flight_number(),
     }
 
     return render(

@@ -6,6 +6,13 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 from datetime import datetime, timedelta
 from flights.models import Airport, Flight
+from flights.realism import (
+    ACTIVE_AIRLINES,
+    get_airline_code,
+    get_route_base_fare,
+    get_route_duration_minutes,
+    normalize_airline_name,
+)
 import random
 
 
@@ -40,12 +47,10 @@ class Command(BaseCommand):
         # Airlines
         airlines = [
             'Air India',
+            'Air India Express',
             'IndiGo',
+            'Akasa Air',
             'SpiceJet',
-            'Vistara',
-            'Go First',
-            'AirAsia India',
-            'Alliance Air',
         ]
         
         # Create Airports
@@ -103,19 +108,19 @@ class Command(BaseCommand):
                         datetime.combine(current_date, datetime.min.time().replace(hour=hour, minute=minute))
                     )
                     
-                    # Flight duration between 1.5 to 3.5 hours
-                    duration_minutes = random.randint(90, 210)
+                    # Realistic duration based on route band
+                    duration_minutes = get_route_duration_minutes(source_code, dest_code)
                     arrival_time = departure_time + timedelta(minutes=duration_minutes)
                     
                     # Prices (in INR)
-                    base_price = random.randint(3000, 8000)
-                    economy_price = base_price
-                    business_price = int(base_price * 2.5)
-                    first_class_price = int(base_price * 5)
+                    base_price = get_route_base_fare(source_code, dest_code)
+                    economy_price = float(base_price)
+                    business_price = float(base_price * 1.8)
+                    first_class_price = float(base_price * 1.35)
                     
                     # Flight number - make it unique by including date, route, and flight number
-                    airline = random.choice(airlines)
-                    airline_code = airline[:2].upper() if len(airline) >= 2 else 'AI'
+                    airline = normalize_airline_name(random.choice(airlines))
+                    airline_code = get_airline_code(airline)
                     route_code = f"{source_code}{dest_code}"
                     flight_num = random.randint(100, 999)
                     flight_number = f"{airline_code}-{flight_num}-{route_code}-{day}-{flight_num}"

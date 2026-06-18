@@ -2,6 +2,13 @@ from django.db import models
 from django.core.validators import MinValueValidator
 from decimal import Decimal
 
+from .realism import (
+    format_duration_minutes,
+    get_display_flight_number,
+    get_seat_label,
+    normalize_airline_name,
+)
+
 
 class Airport(models.Model):
     """Airport model"""
@@ -60,6 +67,10 @@ class Flight(models.Model):
     def __str__(self):
         return f"{self.flight_number} - {self.source.code} to {self.destination.code}"
 
+    def save(self, *args, **kwargs):
+        self.airline = normalize_airline_name(self.airline)
+        super().save(*args, **kwargs)
+
     def get_price(self, cabin_class):
         """Get price for specific cabin class"""
         price_map = {
@@ -71,11 +82,10 @@ class Flight(models.Model):
 
     def get_duration_display(self):
         """Get formatted duration string"""
-        hours = self.duration_minutes // 60
-        minutes = self.duration_minutes % 60
-        if hours > 0 and minutes > 0:
-            return f"{hours}h {minutes}m"
-        elif hours > 0:
-            return f"{hours}h"
-        else:
-            return f"{minutes}m"
+        return format_duration_minutes(self.duration_minutes)
+
+    def get_seat_display(self):
+        return get_seat_label(self.available_seats)
+
+    def get_display_flight_number(self):
+        return get_display_flight_number(self.flight_number, self.airline)

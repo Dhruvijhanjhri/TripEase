@@ -32,14 +32,21 @@
 
             <h4>
                 {{ flight.airline }}
-                -
-                {{ flight.flight_number }}
             </h4>
+
+            <p>
+                {{ flight.get_display_flight_number }}
+            </p>
 
             <p>
                 {{ flight.source.code }}
                 →
                 {{ flight.destination.code }}
+            </p>
+
+            <p>
+                Seats:
+                {{ flight.seat_display }}
             </p>
 
             <p>
@@ -55,6 +62,11 @@
             <p>
                 Duration:
                 {{ flight.get_duration_display }}
+            </p>
+
+            <p>
+                Cabin Price:
+                ₹ {{ flight.cabin_price }}
             </p>
 
             <p>
@@ -102,11 +114,18 @@
             </p>
 
             <p>
+                Seats:
+                {{ route.first_leg_seat_display }}
+                +
+                {{ route.second_leg_seat_display }}
+            </p>
+
+            <p>
                 <strong>First Flight:</strong>
 
                 {{ route.first_leg.airline }}
 
-                ({{ route.first_leg.flight_number }})
+                ({{ route.first_leg.get_display_flight_number }})
             </p>
 
             <p>
@@ -120,7 +139,7 @@
 
                 {{ route.second_leg.airline }}
 
-                ({{ route.second_leg.flight_number }})
+                ({{ route.second_leg.get_display_flight_number }})
             </p>
 
             <p>
@@ -135,8 +154,13 @@
             </p>
 
             <p>
-                Duration:
-                {{ route.total_duration }} mins
+                Cabin Price:
+                ₹ {{ route.first_leg_price }} + ₹ {{ route.second_leg_price }}
+            </p>
+
+            <p>
+                Total Journey Time:
+                {{ route.total_duration_display }}
             </p>
 
             <a href="{% url 'flights:flight_detail' route.first_leg.id %}?cabin_class={{ cabin_class }}&passengers={{ passengers }}&departure_date={{ request.GET.departure_date }}&is_via=1&second_leg_id={{ route.second_leg.id }}">

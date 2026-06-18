@@ -5,16 +5,23 @@ from decimal import Decimal
 import random
 import uuid
 
+from flights.realism import (
+    get_airline_code,
+    get_route_base_fare,
+    get_route_duration_minutes,
+    normalize_airline_name,
+)
+
 print("Fixing missing/weak airports...")
 
 hub_codes = ['DEL', 'BLR', 'MAA', 'BOM', 'HYD', 'CCU']
 
 airlines = [
-    'Indigo',
     'Air India',
+    'Air India Express',
+    'IndiGo',
     'Akasa Air',
     'SpiceJet',
-    'Air India Express'
 ]
 
 # Airports with poor coverage
@@ -53,6 +60,10 @@ for airport_code in target_airports:
 
             for _ in range(2):
 
+                chosen_airline = normalize_airline_name(
+                    random.choice(airlines)
+                )
+
                 departure_hour = random.randint(5, 22)
                 departure_minute = random.choice([0, 15, 30, 45])
 
@@ -66,35 +77,35 @@ for airport_code in target_airports:
                     )
                 )
 
-                duration = random.randint(60, 240)
+                duration = get_route_duration_minutes(airport_code, hub_code)
 
                 arrival_time = (
                     departure_time +
                     timedelta(minutes=duration)
                 )
 
-                base_price = random.randint(2500, 8500)
+                base_price = get_route_base_fare(airport_code, hub_code)
 
                 # guaranteed unique flight number
                 unique_id = uuid.uuid4().hex[:6].upper()
 
                 flight_number = (
-                    f"{random.choice(['AI','6E','SG','QP'])}-"
+                    f"{get_airline_code(chosen_airline)}-"
                     f"{airport_code}{unique_id}"
                 )
 
                 new_flights.append(
                     Flight(
                         flight_number=flight_number,
-                        airline=random.choice(airlines),
+                        airline=chosen_airline,
                         source=source_airport,
                         destination=destination_airport,
                         departure_time=departure_time,
                         arrival_time=arrival_time,
                         duration_minutes=duration,
                         economy_price=Decimal(base_price),
-                        business_price=Decimal(base_price * 2.2),
-                        first_class_price=Decimal(base_price * 4),
+                        business_price=Decimal(base_price * 1.8),
+                        first_class_price=Decimal(base_price * 1.35),
                         total_seats=180,
                         available_seats=random.randint(50, 180),
                         is_non_stop=True

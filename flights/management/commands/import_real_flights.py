@@ -6,6 +6,7 @@ from django.utils import timezone
 from datetime import timedelta
 
 from flights.models import Flight, Airport
+from flights.realism import normalize_airline_name
 
 class Command(BaseCommand):
 
@@ -91,8 +92,7 @@ class Command(BaseCommand):
                     flight_number=flight_number,
 
                     defaults={
-
-                        'airline': row['airline'],
+                        'airline': normalize_airline_name(row['airline']),
 
                         'source': source_airport,
 

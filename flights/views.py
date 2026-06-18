@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 
 from .models import Flight
 from .forms import FlightSearchForm
+from .realism import format_duration_minutes, get_route_price
 
 
 def flight_search(request):
@@ -67,8 +68,17 @@ def flight_search(request):
                 )
 
                 flight.price = (
-                    flight.get_price(cabin_class)
-                    * passengers
+                    get_route_price(
+                        flight.source.code,
+                        flight.destination.code,
+                        cabin_class
+                    ) * passengers
+                )
+                flight.seat_display = flight.get_seat_display()
+                flight.cabin_price = get_route_price(
+                    flight.source.code,
+                    flight.destination.code,
+                    cabin_class
                 )
 
             # ==================================
@@ -108,9 +118,17 @@ def flight_search(request):
                 if second_leg:
 
                     total_price = (
-                        first_leg.get_price(cabin_class)
+                        get_route_price(
+                            first_leg.source.code,
+                            first_leg.destination.code,
+                            cabin_class
+                        )
                         +
-                        second_leg.get_price(cabin_class)
+                        get_route_price(
+                            second_leg.source.code,
+                            second_leg.destination.code,
+                            cabin_class
+                        )
                     ) * passengers
 
                     total_duration = int(
@@ -126,6 +144,19 @@ def flight_search(request):
                         "second_leg": second_leg,
                         "total_price": total_price,
                         "total_duration": total_duration,
+                        "total_duration_display": format_duration_minutes(total_duration),
+                        "first_leg_seat_display": first_leg.get_seat_display(),
+                        "second_leg_seat_display": second_leg.get_seat_display(),
+                        "first_leg_price": get_route_price(
+                            first_leg.source.code,
+                            first_leg.destination.code,
+                            cabin_class
+                        ),
+                        "second_leg_price": get_route_price(
+                            second_leg.source.code,
+                            second_leg.destination.code,
+                            cabin_class
+                        ),
                     })
 
             via_flights = via_flights[:10]
@@ -177,9 +208,7 @@ def flight_detail(request, flight_id):
     second_leg = None
     total_price = 0
     total_duration = 0
-
-    selected_date = None
-
+    total_duration_display = ""
     if departure_date:
 
         selected_date = datetime.strptime(
@@ -241,9 +270,17 @@ def flight_detail(request, flight_id):
                 )
 
         total_price = (
-            flight.get_price(cabin_class)
+            get_route_price(
+                flight.source.code,
+                flight.destination.code,
+                cabin_class
+            )
             +
-            second_leg.get_price(cabin_class)
+            get_route_price(
+                second_leg.source.code,
+                second_leg.destination.code,
+                cabin_class
+            )
         ) * passengers
 
         total_duration = (
@@ -277,25 +314,51 @@ def flight_detail(request, flight_id):
             )
 
         total_price = (
-            flight.get_price(cabin_class)
-            * passengers
+            get_route_price(
+                flight.source.code,
+                flight.destination.code,
+                cabin_class
+            ) * passengers
         )
 
         total_duration = (
             flight.duration_minutes
         )
+        total_duration_display = format_duration_minutes(total_duration)
+
+    selected_departure_date = selected_date or flight.departure_time.date()
 
     context = {
-    'flight': flight,
-    'second_leg': second_leg,
-    'is_via': is_via,
-    'price': total_price,
-    'total_price': total_price,
-    'cabin_class': cabin_class,
-    'passengers': passengers,
-    'departure_date': departure_date,
-    'total_duration': total_duration,
-}
+        'flight': flight,
+        'second_leg': second_leg,
+        'is_via': is_via,
+        'price': total_price,
+        'total_price': total_price,
+        'cabin_class': cabin_class,
+        'passengers': passengers,
+        'departure_date': departure_date,
+        'selected_departure_date': selected_departure_date,
+        'total_duration': total_duration,
+        'total_duration_display': total_duration_display,
+        'seat_display': flight.get_seat_display(),
+        'cabin_price': get_route_price(
+            flight.source.code,
+            flight.destination.code,
+            cabin_class
+        ) if not second_leg else (
+            get_route_price(
+                flight.source.code,
+                flight.destination.code,
+                cabin_class
+            ) + get_route_price(
+                second_leg.source.code,
+                second_leg.destination.code,
+                cabin_class
+            )
+        ),
+        'flight_number_display': flight.get_display_flight_number(),
+        'second_leg_flight_number_display': second_leg.get_display_flight_number() if second_leg else None,
+    }
 
     return render(
         request,

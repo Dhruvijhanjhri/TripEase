@@ -5,6 +5,14 @@ from decimal import Decimal
 import random
 import uuid
 
+from flights.realism import (
+    ACTIVE_AIRLINES,
+    get_airline_code,
+    get_route_base_fare,
+    get_route_duration_minutes,
+    normalize_airline_name,
+)
+
 print("Generating realistic flight schedules...")
 
 # Clear old flights
@@ -13,12 +21,11 @@ Flight.objects.all().delete()
 HUBS = ['DEL', 'BOM', 'BLR', 'HYD', 'MAA', 'CCU']
 
 AIRLINES = [
-    ("6E", "Indigo"),
+    ("6E", "IndiGo"),
     ("AI", "Air India"),
     ("SG", "SpiceJet"),
     ("QP", "Akasa Air"),
     ("IX", "Air India Express"),
-    ("UK", "Vistara"),
 ]
 
 airports = {
@@ -74,21 +81,20 @@ for source_code, source_airport in airports.items():
                     )
                 )
 
-                duration = random.randint(60, 240)
+                duration = get_route_duration_minutes(source_code, destination_code)
 
                 arrival_time = (
                     departure_time +
                     timedelta(minutes=duration)
                 )
 
-                base_price = random.randint(
-                    2500,
-                    9000
-                )
+                base_price = get_route_base_fare(source_code, destination_code)
 
                 code_prefix, airline = random.choice(
                     AIRLINES
                 )
+                airline = normalize_airline_name(airline)
+                code_prefix = get_airline_code(airline)
 
                 # GUARANTEED UNIQUE
                 unique_id = uuid.uuid4().hex[:8]
@@ -103,7 +109,7 @@ for source_code, source_airport in airports.items():
                 new_flights.append(
                     Flight(
                         flight_number=flight_number,
-                        airline=airline,
+                        airline=normalize_airline_name(airline),
                         source=source_airport,
                         destination=destination_airport,
                         departure_time=departure_time,
@@ -114,7 +120,7 @@ for source_code, source_airport in airports.items():
                             base_price * 1.8
                         ),
                         first_class_price=Decimal(
-                            base_price * 3
+                            base_price * 1.35
                         ),
                         total_seats=180,
                         available_seats=random.randint(

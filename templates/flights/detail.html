@@ -28,6 +28,13 @@ Flight Details
 
     </h3>
 
+    <div style="margin: 10px 0 20px; color: #475569;">
+        Travel Date: <strong>{{ selected_departure_date|date:"D, M d, Y" }}</strong> |
+        Seats: <strong>{{ seat_display }}</strong> |
+        Duration: <strong>{{ total_duration_display }}</strong> |
+        Cabin Price: <strong>₹{{ cabin_price }}</strong>
+    </div>
+
     <!-- FIRST FLIGHT -->
     <div
         style="
@@ -40,9 +47,16 @@ Flight Details
 
         <h3>
             {{ flight.airline }}
-            -
-            {{ flight.flight_number }}
         </h3>
+
+        <p>
+            {{ flight.get_display_flight_number }}
+        </p>
+
+        <p>
+            Airline:
+            <strong>{{ flight.airline }}</strong>
+        </p>
 
         <div
             style="
@@ -66,7 +80,7 @@ Flight Details
                 </p>
 
                 <p>
-                    {{ flight.departure_time|date:"D, M d, Y" }}
+                    {{ selected_departure_date|date:"D, M d, Y" }}
                 </p>
             </div>
 
@@ -124,9 +138,16 @@ Flight Details
 
         <h3>
             {{ second_leg.airline }}
-            -
-            {{ second_leg.flight_number }}
         </h3>
+
+        <p>
+            {{ second_leg.get_display_flight_number }}
+        </p>
+
+        <p>
+            Airline:
+            <strong>{{ second_leg.airline }}</strong>
+        </p>
 
         <div
             style="
@@ -150,7 +171,7 @@ Flight Details
                 </p>
 
                 <p>
-                    {{ second_leg.departure_time|date:"D, M d, Y" }}
+                    {{ selected_departure_date|date:"D, M d, Y" }}
                 </p>
             </div>
 
@@ -181,7 +202,7 @@ Flight Details
                 </p>
 
                 <p>
-                    {{ second_leg.arrival_time|date:"D, M d, Y" }}
+                    {{ selected_departure_date|date:"D, M d, Y" }}
                 </p>
             </div>
 
@@ -202,13 +223,18 @@ Flight Details
         </p>
 
         <p>
+            Seats:
+            {{ seat_display }}
+        </p>
+
+        <p>
             Passengers:
             {{ passengers }}
         </p>
 
         <p>
             Total Duration:
-            {{ duration_display }}
+            {{ total_duration_display }}
         </p>
 
         <h2>

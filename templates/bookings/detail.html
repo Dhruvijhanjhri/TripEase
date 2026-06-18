@@ -59,9 +59,12 @@
             <div style="margin: 15px 0;">
 
                 <strong>
-                    {{ booking.flight.airline }} -
-                    {{ booking.flight.flight_number }}
+                    {{ booking.flight.airline }}
                 </strong>
+
+                <div>
+                    {{ booking.flight.get_display_flight_number }}
+                </div>
 
                 <div style="color: #475569; margin-top: 5px;">
 
@@ -78,6 +81,10 @@
                     |
 
                     {{ booking.cabin_class|title }}
+
+                    |
+
+                    {{ booking.flight.get_duration_display }}
 
                 </div>
 

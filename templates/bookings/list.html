@@ -34,6 +34,10 @@ My Bookings - TripEase
                             {{ booking.flight.airline }}
                         </h4>
 
+                        <p class="mb-1">
+                            {{ booking.flight.get_display_flight_number }}
+                        </p>
+
                         <p class="text-muted">
                             {{ booking.flight.source.city }}
                             →
@@ -42,7 +46,7 @@ My Bookings - TripEase
 
                         <p>
                             <strong>Date:</strong>
-                            {{ booking.travel_date }}
+                            {{ booking.travel_date|date:"M d, Y" }}
                         </p>
 
                         <p>
@@ -53,6 +57,11 @@ My Bookings - TripEase
                         <p>
                             <strong>Booking Ref:</strong>
                             {{ booking.booking_reference }}
+                        </p>
+
+                        <p>
+                            <strong>Duration:</strong>
+                            {{ booking.flight.get_duration_display }}
                         </p>
 
                         <h4 class="text-primary fw-bold">

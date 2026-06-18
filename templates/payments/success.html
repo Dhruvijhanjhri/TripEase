@@ -11,6 +11,9 @@
         
         <div style="text-align: left; margin: 30px 0;">
             <p><strong>Booking Reference:</strong> {{ booking.booking_reference }}</p>
+            <p><strong>Flight:</strong> {{ booking.flight.airline }}</p>
+            <p><strong>{{ booking.flight.get_display_flight_number }}</strong></p>
+            <p><strong>Travel Date:</strong> {{ booking.travel_date|date:"D, M d, Y" }}</p>
             <p><strong>Transaction ID:</strong> {{ payment.transaction_id }}</p>
             <p><strong>Amount Paid:</strong> ₹{{ payment.amount|floatformat:0 }}</p>
             <p><strong>Payment Method:</strong> {{ payment.get_payment_method_display }}</p>
