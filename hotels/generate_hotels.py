@@ -2,6 +2,7 @@ from hotels.models import Hotel, Room
 from datetime import time
 import random
 from hotels.india_destinations import INDIA_DESTINATIONS
+from hotels.hotel_master_data import REAL_HOTELS
 
 print("Deleting old hotels...")
 Room.objects.all().delete()
@@ -61,6 +62,7 @@ created = 0
 print("Generating hotels...")
 
 for city, state in india_locations.items():
+    used_hotels = set()
 
     if city in [
         "Mumbai",
@@ -95,13 +97,31 @@ for city, state in india_locations.items():
 
     for _ in range(hotel_count):
 
-        hotel_name = (
-            random.choice(hotel_prefix)
-            + " "
-            + city
-            + " "
-            + random.choice(hotel_suffix)
-        )
+        if city in REAL_HOTELS:
+
+            available_hotels = [
+                h for h in REAL_HOTELS[city]
+                if h not in used_hotels
+            ]
+
+            if available_hotels:
+                hotel_name = random.choice(
+                    available_hotels
+                )
+                used_hotels.add(hotel_name)
+            else:
+                hotel_name = random.choice(
+                    REAL_HOTELS[city]
+                )
+
+        else:
+            hotel_name = (
+                random.choice(hotel_prefix)
+                + " "
+                + city
+                + " "
+                + random.choice(hotel_suffix)
+            )
 
         aliases = {
             "Bengaluru": "bangalore,blr",
