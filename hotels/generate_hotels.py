@@ -1,54 +1,13 @@
 from hotels.models import Hotel, Room
 from datetime import time
 import random
+from hotels.india_destinations import INDIA_DESTINATIONS
 
 print("Deleting old hotels...")
 Room.objects.all().delete()
 Hotel.objects.all().delete()
 
-# Major India cities
-india_locations = {
-    "Ahmedabad": "Gujarat",
-    "Bengaluru": "Karnataka",
-    "Mumbai": "Maharashtra",
-    "Delhi": "Delhi",
-    "Pune": "Maharashtra",
-    "Hyderabad": "Telangana",
-    "Chennai": "Tamil Nadu",
-    "Kolkata": "West Bengal",
-    "Jaipur": "Rajasthan",
-    "Goa": "Goa",
-    "Lucknow": "Uttar Pradesh",
-    "Indore": "Madhya Pradesh",
-    "Bhopal": "Madhya Pradesh",
-    "Kochi": "Kerala",
-    "Srinagar": "Jammu & Kashmir",
-    "Jammu": "Jammu & Kashmir",
-    "Leh": "Ladakh",
-    "Chandigarh": "Chandigarh",
-    "Nagpur": "Maharashtra",
-    "Patna": "Bihar",
-    "Guwahati": "Assam",
-    "Mangalore": "Karnataka",
-    "Mysore": "Karnataka",
-    "Udaipur": "Rajasthan",
-    "Agra": "Uttar Pradesh",
-    "Varanasi": "Uttar Pradesh",
-    "Ranchi": "Jharkhand",
-    "Bhubaneswar": "Odisha",
-    "Imphal": "Manipur",
-    "Madurai": "Tamil Nadu",
-    "Coimbatore": "Tamil Nadu",
-    "Port Blair": "Andaman & Nicobar",
-    "Thiruvananthapuram": "Kerala",
-    "Amritsar": "Punjab",
-    "Shimla": "Himachal Pradesh",
-    "Manali": "Himachal Pradesh",
-    "Darjeeling": "West Bengal",
-    "Gangtok": "Sikkim",
-    "Ooty": "Tamil Nadu",
-    "Nainital": "Uttarakhand",
-}
+india_locations = INDIA_DESTINATIONS
 
 areas = [
     "City Center",
@@ -103,7 +62,36 @@ print("Generating hotels...")
 
 for city, state in india_locations.items():
 
-    hotel_count = random.randint(20, 50)
+    if city in [
+        "Mumbai",
+        "Delhi",
+        "Bengaluru",
+        "Hyderabad",
+        "Chennai",
+        "Kolkata",
+        "Pune",
+        "Ahmedabad"
+    ]:
+        hotel_count = 15
+
+    elif city in [
+        "Goa",
+        "Jaipur",
+        "Udaipur",
+        "Manali",
+        "Shimla",
+        "Ooty",
+        "Munnar",
+        "Darjeeling",
+        "Leh",
+        "Srinagar",
+        "Rishikesh",
+        "Varanasi"
+    ]:
+        hotel_count = 10
+
+    else:
+        hotel_count = 5
 
     for _ in range(hotel_count):
 
@@ -115,12 +103,28 @@ for city, state in india_locations.items():
             + random.choice(hotel_suffix)
         )
 
+        aliases = {
+            "Bengaluru": "bangalore,blr",
+            "Mumbai": "bombay,bom",
+            "Delhi": "new delhi,del",
+            "Chennai": "madras,maa",
+            "Kolkata": "calcutta,ccu",
+            "Hyderabad": "hyd",
+            "Goa": "north goa,south goa",
+            "Varanasi": "banaras,kashi",
+        }
+
+        search_terms = f"{city.lower()},{state.lower()}"
+
+        if city in aliases:
+            search_terms += f",{aliases[city]}"
+
         hotel = Hotel.objects.create(
             name=hotel_name,
             city=city,
             state=state,
             area=random.choice(areas),
-            search_keywords=f"{city.lower()},{state.lower()}",
+            search_keywords=search_terms,
             address=f"{random.randint(1,200)} Main Road, {city}",
             description=f"Comfortable stay in {city}",
             hotel_type=random.choice([
