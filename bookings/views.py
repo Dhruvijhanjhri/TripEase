@@ -9,6 +9,8 @@ from flights.models import Flight
 from flights.realism import format_duration_minutes, get_route_price
 from .models import Booking, Passenger
 from .forms import PassengerFormSet
+from hotels.models import HotelBooking
+from packages.models import PackageBooking
 
 
 @login_required
@@ -254,9 +256,6 @@ def booking_detail(request, booking_id):
     )
 
 
-from hotels.models import HotelBooking
-
-
 @login_required
 def booking_list(request):
 
@@ -268,9 +267,14 @@ def booking_list(request):
         user=request.user
     ).order_by('-created_at')
 
+    package_bookings = PackageBooking.objects.filter(
+        user=request.user
+    ).order_by('-created_at')
+
     context = {
         'flight_bookings': flight_bookings,
         'hotel_bookings': hotel_bookings,
+        'package_bookings': package_bookings,
     }
 
     return render(

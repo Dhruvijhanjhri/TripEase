@@ -1,0 +1,31 @@
+from django.urls import path
+from . import views
+
+app_name = "packages"
+
+urlpatterns = [
+
+    path(
+        "",
+        views.package_search,
+        name="search"
+    ),
+
+    path(
+        "detail/<int:package_id>/",
+        views.package_detail,
+        name="detail"
+    ),
+
+    path(
+        "book/<int:package_id>/",
+        views.package_booking,
+        name="book"
+    ),
+
+    path(
+        "success/<int:booking_id>/",
+        views.booking_success,
+        name="booking_success"
+    ),
+    ]

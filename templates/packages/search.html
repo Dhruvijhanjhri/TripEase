@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2 class="mb-4">
+        Explore Travel Packages
+    </h2>
+
+    <form method="GET">
+
+        <div class="row">
+
+            <div class="col-md-8">
+                {{ form.destination }}
+            </div>
+
+            <div class="col-md-4">
+                <button
+                    type="submit"
+                    class="btn btn-primary w-100"
+                >
+                    Search Packages
+                </button>
+            </div>
+
+        </div>
+
+    </form>
+
+    <hr>
+
+    {% if search_performed %}
+
+        <h4>
+            Packages Found:
+            {{ packages|length }}
+        </h4>
+
+        <div class="row">
+
+            {% for package in packages %}
+
+            <div class="col-md-4 mb-4">
+
+                <div class="card h-100">
+
+                    <img
+                        src="{{ package.image_url }}"
+                        class="card-img-top"
+                        style="height:220px; object-fit:cover;"
+                    >
+
+                    <div class="card-body">
+
+                        <h5>
+                            {{ package.name }}
+                        </h5>
+
+                        <p>
+                            {{ package.destination }},
+                            {{ package.state }}
+                        </p>
+
+                        <p>
+                            ⭐ {{ package.rating }}
+                        </p>
+
+                        <p>
+                            {{ package.duration_days }}
+                            Days /
+                            {{ package.duration_nights }}
+                            Nights
+                        </p>
+
+                        <h5>
+                            ₹{{ package.price }}
+                        </h5>
+
+                        <a
+                            href="{% url 'packages:detail' package.id %}"
+                            class="btn btn-primary"
+                        >
+                            View Details
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% empty %}
+
+            <div class="col-12">
+
+                <div class="alert alert-warning">
+
+                    No packages found.
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

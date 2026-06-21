@@ -195,46 +195,42 @@ for city, state in india_locations.items():
         )
 
         room_types = [
-            "Standard Room",
-            "Deluxe Room",
-            "Executive Room",
-            "Suite Room",
+            ("standard", "Standard Room"),
+            ("deluxe", "Deluxe Room"),
+            ("executive", "Executive Room"),
+            ("suite", "Suite Room"),
         ]
 
-        for room_name in room_types:
+        for room_type, room_name in room_types:
 
-            price = random.randint(
-                1500,
-                15000
-            )
+            if room_type == "standard":
+                price = random.randint(1500, 4000)
+
+            elif room_type == "deluxe":
+                price = random.randint(4000, 8000)
+
+            elif room_type == "executive":
+                price = random.randint(7000, 12000)
+
+            else:  # suite
+                price = random.randint(10000, 20000)
 
             Room.objects.create(
                 hotel=hotel,
-                room_type='deluxe',
+                room_type=room_type,
                 room_name=room_name,
                 max_guests=random.randint(2, 5),
                 total_rooms=random.randint(10, 50),
                 available_rooms=random.randint(5, 30),
                 room_size=random.randint(180, 600),
                 price_per_night=price,
-                extra_bed_price=random.randint(
-                    500,
-                    2500
-                ),
-                breakfast_included=random.choice(
-                    [True, False]
-                ),
-                refundable=random.choice(
-                    [True, False]
-                ),
-                free_cancellation=random.choice(
-                    [True, False]
-                ),
-                room_image=random.choice(
-                    room_images
-                ),
+                extra_bed_price=random.randint(500, 2500),
+                breakfast_included=random.choice([True, False]),
+                refundable=random.choice([True, False]),
+                free_cancellation=random.choice([True, False]),
+                room_image=random.choice(room_images),
             )
-
+            
         created += 1
 
         if created % 100 == 0:

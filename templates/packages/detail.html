@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="row">
+
+        <div class="col-md-6">
+
+            <img
+                src="{{ package.image_url }}"
+                class="img-fluid rounded"
+            >
+
+        </div>
+
+        <div class="col-md-6">
+
+            <h2>
+                {{ package.name }}
+            </h2>
+
+            <p>
+                {{ package.destination }},
+                {{ package.state }}
+            </p>
+
+            <p>
+                ⭐ {{ package.rating }}
+            </p>
+
+            <p>
+                {{ package.duration_days }}
+                Days /
+                {{ package.duration_nights }}
+                Nights
+            </p>
+
+            <h3>
+                ₹{{ package.price }}
+            </h3>
+
+            <hr>
+
+            <h5>Description</h5>
+
+            <p>
+                {{ package.description }}
+            </p>
+
+            <hr>
+
+            <h5>Package Includes</h5>
+
+            <pre style="white-space: pre-wrap;">
+            {{ package.inclusions }}
+            </pre>
+
+            <hr>
+
+            <h5>Detailed Itinerary</h5>
+
+            <pre style="white-space: pre-wrap;">
+            {{ package.itinerary }}
+            </pre>
+
+            <hr>
+
+            <h5>Things To Carry</h5>
+
+            <pre style="white-space: pre-wrap;">
+            {{ package.things_to_carry }}
+            </pre>
+
+            <a
+                href="{% url 'packages:book' package.id %}"
+                class="btn btn-success"
+            >
+                Book Package
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <div class="card">
+
+        <div class="card-body">
+
+            <h2 class="text-success">
+                Booking Successful 🎉
+            </h2>
+
+            <hr>
+
+            <p>
+                <strong>Booking Reference:</strong>
+                {{ booking.booking_reference }}
+            </p>
+
+            <p>
+                <strong>Package:</strong>
+                {{ booking.package.name }}
+            </p>
+
+            <p>
+                <strong>Destination:</strong>
+                {{ booking.package.destination }}
+            </p>
+
+            <p>
+                <strong>Travel Date:</strong>
+                {{ booking.travel_date }}
+            </p>
+
+            <p>
+                <strong>Travellers:</strong>
+                {{ booking.travellers_count }}
+            </p>
+
+            <p>
+                <strong>Total Price:</strong>
+                ₹{{ booking.total_price }}
+            </p>
+
+            <hr>
+
+            <h4>
+                Things To Carry
+            </h4>
+
+            <pre style="white-space: pre-wrap;">
+{{ booking.package.things_to_carry }}
+            </pre>
+
+            <a
+                href="{% url 'packages:search' %}"
+                class="btn btn-primary"
+            >
+                Explore More Packages
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

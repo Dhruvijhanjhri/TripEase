@@ -1,0 +1,131 @@
+from django.shortcuts import render, get_object_or_404
+from .models import TravelPackage
+from .forms import PackageSearchForm
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect
+from .forms import PackageBookingForm
+from .models import PackageBooking
+
+def package_search(request):
+
+    form = PackageSearchForm(
+        request.GET or None
+    )
+
+    packages = []
+    search_performed = False
+
+    if form.is_valid():
+
+        search_performed = True
+
+        destination = (
+            form.cleaned_data["destination"]
+            .strip()
+        )
+
+        packages = TravelPackage.objects.filter(
+            destination__icontains=destination,
+            is_active=True
+        )
+
+    return render(
+        request,
+        "packages/search.html",
+        {
+            "form": form,
+            "packages": packages,
+            "search_performed": search_performed
+        }
+    )
+
+
+def package_detail(
+    request,
+    package_id
+):
+
+    package = get_object_or_404(
+        TravelPackage,
+        id=package_id
+    )
+
+    return render(
+        request,
+        "packages/detail.html",
+        {
+            "package": package
+        }
+    )
+
+@login_required
+def package_booking(request, package_id):
+
+    package = get_object_or_404(
+        TravelPackage,
+        id=package_id
+    )
+
+    if request.method == "POST":
+
+        form = PackageBookingForm(
+            request.POST
+        )
+
+        if form.is_valid():
+
+            travellers = form.cleaned_data[
+                "travellers_count"
+            ]
+
+            total_price = (
+                package.price * travellers
+            )
+
+            booking = PackageBooking.objects.create(
+                user=request.user,
+                package=package,
+                travel_date=form.cleaned_data[
+                    "travel_date"
+                ],
+                travellers_count=travellers,
+                total_price=total_price,
+            )
+
+            return redirect(
+                "packages:booking_success",
+                booking.id
+            )
+
+    else:
+
+        form = PackageBookingForm()
+
+    return render(
+        request,
+        "packages/booking.html",
+        {
+            "package": package,
+            "form": form
+        }
+    )
+
+@login_required
+def booking_success(
+    request,
+    booking_id
+):
+
+    booking = get_object_or_404(
+        PackageBooking,
+        id=booking_id,
+        user=request.user
+    )
+
+    return render(
+        request,
+        "packages/booking_success.html",
+        {
+            "booking": booking
+        }
+    )
