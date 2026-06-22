@@ -90,10 +90,11 @@ def package_booking(request, package_id):
                 ],
                 travellers_count=travellers,
                 total_price=total_price,
+                booking_status="pending"
             )
 
             return redirect(
-                "packages:booking_success",
+                "payments:package_payment",
                 booking.id
             )
 

@@ -1,6 +1,7 @@
 from django.db import models
 from bookings.models import Booking
 from hotels.models import HotelBooking
+from packages.models import PackageBooking
 
 
 class Payment(models.Model):
@@ -32,6 +33,15 @@ class Payment(models.Model):
     # Hotel Booking
     hotel_booking = models.OneToOneField(
         HotelBooking,
+        on_delete=models.CASCADE,
+        related_name='payment',
+        null=True,
+        blank=True
+    )
+
+    #Package Booking
+    package_booking = models.OneToOneField(
+        PackageBooking,
         on_delete=models.CASCADE,
         related_name='payment',
         null=True,
@@ -83,6 +93,12 @@ class Payment(models.Model):
             return (
                 f"Hotel Payment - "
                 f"{self.hotel_booking.booking_reference}"
+            )
+
+        elif self.package_booking:
+            return (
+                f"Package Payment - "
+                f"{self.package_booking.booking_reference}"
             )
 
         return "Payment"

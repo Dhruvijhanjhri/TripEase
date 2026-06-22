@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Package Payment
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+<div class="card shadow border-0 mx-auto"
+     style="max-width:700px;">
+
+    <div class="card-body p-5">
+
+        <h2 class="fw-bold mb-4">
+            Complete Payment
+        </h2>
+
+        <hr>
+
+        <h4>
+            {{ booking.package.name }}
+        </h4>
+
+        <p>
+            {{ booking.package.destination }}
+        </p>
+
+        <p>
+            <strong>Travel Date:</strong>
+            {{ booking.travel_date }}
+        </p>
+
+        <p>
+            <strong>Travellers:</strong>
+            {{ booking.travellers_count }}
+        </p>
+
+        <h3 class="text-primary fw-bold mb-4">
+            ₹{{ booking.total_price }}
+        </h3>
+
+        <style>
+
+        input,
+        select {
+
+            width:100%;
+            padding:10px;
+            border:1px solid #ddd;
+            border-radius:8px;
+        }
+
+        </style>
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <h5 class="mb-3">
+                Select Payment Method
+            </h5>
+
+            {{ form.payment_method }}
+
+            <div id="upi-section" style="display:none;" class="mt-4">
+                <label>UPI ID</label>
+                {{ form.upi_id }}
+            </div>
+
+            <div id="card-section" style="display:none;" class="mt-4">
+
+                <label>Card Number</label>
+                {{ form.card_number }}
+
+                <label class="mt-3">Cardholder Name</label>
+                {{ form.cardholder_name }}
+
+                <label class="mt-3">Expiry Date</label>
+                {{ form.card_expiry }}
+
+                <label class="mt-3">CVV</label>
+                {{ form.card_cvv }}
+
+            </div>
+
+            <div id="bank-section" style="display:none;" class="mt-4">
+                <label>Bank</label>
+                {{ form.bank_name }}
+            </div>
+
+            <div id="wallet-section" style="display:none;" class="mt-4">
+                <label>Wallet</label>
+                {{ form.wallet_name }}
+            </div>
+
+            <button
+                type="submit"
+                class="btn btn-success w-100 mt-4"
+            >
+                Pay Now
+            </button>
+
+        </form>
+
+
+    </div>
+
+</div>
+
+
+</div>
+
+<script>
+
+function hideAllSections() {
+
+    document.getElementById("upi-section").style.display = "none";
+    document.getElementById("card-section").style.display = "none";
+    document.getElementById("bank-section").style.display = "none";
+    document.getElementById("wallet-section").style.display = "none";
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+
+    const radios = document.querySelectorAll(
+        "input[name='payment_method']"
+    );
+
+    radios.forEach(function(radio) {
+
+        radio.addEventListener("change", function() {
+
+            hideAllSections();
+
+            if(this.value === "upi") {
+                document.getElementById("upi-section").style.display = "block";
+            }
+
+            else if(this.value === "card") {
+                document.getElementById("card-section").style.display = "block";
+            }
+
+            else if(this.value === "netbanking") {
+                document.getElementById("bank-section").style.display = "block";
+            }
+
+            else if(this.value === "wallet") {
+                document.getElementById("wallet-section").style.display = "block";
+            }
+
+        });
+
+    });
+
+});
+
+</script>
+
+{% endblock %}

@@ -1,6 +1,5 @@
 from django.shortcuts import render, get_object_or_404
 from datetime import datetime, timedelta
-
 from .models import Flight
 from .forms import FlightSearchForm
 from .realism import format_duration_minutes, get_route_price
@@ -209,6 +208,7 @@ def flight_detail(request, flight_id):
     total_price = 0
     total_duration = 0
     total_duration_display = ""
+    selected_date = None
     if departure_date:
 
         selected_date = datetime.strptime(
@@ -283,10 +283,17 @@ def flight_detail(request, flight_id):
             )
         ) * passengers
 
-        total_duration = (
-            flight.duration_minutes
-            +
-            second_leg.duration_minutes
+
+        total_duration = int(
+            (
+                second_leg.arrival_time
+                -
+                flight.departure_time
+            ).total_seconds() / 60
+        )
+
+        total_duration_display = format_duration_minutes(
+            total_duration
         )
 
     # ==================================
