@@ -16,6 +16,8 @@ urlpatterns = [
     path('contact/', include('contact.urls')),
     path('hotels/', include('hotels.urls')),
     path('packages/',include('packages.urls')), 
+    path('planner/',include('ai_planner.urls')),
+    path('reviews/',include('reviews.urls')),
 ]
 
 # Serve media files in development

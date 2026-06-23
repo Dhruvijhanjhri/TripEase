@@ -5,6 +5,8 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from .forms import PackageBookingForm
 from .models import PackageBooking
+from reviews.models import PackageReview
+from django.db.models import Avg
 
 def package_search(request):
 
@@ -50,11 +52,21 @@ def package_detail(
         id=package_id
     )
 
+    reviews = PackageReview.objects.filter(
+        package=package
+    ).order_by("-created_at")
+
+    average_rating = reviews.aggregate(
+        Avg("rating")
+    )["rating__avg"]
+
     return render(
         request,
         "packages/detail.html",
         {
-            "package": package
+            "package": package,
+            "reviews": reviews,
+            "average_rating": average_rating,
         }
     )
 

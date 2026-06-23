@@ -3,7 +3,10 @@ from django.conf import settings
 
 from hotels.models import Hotel
 from packages.models import TravelPackage
-
+from django.core.validators import (
+    MinValueValidator,
+    MaxValueValidator
+)
 
 class HotelReview(models.Model):
 
@@ -18,7 +21,12 @@ class HotelReview(models.Model):
         related_name="reviews"
     )
 
-    rating = models.IntegerField()
+    rating = models.IntegerField(
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(5)
+        ]
+    )
 
     review_text = models.TextField()
 
@@ -46,7 +54,12 @@ class PackageReview(models.Model):
         related_name="reviews"
     )
 
-    rating = models.IntegerField()
+    rating = models.IntegerField(
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(5)
+        ]
+    )
 
     review_text = models.TextField()
 

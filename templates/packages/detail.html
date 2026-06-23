@@ -86,4 +86,60 @@
 
 </div>
 
+<hr>
+
+<h3>
+    Traveller Reviews
+</h3>
+
+{% if average_rating %}
+
+<p>
+    ⭐ Average Rating:
+    <strong>{{ average_rating|floatformat:1 }}</strong>
+</p>
+
+{% endif %}
+
+<a
+    href="{% url 'reviews:add_package_review' package.id %}"
+    class="btn btn-outline-primary mb-3"
+>
+    Write Review
+</a>
+
+{% for review in reviews %}
+
+<div class="card mb-3">
+
+    <div class="card-body">
+
+        <h5>
+            {{ review.user.username }}
+        </h5>
+
+        <p>
+            ⭐ {{ review.rating }}/5
+        </p>
+
+        <p>
+            {{ review.review_text }}
+        </p>
+
+        <small>
+            {{ review.created_at }}
+        </small>
+
+    </div>
+
+</div>
+
+{% empty %}
+
+<p>
+    No reviews yet.
+</p>
+
+{% endfor %}
+
 {% endblock %}

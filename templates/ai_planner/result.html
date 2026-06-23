@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>
+    Trip Plan
+</h2>
+
+<p>
+    Destination:
+    {{ trip.destination }}
+</p>
+
+<p>
+    Budget:
+    ₹{{ trip.budget }}
+</p>
+
+<p>
+    Days:
+    {{ trip.days }}
+</p>
+
+<p>
+    Interests:
+    {{ trip.interests }}
+</p>
+
+<p>
+    Status:
+    {{ trip.generated_plan }}
+</p>
+
+{% endblock %}

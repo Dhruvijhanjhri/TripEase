@@ -1,6 +1,5 @@
 from datetime import datetime
 from django.db.models import Q
-
 from django.shortcuts import (
     render,
     get_object_or_404,
@@ -12,17 +11,16 @@ from django.contrib.auth.decorators import (
 )
 
 from django.contrib import messages
-
 from .models import Hotel
 from .models import Room
 from .models import HotelBooking
 from .models import HotelGuest
-
 from payments.models import Payment
-
 from .forms import HotelSearchForm
 from .forms import HotelGuestFormSet
 from .forms import HotelPaymentForm
+from reviews.models import HotelReview
+from django.db.models import Avg
 
 
 def hotel_search(request):
@@ -94,6 +92,14 @@ def hotel_detail(request, hotel_id):
         available_rooms__gt=0
     )
 
+    reviews = HotelReview.objects.filter(
+        hotel=hotel
+    ).order_by("-created_at")
+
+    average_rating = reviews.aggregate(
+        Avg("rating")
+    )["rating__avg"]
+
     context = {
         "hotel": hotel,
         "rooms": rooms,
@@ -101,6 +107,8 @@ def hotel_detail(request, hotel_id):
         "check_out": request.GET.get("check_out"),
         "guests": request.GET.get("guests"),
         "rooms_count": request.GET.get("rooms"),
+        "reviews": reviews,
+        "average_rating": average_rating,
     }
 
     return render(
