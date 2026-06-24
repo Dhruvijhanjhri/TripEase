@@ -5,13 +5,8 @@
 <h2>Search Flights</h2>
 
 <form method="GET">
-
     {{ form.as_p }}
-
-    <button type="submit">
-        Search
-    </button>
-
+    <button type="submit">Search</button>
 </form>
 
 <hr>
@@ -20,171 +15,123 @@
 
     <!-- DIRECT FLIGHTS -->
     {% if direct_flights %}
-
-        <h3>
-            Direct Flights
-            ({{ direct_flights|length }})
-        </h3>
+        <h3>Direct Flights ({{ direct_flights|length }})</h3>
 
         {% for flight in direct_flights %}
+            <div style="border:1px solid #ccc; padding:15px; margin-bottom:15px;">
 
-        <div style="border:1px solid #ccc; padding:15px; margin-bottom:15px;">
+                <h4>{{ flight.airline }}</h4>
 
-            <h4>
-                {{ flight.airline }}
-            </h4>
+                <p>{{ flight.get_display_flight_number }}</p>
 
-            <p>
-                {{ flight.get_display_flight_number }}
-            </p>
+                <p>
+                    {{ flight.source.code }} → {{ flight.destination.code }}
+                </p>
 
-            <p>
-                {{ flight.source.code }}
-                →
-                {{ flight.destination.code }}
-            </p>
+                <p>
+                    Seats: {{ flight.seat_display }}
+                </p>
 
-            <p>
-                Seats:
-                {{ flight.seat_display }}
-            </p>
+                <p>
+                    Departure: {{ flight.display_departure }}
+                </p>
 
-            <p>
-                Departure:
-                {{ flight.display_departure }}
-            </p>
+                <p>
+                    Arrival: {{ flight.display_arrival }}
+                </p>
 
-            <p>
-                Arrival:
-                {{ flight.display_arrival }}
-            </p>
+                <p>
+                    Duration: {{ flight.get_duration_display }}
+                </p>
 
-            <p>
-                Duration:
-                {{ flight.get_duration_display }}
-            </p>
+                <p>
+                    Cabin Price: ₹ {{ flight.cabin_price }}
+                </p>
 
-            <p>
-                Cabin Price:
-                ₹ {{ flight.cabin_price }}
-            </p>
+                <p>
+                    Total Price: ₹ {{ flight.price }}
+                </p>
 
-            <p>
-                Price:
-                ₹ {{ flight.price }}
-            </p>
+                <a href="{% url 'flights:flight_detail' flight.id %}?cabin_class={{ cabin_class }}&passengers={{ passengers }}&departure_date={{ request.GET.departure_date }}">
+                    <button type="button">View Details & Book</button>
+                </a>
 
-            <a href="{% url 'flights:flight_detail' flight.id %}?cabin_class={{ cabin_class }}&passengers={{ passengers }}&departure_date={{ request.GET.departure_date }}">
-
-                <button type="button">
-                    View Details & Book
-                </button>
-
-            </a>
-
-        </div>
-
+            </div>
         {% endfor %}
-
     {% endif %}
 
 
     <!-- VIA FLIGHTS -->
     {% if via_flights %}
-
-        <h3>
-            Via Flights
-            ({{ via_flights|length }})
-        </h3>
+        <h3>Via Flights ({{ via_flights|length }})</h3>
 
         {% for route in via_flights %}
+            <div style="border:1px solid #ccc; padding:15px; margin-bottom:15px;">
 
-        <div style="border:1px solid #ccc; padding:15px; margin-bottom:15px;">
+                <h4>1 Stop Journey</h4>
 
-            <h4>
-                1 Stop Journey
-            </h4>
+                <p>
+                    {{ route.first_leg.source.code }}
+                    →
+                    {{ route.first_leg.destination.code }}
+                    →
+                    {{ route.second_leg.destination.code }}
+                </p>
 
-            <p>
-                {{ route.first_leg.source.code }}
-                →
-                {{ route.first_leg.destination.code }}
-                →
-                {{ route.second_leg.destination.code }}
-            </p>
+                <p>
+                    Seats:
+                    {{ route.first_leg_seat_display }} + {{ route.second_leg_seat_display }}
+                </p>
 
-            <p>
-                Seats:
-                {{ route.first_leg_seat_display }}
-                +
-                {{ route.second_leg_seat_display }}
-            </p>
+                <p>
+                    <strong>First Flight:</strong>
+                    {{ route.first_leg.airline }}
+                    ({{ route.first_leg.get_display_flight_number }})
+                </p>
 
-            <p>
-                <strong>First Flight:</strong>
+                <p>
+                    Departure:
+                    {{ request.GET.departure_date }}
+                    {{ route.first_leg.departure_time|time:"H:i" }}
+                </p>
 
-                {{ route.first_leg.airline }}
+                <p>
+                    <strong>Second Flight:</strong>
+                    {{ route.second_leg.airline }}
+                    ({{ route.second_leg.get_display_flight_number }})
+                </p>
 
-                ({{ route.first_leg.get_display_flight_number }})
-            </p>
+                <p>
+                    Departure:
+                    {{ request.GET.departure_date }}
+                    {{ route.second_leg.departure_time|time:"H:i" }}
+                </p>
 
-            <p>
-                Departure:
-                {{ request.GET.departure_date }}
-                {{ route.first_leg.departure_time|time:"H:i" }}
-            </p>
+                <p>
+                    Total Price: ₹ {{ route.total_price }}
+                </p>
 
-            <p>
-                <strong>Second Flight:</strong>
+                <p>
+                    Cabin Price:
+                    ₹ {{ route.first_leg_price }} + ₹ {{ route.second_leg_price }}
+                </p>
 
-                {{ route.second_leg.airline }}
+                <p>
+                    Total Journey Time: {{ route.total_duration_display }}
+                </p>
 
-                ({{ route.second_leg.get_display_flight_number }})
-            </p>
+                <a href="{% url 'flights:flight_detail' route.first_leg.id %}?cabin_class={{ cabin_class }}&passengers={{ passengers }}&departure_date={{ request.GET.departure_date }}&is_via=1&second_leg_id={{ route.second_leg.id }}">
+                    <button type="button">View Details & Book</button>
+                </a>
 
-            <p>
-                Departure:
-                {{ request.GET.departure_date }}
-                {{ route.second_leg.departure_time|time:"H:i" }}
-            </p>
-
-            <p>
-                Total Price:
-                ₹ {{ route.total_price }}
-            </p>
-
-            <p>
-                Cabin Price:
-                ₹ {{ route.first_leg_price }} + ₹ {{ route.second_leg_price }}
-            </p>
-
-            <p>
-                Total Journey Time:
-                {{ route.total_duration_display }}
-            </p>
-
-            <a href="{% url 'flights:flight_detail' route.first_leg.id %}?cabin_class={{ cabin_class }}&passengers={{ passengers }}&departure_date={{ request.GET.departure_date }}&is_via=1&second_leg_id={{ route.second_leg.id }}">
-
-                <button type="button">
-                    View Details & Book
-                </button>
-
-            </a>
-
-        </div>
-
+            </div>
         {% endfor %}
-
     {% endif %}
 
 
     <!-- NOTHING FOUND -->
     {% if not direct_flights and not via_flights %}
-
-        <p>
-            No flights found matching your criteria.
-        </p>
-
+        <p>No flights found matching your criteria.</p>
     {% endif %}
 
 {% endif %}

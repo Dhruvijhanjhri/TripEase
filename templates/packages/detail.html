@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<div class="container mt-4">
+<div class="container mt-4 mb-5">
 
     <div class="row">
 
@@ -10,7 +10,7 @@
 
             <img
                 src="{{ package.image_url }}"
-                class="img-fluid rounded"
+                class="img-fluid rounded shadow"
             >
 
         </div>
@@ -53,25 +53,19 @@
 
             <h5>Package Includes</h5>
 
-            <pre style="white-space: pre-wrap;">
-            {{ package.inclusions }}
-            </pre>
+            <pre style="white-space: pre-wrap;">{{ package.inclusions }}</pre>
 
             <hr>
 
             <h5>Detailed Itinerary</h5>
 
-            <pre style="white-space: pre-wrap;">
-            {{ package.itinerary }}
-            </pre>
+            <pre style="white-space: pre-wrap;">{{ package.itinerary }}</pre>
 
             <hr>
 
             <h5>Things To Carry</h5>
 
-            <pre style="white-space: pre-wrap;">
-            {{ package.things_to_carry }}
-            </pre>
+            <pre style="white-space: pre-wrap;">{{ package.things_to_carry }}</pre>
 
             <a
                 href="{% url 'packages:book' package.id %}"
@@ -84,62 +78,103 @@
 
     </div>
 
-</div>
+    <hr class="my-5">
 
-<hr>
+    <!-- Review Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
 
-<h3>
-    Traveller Reviews
-</h3>
+        <div>
+            <h2 class="fw-bold mb-1">
+                Traveller Reviews
+            </h2>
 
-{% if average_rating %}
+            <p class="mb-0 text-muted">
+                ⭐ Average Rating:
+                {% if average_rating %}
+                    {{ average_rating|floatformat:1 }}
+                {% else %}
+                    No ratings yet
+                {% endif %}
+                {% if review_count %}
+                    ({{ review_count }} review{{ review_count|pluralize }})
+                {% endif %}
+            </p>
+        </div>
 
-<p>
-    ⭐ Average Rating:
-    <strong>{{ average_rating|floatformat:1 }}</strong>
-</p>
-
-{% endif %}
-
-<a
-    href="{% url 'reviews:add_package_review' package.id %}"
-    class="btn btn-outline-primary mb-3"
->
-    Write Review
-</a>
-
-{% for review in reviews %}
-
-<div class="card mb-3">
-
-    <div class="card-body">
-
-        <h5>
-            {{ review.user.username }}
-        </h5>
-
-        <p>
-            ⭐ {{ review.rating }}/5
-        </p>
-
-        <p>
-            {{ review.review_text }}
-        </p>
-
-        <small>
-            {{ review.created_at }}
-        </small>
+        <div>
+            {% if user.is_authenticated %}
+                {% if can_review %}
+                    <a
+                        href="{% url 'reviews:add_package_review' package.id %}"
+                        class="btn btn-success"
+                    >
+                        Write Review
+                    </a>
+                {% elif already_reviewed %}
+                    <span class="badge bg-success-subtle text-success px-3 py-2">
+                        ✓ You already reviewed this hotel
+                    </span>
+                {% endif %}
+            {% else %}
+                <a
+                    href="{% url 'accounts:login' %}"
+                    class="btn btn-outline-primary"
+                >
+                    Login to Review
+                </a>
+            {% endif %}
+        </div>
 
     </div>
 
+    {% if reviews %}
+
+        <div class="row">
+
+            {% for review in reviews %}
+
+            <div class="col-md-6 mb-4">
+
+                <div class="card shadow-sm border-0 h-100">
+
+                    <div class="card-body">
+
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="mb-0 fw-bold">
+                                {{ review.user.get_full_name|default:review.user.email }}
+                            </h5>
+
+                            <span class="badge bg-warning text-dark">
+                                ⭐ {{ review.rating }}/5
+                            </span>
+                        </div>
+
+                        <p class="mb-2">
+                            {{ review.review_text }}
+                        </p>
+
+                        <small class="text-muted">
+                            {{ review.created_at|date:"F d, Y, g:i a" }}
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="alert alert-light border">
+            No reviews yet.
+        </div>
+
+    {% endif %}
+
 </div>
-
-{% empty %}
-
-<p>
-    No reviews yet.
-</p>
-
-{% endfor %}
 
 {% endblock %}

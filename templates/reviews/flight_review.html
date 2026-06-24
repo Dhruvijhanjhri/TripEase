@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}
+Review Flight
+{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 700px;">
+    <div class="card shadow border-0">
+        <div class="card-body p-4">
+            <h2 class="fw-bold mb-3">Review Flight</h2>
+
+            <p class="text-muted mb-4">
+                {{ flight.airline }} — {{ flight.flight_number }}<br>
+                {{ flight.source.city }} ({{ flight.source.code }}) → {{ flight.destination.city }} ({{ flight.destination.code }})
+            </p>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Rating (1 to 5)</label>
+                    {{ form.rating }}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Your Review</label>
+                    {{ form.review_text }}
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    Submit Review
+                </button>
+
+                <a href="{% url 'flights:detail' flight.id %}" class="btn btn-outline-secondary ms-2">
+                    Cancel
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

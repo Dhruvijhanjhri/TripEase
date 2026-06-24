@@ -3,7 +3,9 @@ from datetime import datetime, timedelta
 from .models import Flight
 from .forms import FlightSearchForm
 from .realism import format_duration_minutes, get_route_price
-
+from django.db.models import Avg
+from reviews.models import FlightReview
+from bookings.models import Booking
 
 def flight_search(request):
 
@@ -335,6 +337,34 @@ def flight_detail(request, flight_id):
 
     selected_departure_date = selected_date or flight.departure_time.date()
 
+        # ==================================
+    # FLIGHT REVIEWS LOGIC
+    # ==================================
+    average_rating = flight.reviews.aggregate(
+        Avg("rating")
+    )["rating__avg"]
+
+    review_count = flight.reviews.count()
+
+    reviews = flight.reviews.all()
+
+    can_review = False
+    already_reviewed = False
+
+    if request.user.is_authenticated:
+        booking_exists = Booking.objects.filter(
+            user=request.user,
+            flight=flight,
+            booking_status__in=["confirmed", "completed"]
+        ).exists()
+
+        already_reviewed = FlightReview.objects.filter(
+            user=request.user,
+            flight=flight
+        ).exists()
+
+        can_review = booking_exists and not already_reviewed
+
     context = {
         'flight': flight,
         'second_leg': second_leg,
@@ -365,6 +395,11 @@ def flight_detail(request, flight_id):
         ),
         'flight_number_display': flight.get_display_flight_number(),
         'second_leg_flight_number_display': second_leg.get_display_flight_number() if second_leg else None,
+        "average_rating": average_rating,
+        "review_count": review_count,
+        "reviews": reviews,
+        "can_review": can_review,
+        "already_reviewed": already_reviewed,
     }
 
     return render(

@@ -52,21 +52,43 @@ def package_detail(
         id=package_id
     )
 
-    reviews = PackageReview.objects.filter(
-        package=package
-    ).order_by("-created_at")
-
-    average_rating = reviews.aggregate(
+    average_rating = package.reviews.aggregate(
         Avg("rating")
     )["rating__avg"]
+
+    review_count = package.reviews.count()
+
+    reviews = package.reviews.all()
+
+    can_review = False
+    already_reviewed = False
+
+    if request.user.is_authenticated:
+
+        booking_exists = PackageBooking.objects.filter(
+            user=request.user,
+            package=package,
+            booking_status="confirmed"
+        ).exists()
+
+        already_reviewed = PackageReview.objects.filter(
+            user=request.user,
+            package=package
+        ).exists()
+
+        if booking_exists and not already_reviewed:
+            can_review = True
 
     return render(
         request,
         "packages/detail.html",
         {
             "package": package,
-            "reviews": reviews,
             "average_rating": average_rating,
+            "review_count": review_count,
+            "reviews": reviews,
+            "can_review": can_review,
+            "already_reviewed": already_reviewed,
         }
     )
 

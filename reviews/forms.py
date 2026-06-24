@@ -1,68 +1,56 @@
 from django import forms
-
-from .models import (
-    HotelReview,
-    PackageReview
-)
+from .models import HotelReview, PackageReview, FlightReview
 
 
 class HotelReviewForm(forms.ModelForm):
-
     class Meta:
-
         model = HotelReview
-
-        fields = [
-            "rating",
-            "review_text"
-        ]
-
+        fields = ["rating", "review_text"]
         widgets = {
-
-            "rating": forms.Select(
-                choices=[
-                    (1, "⭐ 1"),
-                    (2, "⭐⭐ 2"),
-                    (3, "⭐⭐⭐ 3"),
-                    (4, "⭐⭐⭐⭐ 4"),
-                    (5, "⭐⭐⭐⭐⭐ 5"),
-                ]
-            ),
-
-            "review_text": forms.Textarea(
-                attrs={
-                    "rows": 4
-                }
-            )
+            "rating": forms.NumberInput(attrs={
+                "class": "form-control",
+                "min": 1,
+                "max": 5
+            }),
+            "review_text": forms.Textarea(attrs={
+                "class": "form-control",
+                "rows": 4,
+                "placeholder": "Write your review..."
+            }),
         }
 
 
 class PackageReviewForm(forms.ModelForm):
-
     class Meta:
-
         model = PackageReview
-
-        fields = [
-            "rating",
-            "review_text"
-        ]
-
+        fields = ["rating", "review_text"]
         widgets = {
+            "rating": forms.NumberInput(attrs={
+                "class": "form-control",
+                "min": 1,
+                "max": 5
+            }),
+            "review_text": forms.Textarea(attrs={
+                "class": "form-control",
+                "rows": 4,
+                "placeholder": "Write your review..."
+            }),
+        }
 
-            "rating": forms.Select(
-                choices=[
-                    (1, "⭐ 1"),
-                    (2, "⭐⭐ 2"),
-                    (3, "⭐⭐⭐ 3"),
-                    (4, "⭐⭐⭐⭐ 4"),
-                    (5, "⭐⭐⭐⭐⭐ 5"),
-                ]
-            ),
 
-            "review_text": forms.Textarea(
-                attrs={
-                    "rows": 4
-                }
-            )
+class FlightReviewForm(forms.ModelForm):
+    class Meta:
+        model = FlightReview
+        fields = ["rating", "review_text"]
+        widgets = {
+            "rating": forms.NumberInput(attrs={
+                "class": "form-control",
+                "min": 1,
+                "max": 5
+            }),
+            "review_text": forms.Textarea(attrs={
+                "class": "form-control",
+                "rows": 4,
+                "placeholder": "Write your review..."
+            }),
         }

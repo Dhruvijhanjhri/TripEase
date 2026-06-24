@@ -118,6 +118,47 @@
     </div>
 </section>
 
+
+<section class="section">
+    <div class="container">
+        <h2 class="section-title">Explore TripEase</h2>
+
+        <div class="row g-4 mt-2">
+
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100 p-3">
+                    <h4>Hotels</h4>
+                    <p>Search stays across cities with room details, pricing and reviews.</p>
+                    <a href="{% url 'hotels:search' %}" class="btn btn-primary">
+                        Explore Hotels
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100 p-3">
+                    <h4>Packages</h4>
+                    <p>Discover curated travel packages with itinerary, pricing and traveller reviews.</p>
+                    <a href="{% url 'packages:search' %}" class="btn btn-success">
+                        Explore Packages
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100 p-3">
+                    <h4>AI Travel Planner</h4>
+                    <p>Generate a smart travel plan based on destination, budget, trip duration and interests.</p>
+                    <a href="{% url 'ai_planner:planner' %}" class="btn btn-dark">
+                        Plan with AI
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
 <!-- Testimonials Section -->
 <section id="testimonials" class="section">
     <div class="container">

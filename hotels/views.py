@@ -92,13 +92,32 @@ def hotel_detail(request, hotel_id):
         available_rooms__gt=0
     )
 
-    reviews = HotelReview.objects.filter(
-        hotel=hotel
-    ).order_by("-created_at")
-
-    average_rating = reviews.aggregate(
+    average_rating = hotel.reviews.aggregate(
         Avg("rating")
     )["rating__avg"]
+
+    review_count = hotel.reviews.count()
+
+    reviews = hotel.reviews.all()
+
+    can_review = False
+    already_reviewed = False
+
+    if request.user.is_authenticated:
+
+        booking_exists = HotelBooking.objects.filter(
+            user=request.user,
+            hotel=hotel,
+            booking_status="confirmed"
+        ).exists()
+
+        already_reviewed = HotelReview.objects.filter(
+            user=request.user,
+            hotel=hotel
+        ).exists()
+
+        if booking_exists and not already_reviewed:
+            can_review = True
 
     context = {
         "hotel": hotel,
@@ -107,8 +126,11 @@ def hotel_detail(request, hotel_id):
         "check_out": request.GET.get("check_out"),
         "guests": request.GET.get("guests"),
         "rooms_count": request.GET.get("rooms"),
-        "reviews": reviews,
         "average_rating": average_rating,
+        "review_count": review_count,
+        "reviews": reviews,
+        "can_review": can_review,
+        "already_reviewed": already_reviewed,
     }
 
     return render(
