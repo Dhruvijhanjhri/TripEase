@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>My Trip Plans</h2>
+
+{% if trips %}
+    <ul>
+        {% for trip in trips %}
+            <li>
+                <a href="{% url 'ai_planner:result' trip.id %}">
+                    {{ trip.destination }}
+                </a>
+                - {{ trip.days }} days
+                - Budget ₹{{ trip.budget }}
+                - {{ trip.created_at|date:"d M Y, h:i A" }}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No trip plans created yet.</p>
+{% endif %}
+
+{% endblock %}

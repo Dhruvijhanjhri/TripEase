@@ -2,33 +2,56 @@
 
 {% block content %}
 
-<h2>
-    Trip Plan
-</h2>
+<h2>Trip Plan</h2>
+
+<p><strong>Destination:</strong> {{ trip.destination }}</p>
+<p><strong>Budget:</strong> ₹{{ trip.budget }}</p>
+<p><strong>Days:</strong> {{ trip.days }}</p>
+<p><strong>Interests:</strong> {{ trip.interests }}</p>
+<p><strong>Estimated Cost:</strong> ₹{{ trip.estimated_cost }}</p>
+
+<h3>Generated Itinerary</h3>
+<pre>{{ trip.generated_plan }}</pre>
+
+<h3>Recommended Hotels</h3>
+{% if hotels %}
+    <ul>
+        {% for hotel in hotels %}
+            <li>
+                <strong>{{ hotel.name }}</strong> - {{ hotel.city }}
+                | Rating: {{ hotel.user_rating }}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No hotel recommendations found.</p>
+{% endif %}
+
+<h3>Recommended Packages</h3>
+{% if packages %}
+    <ul>
+        {% for package in packages %}
+            <li>
+                <strong>{{ package.name }}</strong> - {{ package.destination }}
+                | ₹{{ package.price }}
+                | {{ package.duration_days }} days
+                {% if package.is_budget_friendly %}
+                    | Budget-friendly
+                {% else %}
+                    | Above current budget
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No package recommendations found.</p>
+{% endif %}
+
+<hr>
 
 <p>
-    Destination:
-    {{ trip.destination }}
-</p>
-
-<p>
-    Budget:
-    ₹{{ trip.budget }}
-</p>
-
-<p>
-    Days:
-    {{ trip.days }}
-</p>
-
-<p>
-    Interests:
-    {{ trip.interests }}
-</p>
-
-<p>
-    Status:
-    {{ trip.generated_plan }}
+    <a href="{% url 'ai_planner:planner' %}">Plan Another Trip</a> |
+    <a href="{% url 'ai_planner:history' %}">View My Plans</a>
 </p>
 
 {% endblock %}

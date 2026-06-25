@@ -2,20 +2,17 @@
 
 {% block content %}
 
-<h2>
-    AI Travel Planner
-</h2>
+<h2>AI Travel Planner</h2>
+
+<p>
+    <a href="{% url 'ai_planner:history' %}">My Plans</a>
+</p>
 
 <form method="post">
-
     {% csrf_token %}
-
     {{ form.as_p }}
 
-    <button type="submit">
-        Generate Plan
-    </button>
-
+    <button type="submit">Generate Plan</button>
 </form>
 
 {% endblock %}
