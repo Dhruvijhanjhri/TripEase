@@ -1,0 +1,305 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}TripEase Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-wrapper {
+        max-width: 1250px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    .dashboard-header {
+        margin-bottom: 28px;
+    }
+
+    .dashboard-header h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .dashboard-header p {
+        color: #6b7280;
+        margin: 0;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 18px;
+        margin-bottom: 32px;
+    }
+
+    .stat-card,
+    .dashboard-card {
+        background: #fff;
+        border-radius: 18px;
+        padding: 22px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        border: 1px solid #f1f1f1;
+    }
+
+    .stat-label {
+        font-size: 0.95rem;
+        color: #6b7280;
+        margin-bottom: 10px;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #111827;
+    }
+
+    .dashboard-card h3 {
+        font-size: 1.15rem;
+        font-weight: 700;
+        margin-bottom: 18px;
+    }
+
+    .dashboard-grid-2 {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 22px;
+        margin-bottom: 24px;
+    }
+
+    .dashboard-grid-3 {
+        display: grid;
+        grid-template-columns: 1.4fr 1fr;
+        gap: 22px;
+    }
+
+    .chart-wrap {
+        position: relative;
+        width: 100%;
+        min-height: 320px;
+    }
+
+    .simple-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .simple-list li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .simple-list li:last-child {
+        border-bottom: none;
+    }
+
+    .pill {
+        background: #eff6ff;
+        color: #2563eb;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .table-wrap {
+        overflow-x: auto;
+    }
+
+    .custom-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .custom-table th,
+    .custom-table td {
+        padding: 12px 10px;
+        border-bottom: 1px solid #f0f0f0;
+        text-align: left;
+        font-size: 0.95rem;
+    }
+
+    .custom-table th {
+        font-weight: 700;
+        color: #111827;
+    }
+
+    .muted {
+        color: #6b7280;
+        font-size: 0.92rem;
+    }
+
+    @media (max-width: 950px) {
+        .dashboard-grid-2,
+        .dashboard-grid-3 {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+
+    <div class="dashboard-header">
+        <h2>TripEase Admin Dashboard</h2>
+        <p>Business analytics overview for bookings, revenue, destinations and payments.</p>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Total Bookings</div>
+            <div class="stat-value">{{ total_bookings }}</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">Flight Bookings</div>
+            <div class="stat-value">{{ flight_bookings }}</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">Hotel Bookings</div>
+            <div class="stat-value">{{ hotel_bookings }}</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">Package Bookings</div>
+            <div class="stat-value">{{ package_bookings }}</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">Successful Payments</div>
+            <div class="stat-value">{{ successful_payments_count }}</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">Total Revenue</div>
+            <div class="stat-value">₹{{ total_revenue }}</div>
+        </div>
+    </div>
+
+    <div class="dashboard-grid-2">
+        <div class="dashboard-card">
+            <h3>Monthly Booking Trend</h3>
+            <div class="chart-wrap">
+                <canvas id="monthlyBookingChart"></canvas>
+            </div>
+        </div>
+
+        <div class="dashboard-card">
+            <h3>Top Flight Destinations</h3>
+
+            {% if top_destinations %}
+                <ul class="simple-list">
+                    {% for destination, count in top_destinations %}
+                        <li>
+                            <span>{{ destination }}</span>
+                            <span class="pill">{{ count }} bookings</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="muted">No destination booking data found.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="dashboard-grid-3">
+        <div class="dashboard-card">
+            <h3>Recent Successful Payments</h3>
+
+            {% if recent_payments %}
+                <div class="table-wrap">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Amount</th>
+                                <th>Method</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for payment in recent_payments %}
+                                <tr>
+                                    <td>
+                                        {% if payment.booking %}
+                                            Flight
+                                        {% elif payment.hotel_booking %}
+                                            Hotel
+                                        {% elif payment.package_booking %}
+                                            Package
+                                        {% else %}
+                                            Payment
+                                        {% endif %}
+                                    </td>
+                                    <td>₹{{ payment.amount }}</td>
+                                    <td>{{ payment.payment_method }}</td>
+                                    <td>{{ payment.payment_date|date:"d M Y, h:i A" }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="muted">No successful payments found.</p>
+            {% endif %}
+        </div>
+
+        <div class="dashboard-card">
+            <h3>Analytics Notes</h3>
+            <ul class="simple-list">
+                <li>
+                    <span>Total revenue is based only on <strong>successful</strong> payments.</span>
+                </li>
+                <li>
+                    <span>Booking trend combines flight, hotel and package bookings month-wise.</span>
+                </li>
+                <li>
+                    <span>Top destinations currently use flight booking destination data.</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const monthlyCtx = document.getElementById('monthlyBookingChart');
+
+    new Chart(monthlyCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ monthly_labels|safe }},
+            datasets: [
+                {
+                    label: 'Flights',
+                    data: {{ monthly_flights|safe }},
+                    backgroundColor: '#2563eb'
+                },
+                {
+                    label: 'Hotels',
+                    data: {{ monthly_hotels|safe }},
+                    backgroundColor: '#10b981'
+                },
+                {
+                    label: 'Packages',
+                    data: {{ monthly_packages|safe }},
+                    backgroundColor: '#f59e0b'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+</script>
+{% endblock %}

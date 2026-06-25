@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'packages',
     'reviews',
     'ai_planner',
+    'dashboard',
 ]
 
 MIDDLEWARE = [
