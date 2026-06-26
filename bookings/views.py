@@ -11,6 +11,8 @@ from .models import Booking, Passenger
 from .forms import PassengerFormSet
 from hotels.models import HotelBooking
 from packages.models import PackageBooking
+from django.contrib.auth.decorators import login_required
+from .models import Booking
 
 
 @login_required
@@ -281,4 +283,24 @@ def booking_list(request):
         request,
         'bookings/list.html',
         context
+    )
+
+
+@login_required
+def booking_detail(request, booking_reference):
+    booking = get_object_or_404(
+        Booking.objects.select_related(
+            'flight__source',
+            'flight__destination'
+        ).prefetch_related('passengers'),
+        booking_reference=booking_reference,
+        user=request.user
+    )
+
+    return render(
+        request,
+        'bookings/booking_detail.html',
+        {
+            'booking': booking
+        }
     )

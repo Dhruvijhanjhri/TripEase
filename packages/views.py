@@ -164,3 +164,19 @@ def booking_success(
             "booking": booking
         }
     )
+
+@login_required
+def package_booking_detail(request, booking_id):
+    booking = get_object_or_404(
+        PackageBooking.objects.select_related('package'),
+        id=booking_id,
+        user=request.user
+    )
+
+    return render(
+        request,
+        'packages/package_booking_detail.html',
+        {
+            'booking': booking
+        }
+    )

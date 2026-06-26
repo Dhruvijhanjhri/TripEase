@@ -267,39 +267,80 @@
     </div>
 
 </div>
+
+{{ monthly_labels|json_script:"monthly-labels-data" }}
+{{ monthly_flights|json_script:"monthly-flights-data" }}
+{{ monthly_hotels|json_script:"monthly-hotels-data" }}
+{{ monthly_packages|json_script:"monthly-packages-data" }}
+
 {% endblock %}
 
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    const monthlyLabels = JSON.parse(
+        document.getElementById('monthly-labels-data').textContent
+    );
+    const monthlyFlights = JSON.parse(
+        document.getElementById('monthly-flights-data').textContent
+    );
+    const monthlyHotels = JSON.parse(
+        document.getElementById('monthly-hotels-data').textContent
+    );
+    const monthlyPackages = JSON.parse(
+        document.getElementById('monthly-packages-data').textContent
+    );
+
     const monthlyCtx = document.getElementById('monthlyBookingChart');
 
-    new Chart(monthlyCtx, {
-        type: 'bar',
-        data: {
-            labels: {{ monthly_labels|safe }},
-            datasets: [
-                {
-                    label: 'Flights',
-                    data: {{ monthly_flights|safe }},
-                    backgroundColor: '#2563eb'
+    if (monthlyCtx) {
+        new Chart(monthlyCtx, {
+            type: 'bar',
+            data: {
+                labels: monthlyLabels,
+                datasets: [
+                    {
+                        label: 'Flights',
+                        data: monthlyFlights,
+                        backgroundColor: '#2563eb',
+                        borderRadius: 8
+                    },
+                    {
+                        label: 'Hotels',
+                        data: monthlyHotels,
+                        backgroundColor: '#10b981',
+                        borderRadius: 8
+                    },
+                    {
+                        label: 'Packages',
+                        data: monthlyPackages,
+                        backgroundColor: '#f59e0b',
+                        borderRadius: 8
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
                 },
-                {
-                    label: 'Hotels',
-                    data: {{ monthly_hotels|safe }},
-                    backgroundColor: '#10b981'
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
                 },
-                {
-                    label: 'Packages',
-                    data: {{ monthly_packages|safe }},
-                    backgroundColor: '#f59e0b'
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
                 }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false
-        }
-    });
+            }
+        });
+    }
 </script>
 {% endblock %}

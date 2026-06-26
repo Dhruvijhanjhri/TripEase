@@ -21,7 +21,8 @@ from .forms import HotelGuestFormSet
 from .forms import HotelPaymentForm
 from reviews.models import HotelReview
 from django.db.models import Avg
-
+from django.contrib.auth.decorators import login_required
+from .models import HotelBooking
 
 def hotel_search(request):
 
@@ -441,4 +442,20 @@ def cancel_booking(
     return redirect(
         "hotels:booking_detail",
         booking_id=booking.id
+    )
+
+@login_required
+def hotel_booking_detail(request, booking_id):
+    booking = get_object_or_404(
+        HotelBooking.objects.select_related('hotel', 'room'),
+        id=booking_id,
+        user=request.user
+    )
+
+    return render(
+        request,
+        'hotels/hotel_booking_detail.html',
+        {
+            'booking': booking
+        }
     )

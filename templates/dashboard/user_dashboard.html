@@ -1,408 +1,1545 @@
-{% extends 'base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Dashboard — TripEase</title>
 
-{% block title %}My Dashboard - TripEase{% endblock %}
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
 
-{% block extra_css %}
-<style>
-    .dashboard-wrapper {
-        max-width: 1250px;
-        margin: 40px auto;
-        padding: 0 20px;
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+
+  <!-- Chart.js (loaded in <head> so it is available before any inline script) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+
+  <style>
+    /* ═══════════════════════════════════════════════
+       DESIGN TOKENS
+    ═══════════════════════════════════════════════ */
+    :root {
+      --brand-primary   : #0d6efd;
+      --brand-secondary : #6610f2;
+      --brand-accent    : #0dcaf0;
+      --brand-success   : #198754;
+      --brand-warning   : #ffc107;
+      --brand-danger    : #dc3545;
+      --brand-orange    : #fd7e14;
+      --brand-dark      : #12172b;
+      --brand-muted     : #6c757d;
+      --body-bg         : #f0f2f8;
+      --card-bg         : #ffffff;
+      --card-radius     : 1rem;
+      --card-radius-lg  : 1.25rem;
+      --shadow-xs       : 0 1px 4px rgba(0,0,0,0.06);
+      --shadow-sm       : 0 2px 12px rgba(0,0,0,0.07);
+      --shadow-md       : 0 6px 28px rgba(0,0,0,0.11);
+      --shadow-hover    : 0 12px 36px rgba(13,110,253,0.18);
+      --transition-fast : 0.18s ease;
     }
 
-    .dashboard-header {
-        margin-bottom: 28px;
+    /* ═══════════════════════════════════════════════
+       BASE
+    ═══════════════════════════════════════════════ */
+    *,
+    *::before,
+    *::after { box-sizing: border-box; }
+
+    body {
+      background  : var(--body-bg);
+      font-family : 'Segoe UI', system-ui, -apple-system, sans-serif;
+      color       : var(--brand-dark);
+      font-size   : 0.9375rem;
     }
 
-    .dashboard-header h2 {
-        font-size: 2rem;
-        font-weight: 700;
-        margin-bottom: 8px;
-        color: #111827;
+    /* Wide dashboard container */
+    .te-container {
+      max-width : 1450px;
+      width     : 95%;
+      margin    : 0 auto;
     }
 
-    .dashboard-header p {
-        color: #6b7280;
-        margin: 0;
+    /* ═══════════════════════════════════════════════
+       NAVBAR
+    ═══════════════════════════════════════════════ */
+    .te-navbar {
+      background : linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);
+      box-shadow : 0 2px 20px rgba(13,110,253,0.30);
     }
 
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 18px;
-        margin-bottom: 28px;
+    .te-navbar .navbar-brand {
+      font-weight    : 800;
+      font-size      : 1.4rem;
+      letter-spacing : -0.5px;
+      color          : #fff !important;
     }
 
-    .stat-card,
-    .dashboard-card {
-        background: #fff;
-        border-radius: 18px;
-        padding: 22px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-        border: 1px solid #f1f1f1;
+    .te-navbar .nav-link {
+      color       : rgba(255,255,255,0.82) !important;
+      font-weight : 500;
+      transition  : color var(--transition-fast);
+      border-radius : 0.4rem;
+      padding     : 0.45rem 0.75rem !important;
     }
 
-    .stat-card.gradient-blue {
-        background: linear-gradient(135deg, #eff6ff, #ffffff);
+    .te-navbar .nav-link:hover,
+    .te-navbar .nav-link.active {
+      color            : #fff !important;
+      background-color : rgba(255,255,255,0.12);
     }
 
-    .stat-card.gradient-green {
-        background: linear-gradient(135deg, #ecfdf5, #ffffff);
+    /* ═══════════════════════════════════════════════
+       PAGE HEADER HERO
+    ═══════════════════════════════════════════════ */
+    .page-hero {
+      background  : linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);
+      padding     : 3rem 0 5.5rem;
+      position    : relative;
+      overflow    : hidden;
     }
 
-    .stat-card.gradient-orange {
-        background: linear-gradient(135deg, #fff7ed, #ffffff);
+    .page-hero::before {
+      content       : '';
+      position      : absolute;
+      top           : -35%;
+      right         : -8%;
+      width         : 520px;
+      height        : 520px;
+      background    : rgba(255,255,255,0.06);
+      border-radius : 50%;
+      pointer-events: none;
     }
 
-    .stat-card.gradient-purple {
-        background: linear-gradient(135deg, #faf5ff, #ffffff);
+    .page-hero::after {
+      content       : '';
+      position      : absolute;
+      bottom        : -55%;
+      left          : -6%;
+      width         : 400px;
+      height        : 400px;
+      background    : rgba(255,255,255,0.04);
+      border-radius : 50%;
+      pointer-events: none;
     }
 
-    .stat-card.gradient-indigo {
-        background: linear-gradient(135deg, #eef2ff, #ffffff);
+    .page-hero h1 {
+      font-size   : 2.1rem;
+      font-weight : 800;
+      color       : #fff;
+      margin      : 0 0 0.4rem;
     }
 
-    .stat-label {
-        font-size: 0.95rem;
-        color: #6b7280;
-        margin-bottom: 10px;
-        font-weight: 600;
+    .page-hero p {
+      color     : rgba(255,255,255,0.82);
+      font-size : 1rem;
+      margin    : 0;
     }
 
-    .stat-value {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #111827;
+    /* ═══════════════════════════════════════════════
+       DASHBOARD BODY (pulled up over hero)
+    ═══════════════════════════════════════════════ */
+    .dashboard-body {
+      margin-top     : -4rem;
+      position       : relative;
+      z-index        : 10;
+      padding-bottom : 4rem;
     }
 
-    .stat-subtext {
-        margin-top: 8px;
-        font-size: 0.9rem;
-        color: #6b7280;
+    /* ═══════════════════════════════════════════════
+       KPI CARDS (Snapshot)
+    ═══════════════════════════════════════════════ */
+    .kpi-card {
+      border        : none;
+      border-radius : var(--card-radius);
+      box-shadow    : var(--shadow-sm);
+      transition    : transform var(--transition-fast), box-shadow var(--transition-fast);
+      overflow      : hidden;
+      position      : relative;
+      background    : var(--card-bg);
     }
 
-    .dashboard-card h3 {
-        font-size: 1.15rem;
-        font-weight: 700;
-        margin-bottom: 18px;
-        color: #111827;
+    .kpi-card::after {
+      content    : '';
+      position   : absolute;
+      bottom     : 0;
+      left       : 0;
+      right      : 0;
+      height     : 3px;
+      background : var(--kpi-accent, #0d6efd);
+      opacity    : 0;
+      transition : opacity var(--transition-fast);
     }
 
-    .dashboard-grid-2 {
-        display: grid;
-        grid-template-columns: 1.3fr 1fr;
-        gap: 22px;
-        margin-bottom: 24px;
+    .kpi-card:hover {
+      transform  : translateY(-5px);
+      box-shadow : var(--shadow-hover);
     }
 
-    .dashboard-grid-3 {
-        display: grid;
-        grid-template-columns: 1.4fr 1fr;
-        gap: 22px;
-        margin-bottom: 24px;
+    .kpi-card:hover::after {
+      opacity : 1;
     }
 
+    .kpi-icon {
+      width         : 58px;
+      height        : 58px;
+      border-radius : 0.85rem;
+      display       : flex;
+      align-items   : center;
+      justify-content: center;
+      font-size     : 1.55rem;
+      flex-shrink   : 0;
+    }
+
+    .kpi-value {
+      font-size   : 2.1rem;
+      font-weight : 800;
+      line-height : 1;
+      margin      : 0;
+    }
+
+    .kpi-label {
+      font-size      : 0.78rem;
+      font-weight    : 700;
+      text-transform : uppercase;
+      letter-spacing : 0.06em;
+      color          : var(--brand-muted);
+      margin         : 0;
+    }
+
+    .kpi-sub {
+      font-size  : 0.78rem;
+      color      : var(--brand-muted);
+      margin-top : 0.2rem;
+    }
+
+    /* ═══════════════════════════════════════════════
+       SECTION CARDS
+    ═══════════════════════════════════════════════ */
+    .section-card {
+      border        : none;
+      border-radius : var(--card-radius-lg);
+      box-shadow    : var(--shadow-sm);
+      background    : var(--card-bg);
+      height        : 100%;
+    }
+
+    .section-card .card-header {
+      background    : transparent;
+      border-bottom : 1px solid #eef0f8;
+      padding       : 1.25rem 1.5rem 1.1rem;
+      font-weight   : 700;
+      font-size     : 0.97rem;
+      letter-spacing: 0.01em;
+      display       : flex;
+      align-items   : center;
+      gap           : 0.55rem;
+      color         : var(--brand-dark);
+    }
+
+    .section-card .card-header .badge {
+      font-weight : 600;
+      font-size   : 0.72rem;
+    }
+
+    .section-card .card-body {
+      padding : 1.5rem;
+    }
+
+    /* ═══════════════════════════════════════════════
+       CHART CONTAINERS
+    ═══════════════════════════════════════════════ */
     .chart-wrap {
-        position: relative;
-        width: 100%;
-        min-height: 320px;
+      position : relative;
+      width    : 100%;
     }
 
-    .simple-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
+    .chart-h-240 { height: 240px; }
+    .chart-h-280 { height: 280px; }
+    .chart-h-320 { height: 320px; }
+    .chart-h-360 { height: 360px; }
 
-    .simple-list li {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 12px 0;
-        border-bottom: 1px solid #f0f0f0;
-    }
-
-    .simple-list li:last-child {
-        border-bottom: none;
-    }
-
-    .pill {
-        background: #eff6ff;
-        color: #2563eb;
-        padding: 5px 12px;
-        border-radius: 999px;
-        font-size: 0.85rem;
-        font-weight: 600;
-    }
-
-    .highlight-box {
-        margin-top: 18px;
-        background: linear-gradient(135deg, #eef2ff, #f8fbff);
-        border: 1px solid #dbeafe;
-        border-radius: 16px;
-        padding: 16px;
-    }
-
-    .highlight-box h4 {
-        font-size: 1rem;
-        font-weight: 700;
-        margin-bottom: 8px;
-    }
-
-    .highlight-box p {
-        margin: 0;
-        color: #374151;
-        line-height: 1.6;
-    }
-
-    .table-wrap {
-        overflow-x: auto;
-    }
-
-    .custom-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    .custom-table th,
-    .custom-table td {
-        padding: 12px 10px;
-        border-bottom: 1px solid #f0f0f0;
-        text-align: left;
-        font-size: 0.95rem;
-        vertical-align: middle;
-    }
-
-    .custom-table th {
-        font-weight: 700;
-        color: #111827;
-    }
-
+    /* ═══════════════════════════════════════════════
+       STATUS BADGES
+    ═══════════════════════════════════════════════ */
     .status-badge {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 999px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        background: #ecfdf5;
-        color: #059669;
+      display        : inline-block;
+      font-size      : 0.7rem;
+      font-weight    : 700;
+      letter-spacing : 0.05em;
+      text-transform : uppercase;
+      padding        : 0.28em 0.8em;
+      border-radius  : 50px;
+      white-space    : nowrap;
     }
 
-    .amount-text {
-        font-weight: 700;
-        color: #111827;
+    .status-pending   { background: #fff8e1; color: #e65100; }
+    .status-confirmed { background: #e8f5e9; color: #1b5e20; }
+    .status-cancelled { background: #fce4ec; color: #880e4f; }
+    .status-completed { background: #e3f2fd; color: #0d47a1; }
+
+    /* ═══════════════════════════════════════════════
+       ANALYTICS METRICS GRID
+    ═══════════════════════════════════════════════ */
+    .metric-item {
+      padding       : 1.1rem 1.25rem;
+      background    : #f8f9ff;
+      border-radius : 0.85rem;
+      border        : 1px solid #eef0f8;
+      transition    : box-shadow var(--transition-fast);
     }
 
+    .metric-item:hover {
+      box-shadow : var(--shadow-xs);
+    }
+
+    .metric-value {
+      font-size   : 1.55rem;
+      font-weight : 800;
+      line-height : 1;
+      color       : var(--brand-dark);
+    }
+
+    .metric-label {
+      font-size      : 0.75rem;
+      font-weight    : 700;
+      text-transform : uppercase;
+      letter-spacing : 0.05em;
+      color          : var(--brand-muted);
+      margin-top     : 0.3rem;
+    }
+
+    .metric-na {
+      font-size   : 1.25rem;
+      font-weight : 700;
+      color       : #ced4da;
+    }
+
+    /* ═══════════════════════════════════════════════
+       INSIGHTS CARD
+    ═══════════════════════════════════════════════ */
     .insight-card {
-        background: linear-gradient(135deg, #f8fafc, #ffffff);
-        border-radius: 18px;
-        padding: 22px;
-        border: 1px solid #eef2f7;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+      background    : linear-gradient(135deg, #f0f4ff 0%, #faf5ff 100%);
+      border        : 1px solid #e4e9ff;
+      border-radius : var(--card-radius);
+      padding       : 1.1rem 1.25rem;
+      position      : relative;
+      transition    : box-shadow var(--transition-fast);
     }
 
-    .insight-card h4 {
-        font-size: 1rem;
-        font-weight: 700;
-        margin-bottom: 12px;
+    .insight-card:hover {
+      box-shadow : var(--shadow-xs);
     }
 
-    .insight-card p {
-        margin: 0;
-        color: #4b5563;
-        line-height: 1.7;
+    .insight-card .insight-icon {
+      width         : 34px;
+      height        : 34px;
+      border-radius : 50%;
+      background    : linear-gradient(135deg, #0d6efd, #6610f2);
+      color         : #fff;
+      font-size     : 0.95rem;
+      display       : flex;
+      align-items   : center;
+      justify-content: center;
+      flex-shrink   : 0;
     }
 
-    @media (max-width: 950px) {
-        .dashboard-grid-2,
-        .dashboard-grid-3 {
-            grid-template-columns: 1fr;
-        }
+    .insight-card .insight-text {
+      font-size   : 0.88rem;
+      font-weight : 500;
+      color       : #3a3f5c;
+      line-height : 1.5;
     }
-</style>
-{% endblock %}
 
-{% block content %}
-<div class="dashboard-wrapper">
+    /* ═══════════════════════════════════════════════
+       TIMELINE (Recent Activity)
+    ═══════════════════════════════════════════════ */
+    .timeline {
+      position     : relative;
+      padding-left : 2.4rem;
+    }
 
-    <div class="dashboard-header">
-        <h2>My Trip Dashboard</h2>
-        <p>Your personal TripEase booking and spending overview.</p>
+    .timeline::before {
+      content       : '';
+      position      : absolute;
+      left          : 0.7rem;
+      top           : 0;
+      bottom        : 0;
+      width         : 2px;
+      background    : linear-gradient(180deg, #0d6efd 0%, #6610f2 100%);
+      border-radius : 2px;
+    }
+
+    .timeline-item {
+      position      : relative;
+      margin-bottom : 1.25rem;
+    }
+
+    .timeline-item:last-child {
+      margin-bottom : 0;
+    }
+
+    .timeline-dot {
+      position      : absolute;
+      left          : -2.05rem;
+      top           : 0.55rem;
+      width         : 14px;
+      height        : 14px;
+      border-radius : 50%;
+      border        : 2.5px solid #fff;
+      box-shadow    : 0 0 0 2px var(--brand-primary);
+      background    : var(--brand-primary);
+    }
+
+    .timeline-dot.dot-hotel   { background: #6610f2; box-shadow: 0 0 0 2px #6610f2; }
+    .timeline-dot.dot-package { background: #0dcaf0; box-shadow: 0 0 0 2px #0dcaf0; }
+    .timeline-dot.dot-flight  { background: #0d6efd; box-shadow: 0 0 0 2px #0d6efd; }
+
+    .timeline-content {
+      background    : #f8f9ff;
+      border-radius : 0.85rem;
+      padding       : 1rem 1.2rem;
+      border        : 1px solid #eef0fa;
+      transition    : box-shadow var(--transition-fast);
+    }
+
+    .timeline-content:hover {
+      box-shadow : var(--shadow-xs);
+    }
+
+    .timeline-title {
+      font-weight   : 700;
+      font-size     : 0.92rem;
+      margin-bottom : 0.25rem;
+      color         : var(--brand-dark);
+    }
+
+    .timeline-meta {
+      font-size : 0.78rem;
+      color     : var(--brand-muted);
+    }
+
+    .timeline-actions {
+      margin-top  : 0.65rem;
+      padding-top : 0.65rem;
+      border-top  : 1px solid #eef0fa;
+    }
+
+    /* ═══════════════════════════════════════════════
+       HOTEL TABLE
+    ═══════════════════════════════════════════════ */
+    .hotel-table {
+      margin : 0;
+    }
+
+    .hotel-table thead th {
+      font-size      : 0.76rem;
+      font-weight    : 700;
+      text-transform : uppercase;
+      letter-spacing : 0.06em;
+      color          : var(--brand-muted);
+      border-bottom  : 2px solid #eef0f8;
+      padding        : 0.85rem 1rem;
+      background     : #fafbff;
+    }
+
+    .hotel-table tbody td {
+      font-size      : 0.9rem;
+      padding        : 0.85rem 1rem;
+      vertical-align : middle;
+      border-bottom  : 1px solid #f5f5fa;
+      color          : var(--brand-dark);
+    }
+
+    .hotel-table tbody tr:last-child td {
+      border-bottom : none;
+    }
+
+    .hotel-table tbody tr:hover td {
+      background : #fafbff;
+    }
+
+    .hotel-rank {
+      width          : 30px;
+      height         : 30px;
+      border-radius  : 50%;
+      background     : linear-gradient(135deg, #0d6efd, #6610f2);
+      color          : #fff;
+      font-size      : 0.78rem;
+      font-weight    : 800;
+      display        : flex;
+      align-items    : center;
+      justify-content: center;
+      flex-shrink    : 0;
+    }
+
+    /* Gold, silver, bronze for top 3 */
+    .hotel-rank.rank-1 { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    .hotel-rank.rank-2 { background: linear-gradient(135deg, #94a3b8, #64748b); }
+    .hotel-rank.rank-3 { background: linear-gradient(135deg, #cd7c4a, #a16a35); }
+
+    /* ═══════════════════════════════════════════════
+       EMPTY STATES
+    ═══════════════════════════════════════════════ */
+    .empty-state {
+      text-align : center;
+      padding    : 3rem 1rem;
+      color      : var(--brand-muted);
+    }
+
+    .empty-state .empty-icon {
+      font-size     : 2.8rem;
+      opacity       : 0.3;
+      margin-bottom : 0.85rem;
+      display       : block;
+    }
+
+    .empty-state h6 {
+      font-weight   : 700;
+      margin-bottom : 0.35rem;
+      color         : #9aa5be;
+    }
+
+    .empty-state p {
+      font-size : 0.87rem;
+      margin    : 0;
+    }
+
+    /* ═══════════════════════════════════════════════
+       TYPE PILL (Flight / Hotel / Package)
+    ═══════════════════════════════════════════════ */
+    .type-pill {
+      font-size      : 0.7rem;
+      font-weight    : 700;
+      letter-spacing : 0.04em;
+      text-transform : uppercase;
+      padding        : 0.25em 0.7em;
+      border-radius  : 50px;
+    }
+
+    .type-flight  { background: #e8f0fe; color: #1a56db; }
+    .type-hotel   { background: #f3e8ff; color: #7c3aed; }
+    .type-package { background: #e0f9f8; color: #0e7490; }
+
+    /* ═══════════════════════════════════════════════
+       VIEW DETAILS BUTTON
+    ═══════════════════════════════════════════════ */
+    .btn-view {
+      font-size     : 0.75rem;
+      font-weight   : 600;
+      padding       : 0.3rem 0.9rem;
+      border-radius : 50px;
+      border        : 1.5px solid #dee2ff;
+      color         : var(--brand-primary);
+      background    : transparent;
+      transition    : all var(--transition-fast);
+      white-space   : nowrap;
+    }
+
+    .btn-view:hover {
+      background : var(--brand-primary);
+      color      : #fff;
+      border-color: var(--brand-primary);
+    }
+
+    /* ═══════════════════════════════════════════════
+       SECTION DIVIDER LABEL
+    ═══════════════════════════════════════════════ */
+    .section-label {
+      font-size      : 0.7rem;
+      font-weight    : 800;
+      text-transform : uppercase;
+      letter-spacing : 0.1em;
+      color          : var(--brand-muted);
+      margin-bottom  : 1rem;
+      display        : flex;
+      align-items    : center;
+      gap            : 0.5rem;
+    }
+
+    .section-label::after {
+      content    : '';
+      flex       : 1;
+      height     : 1px;
+      background : #eef0f8;
+    }
+
+    /* ═══════════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════════ */
+    @media (max-width: 991.98px) {
+      .page-hero { padding: 2.5rem 0 5rem; }
+      .page-hero h1 { font-size: 1.7rem; }
+    }
+
+    @media (max-width: 767.98px) {
+      .page-hero { padding: 2rem 0 4.5rem; }
+      .page-hero h1 { font-size: 1.4rem; }
+      .kpi-value { font-size: 1.65rem; }
+      .dashboard-body { margin-top: -3rem; }
+      .te-container { width: 96%; }
+    }
+
+    @media (max-width: 575.98px) {
+      .timeline { padding-left: 2rem; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ═══════════════════════════════════════════════
+       NAVBAR
+  ═══════════════════════════════════════════════ -->
+  <nav class="navbar navbar-expand-lg te-navbar sticky-top">
+    <div class="te-container d-flex align-items-center w-100" style="max-width:1450px;">
+      <a class="navbar-brand me-3" href="{% url 'core:home' %}">
+        <i class="bi bi-airplane-engines-fill me-2"></i>TripEase
+      </a>
+      <button
+        class="navbar-toggler border-0 ms-auto p-1"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#teNav"
+        aria-controls="teNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+        style="color:#fff;"
+      >
+        <i class="bi bi-list fs-4"></i>
+      </button>
+      <div class="collapse navbar-collapse" id="teNav">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center gap-lg-1">
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'core:home' %}">
+              <i class="bi bi-house me-1"></i>Home
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'flights:search' %}">
+              <i class="bi bi-airplane me-1"></i>Flights
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'hotels:search' %}">
+              <i class="bi bi-building me-1"></i>Hotels
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'packages:search' %}">
+              <i class="bi bi-briefcase me-1"></i>Packages
+            </a>
+          </li>
+          <li class="nav-item ms-lg-2">
+            <a class="nav-link active" href="{% url 'dashboard:user_dashboard' %}">
+              <i class="bi bi-speedometer2 me-1"></i>Dashboard
+            </a>
+          </li>
+          <li class="nav-item ms-lg-1">
+            <a class="nav-link" href="{% url 'accounts:logout' %}">
+              <i class="bi bi-box-arrow-right me-1"></i>Logout
+            </a>
+          </li>
+        </ul>
+      </div>
     </div>
+  </nav>
 
-    <div class="stats-grid">
-        <div class="stat-card gradient-blue">
-            <div class="stat-label">Total Bookings</div>
-            <div class="stat-value">{{ total_bookings }}</div>
-            <div class="stat-subtext">All bookings across TripEase</div>
-        </div>
-
-        <div class="stat-card gradient-green">
-            <div class="stat-label">Flight Bookings</div>
-            <div class="stat-value">{{ flight_count }}</div>
-            <div class="stat-subtext">Trips booked by air</div>
-        </div>
-
-        <div class="stat-card gradient-orange">
-            <div class="stat-label">Hotel Bookings</div>
-            <div class="stat-value">{{ hotel_count }}</div>
-            <div class="stat-subtext">Stay reservations</div>
-        </div>
-
-        <div class="stat-card gradient-purple">
-            <div class="stat-label">Package Bookings</div>
-            <div class="stat-value">{{ package_count }}</div>
-            <div class="stat-subtext">Holiday package plans</div>
-        </div>
-
-        <div class="stat-card gradient-indigo">
-            <div class="stat-label">Total Spent</div>
-            <div class="stat-value">₹{{ total_spent }}</div>
-            <div class="stat-subtext">Successful payment amount</div>
-        </div>
+  <!-- ═══════════════════════════════════════════════
+       PAGE HERO
+  ═══════════════════════════════════════════════ -->
+  <div class="page-hero">
+    <div class="te-container">
+      <h1><i class="bi bi-speedometer2 me-2"></i>My Travel Dashboard</h1>
+      <p>
+        Welcome back,
+        <strong>{{ request.user.get_full_name|default:request.user.username }}</strong>!
+        Here's your complete travel overview.
+      </p>
     </div>
+  </div>
 
-    <div class="dashboard-grid-2">
-        <div class="dashboard-card">
-            <h3>Booking Distribution</h3>
-            <div class="chart-wrap">
-                <canvas id="userBookingChart"></canvas>
+  <!-- ═══════════════════════════════════════════════
+       DASHBOARD BODY
+  ═══════════════════════════════════════════════ -->
+  <div class="dashboard-body">
+    <div class="te-container">
+
+      <!-- ═══ ROW 1: KPI CARDS ══════════════════════ -->
+      <div class="row g-3 mb-4">
+
+        <!-- Total Bookings -->
+        <div class="col-6 col-sm-4 col-lg-2">
+          <div class="card kpi-card h-100" style="--kpi-accent:#0d6efd;">
+            <div class="card-body p-3 d-flex flex-column gap-2">
+              <div class="kpi-icon" style="background:#e8f0fe;">
+                <i class="bi bi-ticket-perforated-fill" style="color:#0d6efd;"></i>
+              </div>
+              <div>
+                <p class="kpi-value text-primary">{{ total_bookings }}</p>
+                <p class="kpi-label">Total Bookings</p>
+              </div>
             </div>
+          </div>
+        </div>
 
-            <div class="highlight-box">
-                <h4>Travel Pattern Insight</h4>
-                <p>
-                    Your most booked category right now is
-                    <strong>{{ top_category }}</strong>.
-                    This chart shows how your bookings are split across flights,
-                    hotels and packages.
+        <!-- Flights -->
+        <div class="col-6 col-sm-4 col-lg-2">
+          <div class="card kpi-card h-100" style="--kpi-accent:#0dcaf0;">
+            <div class="card-body p-3 d-flex flex-column gap-2">
+              <div class="kpi-icon" style="background:#e0f9f8;">
+                <i class="bi bi-airplane-fill" style="color:#0894a6;"></i>
+              </div>
+              <div>
+                <p class="kpi-value" style="color:#0894a6;">{{ total_flight_bookings }}</p>
+                <p class="kpi-label">Flights</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hotels -->
+        <div class="col-6 col-sm-4 col-lg-2">
+          <div class="card kpi-card h-100" style="--kpi-accent:#6610f2;">
+            <div class="card-body p-3 d-flex flex-column gap-2">
+              <div class="kpi-icon" style="background:#f3e8ff;">
+                <i class="bi bi-building-fill" style="color:#6610f2;"></i>
+              </div>
+              <div>
+                <p class="kpi-value" style="color:#6610f2;">{{ total_hotel_bookings }}</p>
+                <p class="kpi-label">Hotels</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Packages -->
+        <div class="col-6 col-sm-4 col-lg-2">
+          <div class="card kpi-card h-100" style="--kpi-accent:#fd7e14;">
+            <div class="card-body p-3 d-flex flex-column gap-2">
+              <div class="kpi-icon" style="background:#fff4e6;">
+                <i class="bi bi-briefcase-fill" style="color:#fd7e14;"></i>
+              </div>
+              <div>
+                <p class="kpi-value" style="color:#fd7e14;">{{ total_package_bookings }}</p>
+                <p class="kpi-label">Packages</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Upcoming Trips -->
+        <div class="col-6 col-sm-4 col-lg-2">
+          <div class="card kpi-card h-100" style="--kpi-accent:#198754;">
+            <div class="card-body p-3 d-flex flex-column gap-2">
+              <div class="kpi-icon" style="background:#e6f9f0;">
+                <i class="bi bi-calendar-event-fill" style="color:#198754;"></i>
+              </div>
+              <div>
+                <p class="kpi-value text-success">{{ upcoming_trips }}</p>
+                <p class="kpi-label">Upcoming</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Total Spending -->
+        <div class="col-6 col-sm-4 col-lg-2">
+          <div class="card kpi-card h-100" style="--kpi-accent:#dc3545;">
+            <div class="card-body p-3 d-flex flex-column gap-2">
+              <div class="kpi-icon" style="background:#fdecea;">
+                <i class="bi bi-currency-rupee" style="color:#dc3545;"></i>
+              </div>
+              <div>
+                <p class="kpi-value text-danger" style="font-size:1.5rem;">
+                  ₹{{ total_spending|floatformat:0 }}
                 </p>
+                <p class="kpi-label">Total Spent</p>
+              </div>
             </div>
+          </div>
         </div>
 
-        <div class="dashboard-card">
-            <h3>Quick Summary</h3>
+      </div>
+      <!-- /ROW 1 -->
 
-            <ul class="simple-list">
-                <li>
-                    <span>Flights</span>
-                    <span class="pill">{{ flight_count }}</span>
-                </li>
-                <li>
-                    <span>Hotels</span>
-                    <span class="pill">{{ hotel_count }}</span>
-                </li>
-                <li>
-                    <span>Packages</span>
-                    <span class="pill">{{ package_count }}</span>
-                </li>
-                <li>
-                    <span>Total Spent</span>
-                    <span class="pill">₹{{ total_spent }}</span>
-                </li>
-            </ul>
+      <!-- ═══ ROW 2: CHARTS — Distribution + Status ═ -->
+      <div class="row g-4 mb-4">
 
-            <div class="highlight-box">
-                <h4>Top Category</h4>
-                <p>
-                    Based on your current activity, <strong>{{ top_category }}</strong>
-                    is your most used TripEase booking category.
-                </p>
+        <!-- Booking Distribution Doughnut -->
+        <div class="col-md-5">
+          <div class="section-card card">
+            <div class="card-header">
+              <i class="bi bi-pie-chart-fill text-primary"></i>
+              Booking Distribution
+              {% if total_bookings > 0 %}
+                <span class="badge bg-primary ms-auto">{{ total_bookings }} total</span>
+              {% endif %}
             </div>
-        </div>
-    </div>
-
-    <div class="dashboard-grid-3">
-        <div class="dashboard-card">
-            <h3>Recent Activity</h3>
-
-            {% if recent_items %}
-                <div class="table-wrap">
-                    <table class="custom-table">
-                        <thead>
-                            <tr>
-                                <th>Type</th>
-                                <th>Booking</th>
-                                <th>Date</th>
-                                <th>Status</th>
-                                <th>Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in recent_items %}
-                                <tr>
-                                    <td>{{ item.type }}</td>
-                                    <td>{{ item.title }}</td>
-                                    <td>{{ item.date|date:"d M Y, h:i A" }}</td>
-                                    <td>
-                                        <span class="status-badge">
-                                            {{ item.status }}
-                                        </span>
-                                    </td>
-                                    <td class="amount-text">₹{{ item.price }}</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+            <div class="card-body d-flex align-items-center justify-content-center">
+              {% if total_bookings > 0 %}
+                <div class="chart-wrap chart-h-280" style="max-width:320px; width:100%;">
+                  <canvas id="chartDistribution"></canvas>
                 </div>
-            {% else %}
-                <p>No bookings found yet.</p>
-            {% endif %}
+              {% else %}
+                <div class="empty-state">
+                  <i class="bi bi-pie-chart empty-icon"></i>
+                  <h6>No Bookings Yet</h6>
+                  <p>Start exploring flights, hotels, or packages to see your distribution.</p>
+                </div>
+              {% endif %}
+            </div>
+          </div>
         </div>
 
-        <div class="insight-card">
-            <h4>My Travel Snapshot</h4>
-            <p>
-                You have made <strong>{{ total_bookings }}</strong> total bookings on TripEase,
-                with <strong>{{ flight_count }}</strong> flight,
-                <strong>{{ hotel_count }}</strong> hotel and
-                <strong>{{ package_count }}</strong> package bookings.
-            </p>
-            <br>
-            <p>
-                Your total successful spend so far is
-                <strong>₹{{ total_spent }}</strong>.
-            </p>
-            <br>
-            <p>
-                Keep booking history here as your personal travel analytics space.
-                In the next version we can add monthly spending chart,
-                favorite destinations and travel timeline too.
-            </p>
+        <!-- Booking Status Pie -->
+        <div class="col-md-7">
+          <div class="section-card card">
+            <div class="card-header">
+              <i class="bi bi-bar-chart-fill text-warning"></i>
+              Booking Status Overview
+            </div>
+            <div class="card-body d-flex align-items-center justify-content-center">
+              {% if total_bookings > 0 %}
+                <div class="chart-wrap chart-h-280" style="width:100%;">
+                  <canvas id="chartStatus"></canvas>
+                </div>
+              {% else %}
+                <div class="empty-state">
+                  <i class="bi bi-bar-chart empty-icon"></i>
+                  <h6>No Status Data</h6>
+                  <p>Booking status breakdown will appear once you have bookings.</p>
+                </div>
+              {% endif %}
+            </div>
+          </div>
         </div>
+
+      </div>
+      <!-- /ROW 2 -->
+
+      <!-- ═══ ROW 3: MONTHLY SPENDING LINE CHART ════ -->
+      <div class="row g-4 mb-4">
+        <div class="col-12">
+          <div class="section-card card">
+            <div class="card-header">
+              <i class="bi bi-graph-up-arrow text-success"></i>
+              Monthly Spending — Last 12 Months
+              {% if has_spending %}
+                <span class="badge bg-success ms-auto">₹{{ total_spending|floatformat:0 }} total</span>
+              {% endif %}
+            </div>
+            <div class="card-body">
+              {% if has_spending %}
+                <div class="chart-wrap chart-h-320">
+                  <canvas id="chartMonthly"></canvas>
+                </div>
+              {% else %}
+                <div class="empty-state">
+                  <i class="bi bi-graph-up empty-icon"></i>
+                  <h6>No Spending Data</h6>
+                  <p>Your monthly spending trend will appear here once you make your first booking.</p>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /ROW 3 -->
+
+      <!-- ═══ ROW 4: DESTINATIONS + HOTELS ══════════ -->
+      <div class="row g-4 mb-4">
+
+        <!-- Favourite Destinations Horizontal Bar -->
+        <div class="col-lg-6">
+          <div class="section-card card">
+            <div class="card-header">
+              <i class="bi bi-geo-alt-fill text-danger"></i>
+              Favourite Destinations
+              {% if has_destinations %}
+                <span class="badge bg-danger ms-auto">Top {{ destination_labels|length }}</span>
+              {% endif %}
+            </div>
+            <div class="card-body">
+              {% if has_destinations %}
+                <div class="chart-wrap chart-h-280">
+                  <canvas id="chartDestinations"></canvas>
+                </div>
+              {% else %}
+                <div class="empty-state">
+                  <i class="bi bi-geo empty-icon"></i>
+                  <h6>No Destinations Yet</h6>
+                  <p>Book a flight, hotel, or package to see your favourite destinations appear here.</p>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Favourite Hotels Table -->
+        <div class="col-lg-6">
+          <div class="section-card card">
+            <div class="card-header">
+              <i class="bi bi-building-fill text-primary"></i>
+              Favourite Hotels
+              {% if favorite_hotels %}
+                <span class="badge bg-primary ms-auto">Top {{ favorite_hotels|length }}</span>
+              {% endif %}
+            </div>
+            <div class="card-body p-0">
+              {% if favorite_hotels %}
+                <div class="table-responsive">
+                  <table class="table hotel-table mb-0">
+                    <thead>
+                      <tr>
+                        <th style="width:52px;">Rank</th>
+                        <th>Hotel Name</th>
+                        <th class="text-center" style="width:110px;">Bookings</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for hotel in favorite_hotels %}
+                        <tr>
+                          <td class="ps-3">
+                            <div class="hotel-rank rank-{{ forloop.counter }}">
+                              {{ forloop.counter }}
+                            </div>
+                          </td>
+                          <td>
+                            <span class="fw-bold">{{ hotel.hotel_name }}</span>
+                          </td>
+                          <td class="text-center">
+                            <span class="badge bg-primary rounded-pill px-3">
+                              {{ hotel.booking_count }}
+                            </span>
+                          </td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              {% else %}
+                <div class="empty-state">
+                  <i class="bi bi-building empty-icon"></i>
+                  <h6>No Hotel Bookings Yet</h6>
+                  <p>Start exploring amazing stays and your favourite hotels will appear here.</p>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <!-- /ROW 4 -->
+
+      <!-- ═══ ROW 5: ANALYTICS METRICS ══════════════ -->
+      <div class="row g-4 mb-4">
+        <div class="col-12">
+          <div class="section-card card">
+            <div class="card-header">
+              <i class="bi bi-calculator-fill text-secondary"></i>
+              Analytics Summary
+            </div>
+            <div class="card-body">
+              <div class="row g-3">
+
+                <!-- Average Booking Value -->
+                <div class="col-6 col-sm-4 col-lg-3">
+                  <div class="metric-item text-center">
+                    <div class="metric-value">
+                      {% if avg_booking_value %}
+                        ₹{{ avg_booking_value|floatformat:0 }}
+                      {% else %}
+                        <span class="metric-na">N/A</span>
+                      {% endif %}
+                    </div>
+                    <div class="metric-label">Avg. Booking Value</div>
+                  </div>
+                </div>
+
+                <!-- Average Flight Cost -->
+                <div class="col-6 col-sm-4 col-lg-3">
+                  <div class="metric-item text-center">
+                    <div class="metric-value" style="color:#0894a6;">
+                      {% if avg_flight_cost %}
+                        ₹{{ avg_flight_cost|floatformat:0 }}
+                      {% else %}
+                        <span class="metric-na">N/A</span>
+                      {% endif %}
+                    </div>
+                    <div class="metric-label">Avg. Flight Cost</div>
+                  </div>
+                </div>
+
+                <!-- Average Hotel Cost -->
+                <div class="col-6 col-sm-4 col-lg-3">
+                  <div class="metric-item text-center">
+                    <div class="metric-value" style="color:#6610f2;">
+                      {% if avg_hotel_cost %}
+                        ₹{{ avg_hotel_cost|floatformat:0 }}
+                      {% else %}
+                        <span class="metric-na">N/A</span>
+                      {% endif %}
+                    </div>
+                    <div class="metric-label">Avg. Hotel Cost</div>
+                  </div>
+                </div>
+
+                <!-- Average Package Cost -->
+                <div class="col-6 col-sm-4 col-lg-3">
+                  <div class="metric-item text-center">
+                    <div class="metric-value" style="color:#fd7e14;">
+                      {% if avg_package_cost %}
+                        ₹{{ avg_package_cost|floatformat:0 }}
+                      {% else %}
+                        <span class="metric-na">N/A</span>
+                      {% endif %}
+                    </div>
+                    <div class="metric-label">Avg. Package Cost</div>
+                  </div>
+                </div>
+
+                <!-- Booking Success Rate -->
+                <div class="col-6 col-sm-4 col-lg-3">
+                  <div class="metric-item text-center">
+                    <div class="metric-value text-success">
+                      {% if success_rate is not None %}
+                        {{ success_rate }}%
+                      {% else %}
+                        <span class="metric-na">N/A</span>
+                      {% endif %}
+                    </div>
+                    <div class="metric-label">Success Rate</div>
+                  </div>
+                </div>
+
+                <!-- Cancellation Rate -->
+                <div class="col-6 col-sm-4 col-lg-3">
+                  <div class="metric-item text-center">
+                    <div class="metric-value text-danger">
+                      {% if cancellation_rate is not None %}
+                        {{ cancellation_rate }}%
+                      {% else %}
+                        <span class="metric-na">N/A</span>
+                      {% endif %}
+                    </div>
+                    <div class="metric-label">Cancellation Rate</div>
+                  </div>
+                </div>
+
+                <!-- Travel Frequency -->
+                <div class="col-6 col-sm-4 col-lg-3">
+                  <div class="metric-item text-center">
+                    <div class="metric-value" style="color:#0d6efd;">
+                      {% if travel_frequency is not None %}
+                        {{ travel_frequency }}<small class="fs-6 fw-normal text-muted">/mo</small>
+                      {% else %}
+                        <span class="metric-na">N/A</span>
+                      {% endif %}
+                    </div>
+                    <div class="metric-label">Travel Frequency</div>
+                  </div>
+                </div>
+
+                <!-- Favourite Month -->
+                <div class="col-6 col-sm-4 col-lg-3">
+                  <div class="metric-item text-center">
+                    <div class="metric-value" style="color:#198754; font-size:1.2rem;">
+                      {% if favourite_month %}
+                        {{ favourite_month }}
+                      {% else %}
+                        <span class="metric-na">N/A</span>
+                      {% endif %}
+                    </div>
+                    <div class="metric-label">Busiest Month</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /ROW 5 -->
+
+      <!-- ═══ ROW 6: TRAVEL INSIGHTS ═════════════════ -->
+      <div class="row g-4 mb-4">
+        <div class="col-12">
+          <div class="section-card card">
+            <div class="card-header">
+              <i class="bi bi-lightbulb-fill text-warning"></i>
+              Travel Insights
+              <span class="badge bg-warning text-dark ms-auto">AI Powered</span>
+            </div>
+            <div class="card-body">
+              <div class="row g-3">
+                {% for insight in insights %}
+                  <div class="col-md-6">
+                    <div class="insight-card d-flex align-items-start gap-3">
+                      <div class="insight-icon flex-shrink-0">
+                        <i class="bi bi-stars"></i>
+                      </div>
+                      <p class="insight-text mb-0">{{ insight }}</p>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /ROW 6 -->
+
+      <!-- ═══ ROW 7: RECENT ACTIVITY ════════════════ -->
+      <div class="row g-4 mb-4">
+        <div class="col-12">
+          <div class="section-card card">
+            <div class="card-header">
+              <i class="bi bi-clock-history text-secondary"></i>
+              Recent Activity
+              {% if recent_activity %}
+                <span class="badge bg-secondary ms-auto">Last {{ recent_activity|length }}</span>
+              {% endif %}
+            </div>
+            <div class="card-body">
+              {% if recent_activity %}
+                <div class="timeline">
+                  {% for activity in recent_activity %}
+                    <div class="timeline-item">
+
+                      <!-- Timeline dot — colour by type -->
+                      {% if activity.type == 'Hotel' %}
+                        <div class="timeline-dot dot-hotel"></div>
+                      {% elif activity.type == 'Package' %}
+                        <div class="timeline-dot dot-package"></div>
+                      {% else %}
+                        <div class="timeline-dot dot-flight"></div>
+                      {% endif %}
+
+                      <div class="timeline-content">
+
+                        <!-- Top row: title + badges -->
+                        <div class="d-flex align-items-start justify-content-between gap-2 flex-wrap">
+
+                          <div class="flex-grow-1">
+                            <div class="timeline-title">
+                              {% if activity.type == 'Flight' %}
+                                <i class="bi bi-airplane-fill me-1 text-primary"></i>
+                              {% elif activity.type == 'Hotel' %}
+                                <i class="bi bi-building-fill me-1" style="color:#6610f2;"></i>
+                              {% else %}
+                                <i class="bi bi-briefcase-fill me-1" style="color:#0894a6;"></i>
+                              {% endif %}
+                              {{ activity.title }}
+                            </div>
+                            <div class="timeline-meta mt-1">
+                              <i class="bi bi-calendar3 me-1"></i>
+                              {{ activity.date|date:"d M Y, g:i A" }}
+                              &nbsp;·&nbsp;
+                              <strong class="text-dark">₹{{ activity.amount|floatformat:2 }}</strong>
+                            </div>
+                          </div>
+
+                          <div class="d-flex flex-column align-items-end gap-1 flex-shrink-0">
+                            {% if activity.type == 'Flight' %}
+                              <span class="type-pill type-flight">Flight</span>
+                            {% elif activity.type == 'Hotel' %}
+                              <span class="type-pill type-hotel">Hotel</span>
+                            {% else %}
+                              <span class="type-pill type-package">Package</span>
+                            {% endif %}
+                            {% with status=activity.status|lower %}
+                              <span class="status-badge status-{{ status }}">
+                                {{ activity.status }}
+                              </span>
+                            {% endwith %}
+                          </div>
+
+                        </div>
+
+                        <!-- Action row -->
+                        <div class="timeline-actions d-flex align-items-center gap-2 flex-wrap">
+                          {% if activity.type == 'Flight' %}
+                            <a href="{% url 'bookings:list' %}" class="btn-view">
+                              <i class="bi bi-eye me-1"></i>View Details
+                            </a>
+                          {% elif activity.type == 'Hotel' %}
+                            <a href="{% url 'bookings:list' %}" class="btn-view">
+                              <i class="bi bi-eye me-1"></i>View Details
+                            </a>
+                          {% else %}
+                            <a href="{% url 'bookings:list' %}" class="btn-view">
+                              <i class="bi bi-eye me-1"></i>View Details
+                            </a>
+                          {% endif %}
+                          <span class="text-muted" style="font-size:0.75rem;">
+                            <i class="bi bi-hash me-1"></i>
+                            {{ activity.date|date:"Ymd" }}-{{ forloop.counter }}
+                          </span>
+                        </div>
+
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+              {% else %}
+                <div class="empty-state">
+                  <i class="bi bi-clock empty-icon"></i>
+                  <h6>No Activity Yet</h6>
+                  <p>
+                    Your booking history will appear here.
+                    <a href="{% url 'flights:search' %}" class="text-primary fw-bold">Book your first trip</a>
+                    to get started!
+                  </p>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /ROW 7 -->
+
+    </div><!-- /.te-container -->
+  </div><!-- /.dashboard-body -->
+
+  <!-- ═══════════════════════════════════════════════
+       FOOTER
+  ═══════════════════════════════════════════════ -->
+  <footer class="py-4" style="background:#12172b; color:rgba(255,255,255,0.5);">
+    <div class="te-container d-flex flex-column flex-md-row align-items-center justify-content-between gap-2">
+      <p class="mb-0 small">
+        &copy; {% now "Y" %} TripEase. All rights reserved.
+      </p>
+      <div class="d-flex gap-3">
+        <a href="#" class="text-decoration-none small" style="color:rgba(255,255,255,0.5);">Privacy</a>
+        <a href="#" class="text-decoration-none small" style="color:rgba(255,255,255,0.5);">Terms</a>
+        <a href="#" class="text-decoration-none small" style="color:rgba(255,255,255,0.5);">Support</a>
+      </div>
     </div>
+  </footer>
 
-</div>
-{% endblock %}
+  <!-- Bootstrap 5 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-{% block extra_js %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    const userBookingCtx = document.getElementById('userBookingChart');
+  <!-- ═══════════════════════════════════════════════
+       CHART.JS — ALL CHARTS INITIALISED ONCE
+       Data injected safely via json_script filter.
+  ═══════════════════════════════════════════════ -->
 
-    new Chart(userBookingCtx, {
-        type: 'doughnut',
-        data: {
-            labels: {{ booking_labels|safe }},
-            datasets: [{
-                data: {{ booking_breakdown|safe }},
-                backgroundColor: [
-                    '#2563eb',
-                    '#10b981',
-                    '#f59e0b'
-                ],
-                borderWidth: 0
-            }]
+  {{ booking_distribution_labels|json_script:"data-dist-labels" }}
+  {{ booking_distribution_values|json_script:"data-dist-values" }}
+  {{ booking_status_labels|json_script:"data-status-labels" }}
+  {{ booking_status_values|json_script:"data-status-values" }}
+  {{ monthly_labels|json_script:"data-monthly-labels" }}
+  {{ monthly_values|json_script:"data-monthly-values" }}
+  {{ destination_labels|json_script:"data-dest-labels" }}
+  {{ destination_values|json_script:"data-dest-values" }}
+
+  <script>
+  (function () {
+    'use strict';
+
+    /* ── Global Chart.js Defaults ──────────────────── */
+    Chart.defaults.font.family                       = "'Segoe UI', system-ui, sans-serif";
+    Chart.defaults.font.size                         = 12;
+    Chart.defaults.color                             = '#6c757d';
+    Chart.defaults.plugins.legend.labels.padding     = 16;
+    Chart.defaults.plugins.legend.labels.boxWidth    = 12;
+    Chart.defaults.plugins.legend.labels.borderRadius= 4;
+    Chart.defaults.plugins.tooltip.cornerRadius      = 8;
+    Chart.defaults.plugins.tooltip.padding           = 10;
+
+    /* ── Colour Palette ────────────────────────────── */
+    var C = {
+      blue   : '#0d6efd',
+      purple : '#6610f2',
+      cyan   : '#0dcaf0',
+      green  : '#198754',
+      yellow : '#ffc107',
+      red    : '#dc3545',
+      orange : '#fd7e14',
+      teal   : '#20c997',
+      pink   : '#d63384',
+      indigo : '#6366f1',
+    };
+    var PALETTE = Object.values(C);
+
+    /* ── Helper: safely parse json_script data ─────── */
+    function jd(id) {
+      var el = document.getElementById(id);
+      if (!el) return null;
+      try { return JSON.parse(el.textContent); } catch (e) { return null; }
+    }
+
+    /* ── Helper: get canvas or return null ─────────── */
+    function canvas(id) {
+      return document.getElementById(id) || null;
+    }
+
+    /* ── 1. BOOKING DISTRIBUTION — Doughnut ─────────
+       Canvas ID: chartDistribution
+       Condition: total_bookings > 0 (canvas only rendered if true)
+    ──────────────────────────────────────────────── */
+    (function () {
+      var ctx = canvas('chartDistribution');
+      if (!ctx) return;
+
+      var labels = jd('data-dist-labels');
+      var values = jd('data-dist-values');
+      if (!labels || !values) return;
+
+      var total = values.reduce(function (a, b) { return a + b; }, 0);
+
+      /* Centre-text plugin (inline, no external dependency) */
+      var centerTextPlugin = {
+        id: 'centerText',
+        afterDraw: function (chart) {
+          var width  = chart.width;
+          var height = chart.height;
+          var ctx2   = chart.ctx;
+          ctx2.save();
+          ctx2.font      = 'bold 2rem Segoe UI, system-ui, sans-serif';
+          ctx2.fillStyle = '#12172b';
+          ctx2.textAlign = 'center';
+          ctx2.textBaseline = 'middle';
+          /* approximate doughnut centre */
+          var cx = width  / 2;
+          var cy = (chart.chartArea.top + chart.chartArea.bottom) / 2;
+          ctx2.fillText(total, cx, cy - 10);
+          ctx2.font      = '0.72rem Segoe UI, system-ui, sans-serif';
+          ctx2.fillStyle = '#6c757d';
+          ctx2.fillText('bookings', cx, cy + 14);
+          ctx2.restore();
+        }
+      };
+
+      new Chart(ctx, {
+        type   : 'doughnut',
+        plugins: [centerTextPlugin],
+        data   : {
+          labels  : labels,
+          datasets: [{
+            data           : values,
+            backgroundColor: [C.blue, C.purple, C.cyan],
+            borderColor    : '#fff',
+            borderWidth    : 3,
+            hoverOffset    : 10,
+          }],
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom'
-                }
-            }
+          responsive         : true,
+          maintainAspectRatio: false,
+          cutout             : '68%',
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels  : { usePointStyle: true, pointStyle: 'circle' },
+            },
+            tooltip: {
+              callbacks: {
+                label: function (ctx) {
+                  var tot = ctx.dataset.data.reduce(function (a, b) { return a + b; }, 0);
+                  var pct = tot > 0 ? ((ctx.parsed / tot) * 100).toFixed(1) : 0;
+                  return ' ' + ctx.label + ': ' + ctx.parsed + ' (' + pct + '%)';
+                },
+              },
+            },
+          },
+        },
+      });
+    }());
+
+    /* ── 2. BOOKING STATUS — Pie ─────────────────────
+       Canvas ID: chartStatus
+       Condition: total_bookings > 0
+    ──────────────────────────────────────────────── */
+    (function () {
+      var ctx = canvas('chartStatus');
+      if (!ctx) return;
+
+      var labels = jd('data-status-labels');
+      var values = jd('data-status-values');
+      if (!labels || !values) return;
+
+      /* Filter out zero-value slices so chart doesn't show blank segments */
+      var filteredLabels = [];
+      var filteredValues = [];
+      var statusColors   = [C.yellow, C.green, C.red, C.blue];
+      var filteredColors = [];
+
+      for (var i = 0; i < values.length; i++) {
+        if (values[i] > 0) {
+          filteredLabels.push(labels[i]);
+          filteredValues.push(values[i]);
+          filteredColors.push(statusColors[i] || PALETTE[i % PALETTE.length]);
         }
-    });
-</script>
-{% endblock %}
+      }
+
+      if (filteredValues.length === 0) return;
+
+      new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels  : filteredLabels,
+          datasets: [{
+            data           : filteredValues,
+            backgroundColor: filteredColors,
+            borderColor    : '#fff',
+            borderWidth    : 3,
+            hoverOffset    : 10,
+          }],
+        },
+        options: {
+          responsive         : true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels  : { usePointStyle: true, pointStyle: 'circle' },
+            },
+            tooltip: {
+              callbacks: {
+                label: function (ctx) {
+                  var tot = ctx.dataset.data.reduce(function (a, b) { return a + b; }, 0);
+                  var pct = tot > 0 ? ((ctx.parsed / tot) * 100).toFixed(1) : 0;
+                  return ' ' + ctx.label + ': ' + ctx.parsed + ' (' + pct + '%)';
+                },
+              },
+            },
+          },
+        },
+      });
+    }());
+
+    /* ── 3. MONTHLY SPENDING — Line ──────────────────
+       Canvas ID: chartMonthly
+       Condition: has_spending (canvas only rendered if true)
+    ──────────────────────────────────────────────── */
+    (function () {
+      var ctx = canvas('chartMonthly');
+      if (!ctx) return;
+
+      var labels = jd('data-monthly-labels');
+      var values = jd('data-monthly-values');
+      if (!labels || !values) return;
+
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels  : labels,
+          datasets: [{
+            label              : 'Spending (₹)',
+            data               : values,
+            borderColor        : C.blue,
+            backgroundColor    : 'rgba(13,110,253,0.08)',
+            borderWidth        : 2.5,
+            pointBackgroundColor: C.blue,
+            pointBorderColor   : '#fff',
+            pointBorderWidth   : 2,
+            pointRadius        : 5,
+            pointHoverRadius   : 8,
+            fill               : true,
+            tension            : 0.4,
+          }],
+        },
+        options: {
+          responsive         : true,
+          maintainAspectRatio: false,
+          interaction        : { mode: 'index', intersect: false },
+          scales: {
+            x: {
+              grid : { display: false },
+              ticks: { maxRotation: 40, minRotation: 0 },
+            },
+            y: {
+              beginAtZero: true,
+              grid       : { color: 'rgba(0,0,0,0.04)' },
+              ticks      : {
+                callback: function (v) {
+                  if (v >= 100000) return '₹' + (v / 100000).toFixed(1) + 'L';
+                  if (v >= 1000)   return '₹' + (v / 1000).toFixed(0) + 'K';
+                  return '₹' + v;
+                },
+              },
+            },
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function (ctx) {
+                  return ' ₹' + Number(ctx.parsed.y).toLocaleString('en-IN', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  });
+                },
+              },
+            },
+          },
+        },
+      });
+    }());
+
+    /* ── 4. FAVOURITE DESTINATIONS — Horizontal Bar ──
+       Canvas ID: chartDestinations
+       Condition: has_destinations (canvas only rendered if true)
+    ──────────────────────────────────────────────── */
+    (function () {
+      var ctx = canvas('chartDestinations');
+      if (!ctx) return;
+
+      var labels = jd('data-dest-labels');
+      var values = jd('data-dest-values');
+      if (!labels || !values || labels.length === 0) return;
+
+      var bgColors = labels.map(function (_, i) {
+        return PALETTE[i % PALETTE.length];
+      });
+
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels  : labels,
+          datasets: [{
+            label          : 'Trips',
+            data           : values,
+            backgroundColor: bgColors,
+            borderRadius   : 6,
+            borderSkipped  : false,
+          }],
+        },
+        options: {
+          indexAxis          : 'y',
+          responsive         : true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              beginAtZero: true,
+              grid       : { color: 'rgba(0,0,0,0.04)' },
+              ticks      : { stepSize: 1, precision: 0 },
+            },
+            y: {
+              grid: { display: false },
+            },
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function (ctx) {
+                  var v = ctx.parsed.x;
+                  return ' ' + v + ' trip' + (v !== 1 ? 's' : '');
+                },
+              },
+            },
+          },
+        },
+      });
+    }());
+
+  }()); /* end IIFE */
+  </script>
+
+</body>
+</html>

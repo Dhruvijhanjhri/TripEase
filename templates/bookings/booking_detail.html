@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Flight Booking Details{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width:900px; margin:40px auto;">
+    <div class="card shadow-sm p-4 rounded-4">
+        <h2 class="mb-4">Flight Booking Details</h2>
+
+        <p><strong>Booking Reference:</strong> {{ booking.booking_reference }}</p>
+        <p><strong>Status:</strong> {{ booking.booking_status }}</p>
+        <p><strong>Passengers:</strong> {{ booking.number_of_passengers }}</p>
+        <p><strong>Cabin Class:</strong> {{ booking.cabin_class }}</p>
+        <p><strong>Total Price:</strong> ₹{{ booking.total_price }}</p>
+        <p><strong>Booked On:</strong> {{ booking.created_at|date:"d M Y, h:i A" }}</p>
+
+        <hr>
+
+        <h4>Flight Info</h4>
+        <p><strong>Flight:</strong> {{ booking.flight.flight_number }} - {{ booking.flight.airline }}</p>
+        <p><strong>Route:</strong> {{ booking.flight.source.code }} → {{ booking.flight.destination.code }}</p>
+        <p><strong>Departure:</strong> {{ booking.flight.departure_time|date:"d M Y, h:i A" }}</p>
+        <p><strong>Arrival:</strong> {{ booking.flight.arrival_time|date:"d M Y, h:i A" }}</p>
+    </div>
+</div>
+{% endblock %}

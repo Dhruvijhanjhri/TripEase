@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Package Booking Details{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width:900px; margin:40px auto;">
+    <div class="card shadow-sm p-4 rounded-4">
+        <h2 class="mb-4">Package Booking Details</h2>
+
+        <p><strong>Booking Reference:</strong> {{ booking.booking_reference }}</p>
+        <p><strong>Status:</strong> {{ booking.booking_status }}</p>
+        <p><strong>Package:</strong> {{ booking.package.name }}</p>
+        <p><strong>Destination:</strong> {{ booking.package.destination }}</p>
+        <p><strong>Travel Date:</strong> {{ booking.travel_date }}</p>
+        <p><strong>Travellers:</strong> {{ booking.travellers_count }}</p>
+        <p><strong>Total Price:</strong> ₹{{ booking.total_price }}</p>
+        <p><strong>Booked On:</strong> {{ booking.created_at|date:"d M Y, h:i A" }}</p>
+    </div>
+</div>
+{% endblock %}

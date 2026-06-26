@@ -30,8 +30,14 @@
             <div class="auth-buttons">
                 {% if user.is_authenticated %}
                     <span class="user-menu">Welcome, {{ user.first_name|default:user.username }}!</span>
-                    <a href="{% url 'accounts:profile' %}" class="btn btn-outline">Account</a>
+                   <a href="{% url 'accounts:profile' %}" class="btn btn-outline">Account</a>
                     <a href="{% url 'bookings:list' %}" class="btn btn-outline">My Bookings</a>
+                    <a href="{% url 'dashboard:user_dashboard' %}" class="btn btn-outline">My Dashboard</a>
+
+                    {% if user.is_staff %}
+                        <a href="{% url 'dashboard:home' %}" class="btn btn-primary">Admin Dashboard</a>
+                    {% endif %}
+
                     <a href="{% url 'accounts:logout' %}" class="btn btn-outline">Logout</a>
                 {% else %}
                     <a href="{% url 'accounts:login' %}" class="btn btn-outline">Sign In</a>

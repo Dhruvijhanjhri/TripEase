@@ -28,4 +28,10 @@ urlpatterns = [
         views.booking_success,
         name="booking_success"
     ),
+
+    path(
+        'booking/<str:booking_reference>/',
+        views.package_booking_detail,
+        name='booking_detail'
+    ),
     ]

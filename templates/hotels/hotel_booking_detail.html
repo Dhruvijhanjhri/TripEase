@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Hotel Booking Details{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width:900px; margin:40px auto;">
+    <div class="card shadow-sm p-4 rounded-4">
+        <h2 class="mb-4">Hotel Booking Details</h2>
+
+        <p><strong>Booking Reference:</strong> {{ booking.booking_reference }}</p>
+        <p><strong>Status:</strong> {{ booking.booking_status }}</p>
+        <p><strong>Hotel:</strong> {{ booking.hotel.name }}</p>
+        <p><strong>Room:</strong> {{ booking.room.room_name }}</p>
+        <p><strong>Check-in:</strong> {{ booking.check_in_date }}</p>
+        <p><strong>Check-out:</strong> {{ booking.check_out_date }}</p>
+        <p><strong>Guests:</strong> {{ booking.guests }}</p>
+        <p><strong>Rooms:</strong> {{ booking.rooms_count }}</p>
+        <p><strong>Total Price:</strong> ₹{{ booking.total_price }}</p>
+        <p><strong>Booked On:</strong> {{ booking.created_at|date:"d M Y, h:i A" }}</p>
+    </div>
+</div>
+{% endblock %}

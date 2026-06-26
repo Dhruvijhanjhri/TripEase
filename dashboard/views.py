@@ -1,4 +1,4 @@
-from collections import defaultdict
+from collections import defaultdict, Counter
 from datetime import datetime
 
 from django.contrib.admin.views.decorators import staff_member_required
@@ -13,9 +13,17 @@ from payments.models import Payment
 
 @staff_member_required
 def dashboard_home(request):
-    flight_bookings = Booking.objects.count()
-    hotel_bookings = HotelBooking.objects.count()
-    package_bookings = PackageBooking.objects.count()
+    flight_bookings_qs = Booking.objects.select_related(
+        'flight',
+        'flight__source',
+        'flight__destination'
+    )
+    hotel_bookings_qs = HotelBooking.objects.select_related('hotel')
+    package_bookings_qs = PackageBooking.objects.select_related('package')
+
+    flight_bookings = flight_bookings_qs.count()
+    hotel_bookings = hotel_bookings_qs.count()
+    package_bookings = package_bookings_qs.count()
 
     total_bookings = (
         flight_bookings +
@@ -25,15 +33,15 @@ def dashboard_home(request):
 
     successful_payments = Payment.objects.filter(
         payment_status='success'
-    )
+    ).order_by('-payment_date')
 
     total_revenue = successful_payments.aggregate(
         total=Sum('amount')
     )['total'] or 0
 
-    # -----------------------------
+    # ---------------------------------
     # Monthly booking trend
-    # -----------------------------
+    # ---------------------------------
     monthly_data = defaultdict(
         lambda: {
             'flights': 0,
@@ -42,15 +50,15 @@ def dashboard_home(request):
         }
     )
 
-    for booking in Booking.objects.all():
+    for booking in flight_bookings_qs:
         month_key = booking.created_at.strftime('%b %Y')
         monthly_data[month_key]['flights'] += 1
 
-    for booking in HotelBooking.objects.all():
+    for booking in hotel_bookings_qs:
         month_key = booking.created_at.strftime('%b %Y')
         monthly_data[month_key]['hotels'] += 1
 
-    for booking in PackageBooking.objects.all():
+    for booking in package_bookings_qs:
         month_key = booking.created_at.strftime('%b %Y')
         monthly_data[month_key]['packages'] += 1
 
@@ -76,28 +84,49 @@ def dashboard_home(request):
         for m in sorted_months
     ]
 
-    # -----------------------------
-    # Top flight destinations
-    # -----------------------------
-    destination_counts = defaultdict(int)
+    # ---------------------------------
+    # Top flight routes
+    # ---------------------------------
+    route_counter = Counter()
 
-    for booking in Booking.objects.select_related('flight'):
+    for booking in flight_bookings_qs:
         if booking.flight:
-            destination = booking.flight.destination
-            destination_counts[destination] += 1
+            route = (
+                f"{booking.flight.source.code} → "
+                f"{booking.flight.destination.code}"
+            )
+            route_counter[route] += 1
 
-    top_destinations = sorted(
-        destination_counts.items(),
-        key=lambda x: x[1],
-        reverse=True
-    )[:5]
+    top_routes = route_counter.most_common(5)
 
-    # -----------------------------
+    # ---------------------------------
+    # Top hotel cities
+    # ---------------------------------
+    hotel_city_counter = Counter()
+
+    for booking in hotel_bookings_qs:
+        if booking.hotel:
+            hotel_city_counter[booking.hotel.city] += 1
+
+    top_hotel_cities = hotel_city_counter.most_common(5)
+
+    # ---------------------------------
+    # Top package destinations
+    # ---------------------------------
+    package_destination_counter = Counter()
+
+    for booking in package_bookings_qs:
+        if booking.package:
+            package_destination_counter[
+                booking.package.destination
+            ] += 1
+
+    top_package_destinations = package_destination_counter.most_common(5)
+
+    # ---------------------------------
     # Recent successful payments
-    # -----------------------------
-    recent_payments = successful_payments.order_by(
-        '-payment_date'
-    )[:5]
+    # ---------------------------------
+    recent_payments = successful_payments[:5]
 
     context = {
         'flight_bookings': flight_bookings,
@@ -112,7 +141,9 @@ def dashboard_home(request):
         'monthly_hotels': monthly_hotels,
         'monthly_packages': monthly_packages,
 
-        'top_destinations': top_destinations,
+        'top_routes': top_routes,
+        'top_hotel_cities': top_hotel_cities,
+        'top_package_destinations': top_package_destinations,
         'recent_payments': recent_payments,
     }
 
