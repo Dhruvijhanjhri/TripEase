@@ -68,19 +68,8 @@ def flight_search(request):
                     )
                 )
 
-                flight.price = (
-                    get_route_price(
-                        flight.source.code,
-                        flight.destination.code,
-                        cabin_class
-                    ) * passengers
-                )
-                flight.seat_display = flight.get_seat_display()
-                flight.cabin_price = get_route_price(
-                    flight.source.code,
-                    flight.destination.code,
-                    cabin_class
-                )
+                flight.cabin_price = flight.get_price(cabin_class)
+                flight.price = flight.cabin_price * passengers
 
             # ==================================
             # VIA FLIGHTS (REALISTIC)
@@ -118,18 +107,12 @@ def flight_search(request):
 
                 if second_leg:
 
+                    first_leg_price = first_leg.get_price(cabin_class)
+                    second_leg_price = second_leg.get_price(cabin_class)
+
                     total_price = (
-                        get_route_price(
-                            first_leg.source.code,
-                            first_leg.destination.code,
-                            cabin_class
-                        )
-                        +
-                        get_route_price(
-                            second_leg.source.code,
-                            second_leg.destination.code,
-                            cabin_class
-                        )
+                        first_leg_price +
+                        second_leg_price
                     ) * passengers
 
                     total_duration = int(
@@ -148,16 +131,9 @@ def flight_search(request):
                         "total_duration_display": format_duration_minutes(total_duration),
                         "first_leg_seat_display": first_leg.get_seat_display(),
                         "second_leg_seat_display": second_leg.get_seat_display(),
-                        "first_leg_price": get_route_price(
-                            first_leg.source.code,
-                            first_leg.destination.code,
-                            cabin_class
-                        ),
-                        "second_leg_price": get_route_price(
-                            second_leg.source.code,
-                            second_leg.destination.code,
-                            cabin_class
-                        ),
+                        
+                        "first_leg_price": first_leg_price,
+                        "second_leg_price": second_leg_price,
                     })
 
             via_flights = via_flights[:10]
@@ -271,20 +247,12 @@ def flight_detail(request, flight_id):
                     )
                 )
 
-        total_price = (
-            get_route_price(
-                flight.source.code,
-                flight.destination.code,
-                cabin_class
-            )
-            +
-            get_route_price(
-                second_leg.source.code,
-                second_leg.destination.code,
-                cabin_class
-            )
-        ) * passengers
+        first_leg_price = flight.get_price(cabin_class)
+        second_leg_price = second_leg.get_price(cabin_class)
 
+        cabin_price = first_leg_price + second_leg_price
+
+        total_price = cabin_price * passengers
 
         total_duration = int(
             (
@@ -322,13 +290,9 @@ def flight_detail(request, flight_id):
                 )
             )
 
-        total_price = (
-            get_route_price(
-                flight.source.code,
-                flight.destination.code,
-                cabin_class
-            ) * passengers
-        )
+        cabin_price = flight.get_price(cabin_class)
+
+        total_price = cabin_price * passengers
 
         total_duration = (
             flight.duration_minutes
@@ -378,21 +342,7 @@ def flight_detail(request, flight_id):
         'total_duration': total_duration,
         'total_duration_display': total_duration_display,
         'seat_display': flight.get_seat_display(),
-        'cabin_price': get_route_price(
-            flight.source.code,
-            flight.destination.code,
-            cabin_class
-        ) if not second_leg else (
-            get_route_price(
-                flight.source.code,
-                flight.destination.code,
-                cabin_class
-            ) + get_route_price(
-                second_leg.source.code,
-                second_leg.destination.code,
-                cabin_class
-            )
-        ),
+        'cabin_price': cabin_price,
         'flight_number_display': flight.get_display_flight_number(),
         'second_leg_flight_number_display': second_leg.get_display_flight_number() if second_leg else None,
         "average_rating": average_rating,

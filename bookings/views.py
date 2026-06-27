@@ -13,6 +13,7 @@ from hotels.models import HotelBooking
 from packages.models import PackageBooking
 from django.contrib.auth.decorators import login_required
 from .models import Booking
+from django.utils import timezone
 
 
 @login_required
@@ -64,7 +65,7 @@ def create_booking(request, flight_id):
             travel_date = None
 
     # -------------------------
-    # PRICE CALCULATION FIX
+    # REAL FLIGHT PRICING
     # -------------------------
 
     if is_via and second_leg_id:
@@ -74,34 +75,16 @@ def create_booking(request, flight_id):
             id=second_leg_id
         )
 
-        first_leg_price = get_route_price(
-            flight.source.code,
-            flight.destination.code,
-            cabin_class
-        )
+        first_leg_price = flight.get_price(cabin_class)
+        second_leg_price = second_leg.get_price(cabin_class)
 
-        second_leg_price = get_route_price(
-            second_leg.source.code,
-            second_leg.destination.code,
-            cabin_class
-        )
-
-        price = (
-            first_leg_price +
-            second_leg_price
-        )
+        price = first_leg_price + second_leg_price
 
     else:
 
-        price = get_route_price(
-            flight.source.code,
-            flight.destination.code,
-            cabin_class
-        )
+        price = flight.get_price(cabin_class)
 
-    total_price = (
-        price * passengers
-    )
+    total_price = price * passengers
 
     if second_leg:
         duration_minutes = int(
@@ -194,7 +177,7 @@ def create_booking(request, flight_id):
 
                     return redirect(
                         'bookings:detail',
-                        booking_id=booking.id
+                        booking_reference=booking.booking_reference
                     )
 
             except Exception as e:
@@ -235,28 +218,6 @@ def create_booking(request, flight_id):
         'bookings/create.html',
         context
     )
-
-
-@login_required
-def booking_detail(request, booking_id):
-    """Booking detail view"""
-
-    booking = get_object_or_404(
-        Booking,
-        id=booking_id,
-        user=request.user
-    )
-
-    context = {
-        'booking': booking,
-    }
-
-    return render(
-        request,
-        'bookings/detail.html',
-        context
-    )
-
 
 @login_required
 def booking_list(request):
@@ -303,4 +264,47 @@ def booking_detail(request, booking_reference):
         {
             'booking': booking
         }
+    )
+
+@login_required
+def cancel_booking(request, booking_reference):
+
+    booking = get_object_or_404(
+        Booking,
+        booking_reference=booking_reference,
+        user=request.user
+    )
+
+    if booking.booking_status == "cancelled":
+
+        messages.warning(
+            request,
+            "Booking already cancelled."
+        )
+
+        return redirect(
+            "bookings:detail",
+            booking_reference=booking.booking_reference
+        )
+
+    booking.booking_status = "cancelled"
+
+    booking.cancelled_at = timezone.now()
+
+    booking.refund_amount = booking.total_price
+
+    booking.save()
+
+    booking.flight.available_seats += booking.number_of_passengers
+
+    booking.flight.save()
+
+    messages.success(
+        request,
+        "Booking cancelled successfully."
+    )
+
+    return redirect(
+        "bookings:detail",
+        booking_reference=booking.booking_reference
     )

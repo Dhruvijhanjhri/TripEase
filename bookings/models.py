@@ -97,3 +97,20 @@ class Booking(models.Model):
             )
 
         super().save(*args, **kwargs)
+
+    cancelled_at = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
+    cancellation_reason = models.TextField(
+        blank=True
+    )
+
+    refund_amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0
+    )
+
+

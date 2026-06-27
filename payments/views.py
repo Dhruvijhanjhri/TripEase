@@ -27,7 +27,7 @@ def payment_view(request, booking_id):
 
         return redirect(
             'bookings:detail',
-            booking_id=booking_id
+            booking_reference=booking.booking_reference
         )
 
     if request.method == 'POST':

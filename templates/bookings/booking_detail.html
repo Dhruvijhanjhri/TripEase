@@ -23,4 +23,49 @@
         <p><strong>Arrival:</strong> {{ booking.flight.arrival_time|date:"d M Y, h:i A" }}</p>
     </div>
 </div>
+<hr>
+
+{% if booking.booking_status == "pending" %}
+
+    <a href="{% url 'payments:payment' booking.id %}"
+       class="btn btn-success">
+
+        Complete Payment
+
+    </a>
+
+{% elif booking.payment %}
+
+<div class="alert alert-success mt-3">
+
+    Payment Completed
+
+    <br>
+
+    Transaction ID:
+    {{ booking.payment.transaction_id }}
+
+</div>
+
+{% endif %}
+
+{% if booking.booking_status != "cancelled" %}
+
+    <a
+        href="{% url 'bookings:cancel' booking.booking_reference %}"
+        class="btn btn-danger mt-3"
+        onclick="return confirm('Cancel this booking?');"
+    >
+        Cancel Booking
+    </a>
+
+{% else %}
+
+<div class="alert alert-danger mt-3">
+
+Booking Cancelled
+
+</div>
+
+{% endif %}
 {% endblock %}
