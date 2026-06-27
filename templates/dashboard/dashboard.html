@@ -1,346 +1,1378 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}TripEase Dashboard{% endblock %}
+{% block title %}Admin Dashboard — TripEase{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
-    .dashboard-wrapper {
-        max-width: 1250px;
-        margin: 40px auto;
-        padding: 0 20px;
-    }
+/* ================================================================
+   TRIPEASE ADMIN DASHBOARD — Global Tokens
+   ================================================================ */
+:root {
+  --brand-blue:   #2563eb;
+  --brand-indigo: #4f46e5;
+  --brand-green:  #059669;
+  --brand-amber:  #d97706;
+  --brand-red:    #dc2626;
+  --brand-purple: #7c3aed;
+  --brand-cyan:   #0891b2;
+  --brand-pink:   #db2777;
 
-    .dashboard-header {
-        margin-bottom: 28px;
-    }
+  --surface:      #f8fafc;
+  --card-bg:      #ffffff;
+  --border:       #e2e8f0;
+  --text-primary: #0f172a;
+  --text-muted:   #64748b;
+  --text-light:   #94a3b8;
 
-    .dashboard-header h2 {
-        font-size: 2rem;
-        font-weight: 700;
-        margin-bottom: 8px;
-    }
+  --shadow-sm:    0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:    0 4px 16px rgba(0,0,0,.08);
+  --shadow-lg:    0 10px 40px rgba(0,0,0,.10);
+  --radius:       14px;
+  --radius-sm:    8px;
+}
 
-    .dashboard-header p {
-        color: #6b7280;
-        margin: 0;
-    }
+/* ================================================================
+   Layout
+   ================================================================ */
+body { background: var(--surface); }
 
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 18px;
-        margin-bottom: 32px;
-    }
+.te-wrap {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 28px 24px 60px;
+}
 
-    .stat-card,
-    .dashboard-card {
-        background: #fff;
-        border-radius: 18px;
-        padding: 22px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-        border: 1px solid #f1f1f1;
-    }
+.te-section { margin-bottom: 32px; }
 
-    .stat-label {
-        font-size: 0.95rem;
-        color: #6b7280;
-        margin-bottom: 10px;
-    }
+.te-section-title {
+  font-size: .70rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.te-section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
 
-    .stat-value {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #111827;
-    }
+/* ================================================================
+   Section 1 — Welcome Header
+   ================================================================ */
+.te-header {
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #4f46e5 100%);
+  border-radius: var(--radius);
+  padding: 32px 36px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-bottom: 28px;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  overflow: hidden;
+}
+.te-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  pointer-events: none;
+}
+.te-header-left h1 {
+  font-size: 1.85rem;
+  font-weight: 800;
+  margin: 0 0 4px;
+  letter-spacing: -.02em;
+}
+.te-header-left p {
+  font-size: .88rem;
+  opacity: .75;
+  margin: 0;
+}
+.te-header-stats {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.te-hstat {
+  background: rgba(255,255,255,.15);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 10px;
+  padding: 12px 20px;
+  text-align: center;
+  min-width: 100px;
+}
+.te-hstat-val {
+  font-size: 1.4rem;
+  font-weight: 800;
+  display: block;
+}
+.te-hstat-label {
+  font-size: .72rem;
+  opacity: .75;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+.te-last-updated {
+  font-size: .75rem;
+  opacity: .6;
+  display: block;
+  margin-top: 6px;
+}
 
-    .dashboard-card h3 {
-        font-size: 1.15rem;
-        font-weight: 700;
-        margin-bottom: 18px;
-    }
+/* ================================================================
+   Section 2 — KPI Cards
+   ================================================================ */
+.te-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 16px;
+}
 
-    .dashboard-grid-2 {
-        display: grid;
-        grid-template-columns: 2fr 1fr;
-        gap: 22px;
-        margin-bottom: 24px;
-    }
+.te-kpi {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  box-shadow: var(--shadow-sm);
+  transition: transform .2s, box-shadow .2s;
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+}
+.te-kpi:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+}
+.te-kpi-accent {
+  position: absolute;
+  top: 0; left: 0;
+  width: 4px;
+  height: 100%;
+  border-radius: 0 0 0 var(--radius);
+}
+.te-kpi-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.te-kpi-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  color: #fff;
+  flex-shrink: 0;
+}
+.te-kpi-badge {
+  font-size: .68rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.badge-up   { background: #dcfce7; color: #15803d; }
+.badge-down { background: #fee2e2; color: #991b1b; }
+.badge-neu  { background: #f1f5f9; color: #475569; }
 
-    .dashboard-grid-3 {
-        display: grid;
-        grid-template-columns: 1.4fr 1fr;
-        gap: 22px;
-    }
+.te-kpi-val {
+  font-size: 1.7rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.te-kpi-label {
+  font-size: .78rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
 
-    .chart-wrap {
-        position: relative;
-        width: 100%;
-        min-height: 320px;
-    }
+/* ================================================================
+   Cards (generic)
+   ================================================================ */
+.te-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 24px;
+}
+.te-card-title {
+  font-size: .92rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.te-card-title i { color: var(--text-muted); font-size: .85rem; }
 
-    .simple-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
+/* chart containers */
+.te-chart-box {
+  position: relative;
+  width: 100%;
+  min-height: 280px;
+}
+.te-chart-box canvas { width: 100% !important; }
 
-    .simple-list li {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 12px 0;
-        border-bottom: 1px solid #f0f0f0;
-    }
+/* ================================================================
+   Grids
+   ================================================================ */
+.te-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+.te-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 18px;
+}
+.te-grid-2-1 {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 18px;
+}
+.te-grid-1-2 {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 18px;
+}
 
-    .simple-list li:last-child {
-        border-bottom: none;
-    }
+/* ================================================================
+   Tables
+   ================================================================ */
+.te-table-wrap { overflow-x: auto; }
+.te-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .85rem;
+}
+.te-table th {
+  padding: 10px 12px;
+  font-size: .70rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap;
+  background: #f8fafc;
+}
+.te-table td {
+  padding: 12px 12px;
+  border-bottom: 1px solid #f1f5f9;
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+.te-table tr:last-child td { border-bottom: none; }
+.te-table tr:hover td { background: #f8fafc; }
 
-    .pill {
-        background: #eff6ff;
-        color: #2563eb;
-        padding: 4px 10px;
-        border-radius: 999px;
-        font-size: 0.85rem;
-        font-weight: 600;
-    }
+/* ================================================================
+   Badges
+   ================================================================ */
+.te-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: .73rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.te-badge-confirmed  { background:#dcfce7; color:#15803d; }
+.te-badge-pending    { background:#fef9c3; color:#92400e; }
+.te-badge-cancelled  { background:#fee2e2; color:#991b1b; }
+.te-badge-success    { background:#dcfce7; color:#15803d; }
+.te-badge-failed     { background:#fee2e2; color:#991b1b; }
+.te-badge-flight     { background:#eff6ff; color:#1d4ed8; }
+.te-badge-hotel      { background:#f0fdf4; color:#15803d; }
+.te-badge-package    { background:#fefce8; color:#92400e; }
 
-    .table-wrap {
-        overflow-x: auto;
-    }
+/* ================================================================
+   Lists
+   ================================================================ */
+.te-list { list-style: none; padding: 0; margin: 0; }
+.te-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: .85rem;
+  gap: 8px;
+}
+.te-list li:last-child { border-bottom: none; }
+.te-list-rank {
+  width: 22px; height: 22px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .68rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+.te-pill {
+  font-size: .73rem;
+  font-weight: 700;
+  background: #eff6ff;
+  color: var(--brand-blue);
+  padding: 3px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
 
-    .custom-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
+/* ================================================================
+   Insight mini cards
+   ================================================================ */
+.te-insight-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 14px;
+}
+.te-insight {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+}
+.te-insight-label {
+  font-size: .72rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  margin-bottom: 6px;
+}
+.te-insight-val {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+.te-insight-sub {
+  font-size: .72rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
 
-    .custom-table th,
-    .custom-table td {
-        padding: 12px 10px;
-        border-bottom: 1px solid #f0f0f0;
-        text-align: left;
-        font-size: 0.95rem;
-    }
+/* ================================================================
+   Quick Actions
+   ================================================================ */
+.te-action-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 14px;
+}
+.te-action-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 20px 16px;
+  text-align: center;
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: background .15s, transform .15s, box-shadow .15s;
+  display: block;
+  box-shadow: var(--shadow-sm);
+}
+.te-action-card:hover {
+  background: var(--brand-blue);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  text-decoration: none;
+}
+.te-action-card i {
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+  display: block;
+  opacity: .8;
+}
+.te-action-card span {
+  font-size: .8rem;
+  font-weight: 600;
+}
 
-    .custom-table th {
-        font-weight: 700;
-        color: #111827;
-    }
+/* ================================================================
+   Export bar
+   ================================================================ */
+.te-export-bar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 20px;
+  box-shadow: var(--shadow-sm);
+}
+.te-export-bar span {
+  font-size: .8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-right: 6px;
+}
+.te-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: var(--radius-sm);
+  font-size: .8rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: opacity .15s, transform .15s;
+}
+.te-btn:hover { opacity: .85; transform: translateY(-1px); text-decoration: none; }
+.te-btn-primary { background: var(--brand-blue);   color: #fff; }
+.te-btn-green   { background: var(--brand-green);  color: #fff; }
+.te-btn-amber   { background: var(--brand-amber);  color: #fff; }
+.te-btn-outline { background: transparent; border-color: var(--border); color: var(--text-primary); }
 
-    .muted {
-        color: #6b7280;
-        font-size: 0.92rem;
-    }
+/* ================================================================
+   Filter bar
+   ================================================================ */
+.te-filter-bar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 20px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 18px;
+}
+.te-filter-bar label {
+  font-size: .75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-right: 4px;
+}
+.te-select {
+  font-size: .8rem;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-primary);
+  outline: none;
+}
 
-    @media (max-width: 950px) {
-        .dashboard-grid-2,
-        .dashboard-grid-3 {
-            grid-template-columns: 1fr;
-        }
-    }
+/* ================================================================
+   Empty state
+   ================================================================ */
+.te-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+  font-size: .85rem;
+}
+.te-empty i { font-size: 2rem; display: block; margin-bottom: 10px; opacity: .4; }
+
+/* ================================================================
+   Animated counter
+   ================================================================ */
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.te-kpi-val { animation: countUp .5s ease both; }
+
+/* ================================================================
+   Responsive
+   ================================================================ */
+@media (max-width: 900px) {
+  .te-grid-2, .te-grid-2-1, .te-grid-1-2 { grid-template-columns: 1fr; }
+  .te-grid-3  { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 600px) {
+  .te-header { flex-direction: column; }
+  .te-kpi-grid { grid-template-columns: 1fr 1fr; }
+  .te-grid-3 { grid-template-columns: 1fr; }
+  .te-action-grid { grid-template-columns: repeat(3, 1fr); }
+}
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="dashboard-wrapper">
 
-    <div class="dashboard-header">
-        <h2>TripEase Admin Dashboard</h2>
-        <p>Business analytics overview for bookings, revenue, destinations and payments.</p>
+{{ monthly_labels|json_script:"te-monthly-labels" }}
+{{ monthly_flights|json_script:"te-monthly-flights" }}
+{{ monthly_hotels|json_script:"te-monthly-hotels" }}
+{{ monthly_packages|json_script:"te-monthly-packages" }}
+{{ monthly_total|json_script:"te-monthly-total" }}
+{{ monthly_revenue|json_script:"te-monthly-revenue" }}
+{{ payment_methods|json_script:"te-pay-methods" }}
+{{ payment_method_counts|json_script:"te-pay-counts" }}
+
+<div class="te-wrap">
+
+  <!-- ============================================================
+       SECTION 1 — Welcome Header
+       ============================================================ -->
+  <div class="te-header">
+    <div class="te-header-left">
+      <h1><i class="fa-solid fa-plane-departure me-2"></i>TripEase Admin</h1>
+      <p>Business analytics &amp; operations dashboard</p>
+      <span class="te-last-updated">
+        <i class="fa-regular fa-clock me-1"></i>
+        Last updated: {{ now|date:"d M Y, h:i A" }}
+      </span>
+    </div>
+    <div class="te-header-stats">
+      <div class="te-hstat">
+        <span class="te-hstat-val">{{ active_users }}</span>
+        <span class="te-hstat-label">Active Users</span>
+      </div>
+      <div class="te-hstat">
+        <span class="te-hstat-val">₹{{ total_revenue|floatformat:0 }}</span>
+        <span class="te-hstat-label">Total Revenue</span>
+      </div>
+      <div class="te-hstat">
+        <span class="te-hstat-val">{{ total_bookings }}</span>
+        <span class="te-hstat-label">Total Bookings</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       SECTION 8 — Filters (placed here for UX flow)
+       ============================================================ -->
+  <div class="te-filter-bar">
+    <i class="fa-solid fa-sliders" style="color:var(--text-muted)"></i>
+    <label>Period:</label>
+    <select class="te-select" id="te-period-filter">
+      <option value="all">All Time</option>
+      <option value="today">Today</option>
+      <option value="week">This Week</option>
+      <option value="month" selected>This Month</option>
+      <option value="year">This Year</option>
+    </select>
+    <label class="ms-3">Booking Type:</label>
+    <select class="te-select" id="te-type-filter">
+      <option value="all">All Types</option>
+      <option value="flight">Flights</option>
+      <option value="hotel">Hotels</option>
+      <option value="package">Packages</option>
+    </select>
+    <label class="ms-3">Payment Status:</label>
+    <select class="te-select" id="te-pay-filter">
+      <option value="all">All</option>
+      <option value="success">Success</option>
+      <option value="pending">Pending</option>
+      <option value="failed">Failed</option>
+    </select>
+    <label class="ms-3">Booking Status:</label>
+    <select class="te-select" id="te-booking-filter">
+      <option value="all">All</option>
+      <option value="confirmed">Confirmed</option>
+      <option value="pending">Pending</option>
+      <option value="cancelled">Cancelled</option>
+    </select>
+  </div>
+
+  <!-- ============================================================
+       SECTION 2 — KPI Cards
+       ============================================================ -->
+  <div class="te-section">
+    <div class="te-section-title"><i class="fa-solid fa-chart-line"></i> Key Metrics</div>
+    <div class="te-kpi-grid">
+
+      <div class="te-kpi">
+        <div class="te-kpi-accent" style="background:var(--brand-blue)"></div>
+        <div class="te-kpi-top">
+          <div class="te-kpi-icon" style="background:var(--brand-blue)"><i class="fa-solid fa-ticket"></i></div>
+          <span class="te-kpi-badge badge-neu"><i class="fa-solid fa-minus"></i> All</span>
+        </div>
+        <div class="te-kpi-val">{{ total_bookings }}</div>
+        <div class="te-kpi-label">Total Bookings</div>
+      </div>
+
+      <div class="te-kpi">
+        <div class="te-kpi-accent" style="background:var(--brand-cyan)"></div>
+        <div class="te-kpi-top">
+          <div class="te-kpi-icon" style="background:var(--brand-cyan)"><i class="fa-solid fa-plane"></i></div>
+          <span class="te-kpi-badge badge-up"><i class="fa-solid fa-arrow-up"></i></span>
+        </div>
+        <div class="te-kpi-val">{{ flight_bookings }}</div>
+        <div class="te-kpi-label">Flight Bookings</div>
+      </div>
+
+      <div class="te-kpi">
+        <div class="te-kpi-accent" style="background:var(--brand-green)"></div>
+        <div class="te-kpi-top">
+          <div class="te-kpi-icon" style="background:var(--brand-green)"><i class="fa-solid fa-hotel"></i></div>
+          <span class="te-kpi-badge badge-up"><i class="fa-solid fa-arrow-up"></i></span>
+        </div>
+        <div class="te-kpi-val">{{ hotel_bookings }}</div>
+        <div class="te-kpi-label">Hotel Bookings</div>
+      </div>
+
+      <div class="te-kpi">
+        <div class="te-kpi-accent" style="background:var(--brand-amber)"></div>
+        <div class="te-kpi-top">
+          <div class="te-kpi-icon" style="background:var(--brand-amber)"><i class="fa-solid fa-box-open"></i></div>
+          <span class="te-kpi-badge badge-up"><i class="fa-solid fa-arrow-up"></i></span>
+        </div>
+        <div class="te-kpi-val">{{ package_bookings }}</div>
+        <div class="te-kpi-label">Package Bookings</div>
+      </div>
+
+      <div class="te-kpi">
+        <div class="te-kpi-accent" style="background:var(--brand-purple)"></div>
+        <div class="te-kpi-top">
+          <div class="te-kpi-icon" style="background:var(--brand-purple)"><i class="fa-solid fa-circle-check"></i></div>
+          <span class="te-kpi-badge badge-up"><i class="fa-solid fa-arrow-up"></i></span>
+        </div>
+        <div class="te-kpi-val">{{ successful_payments_count }}</div>
+        <div class="te-kpi-label">Successful Payments</div>
+      </div>
+
+      <div class="te-kpi">
+        <div class="te-kpi-accent" style="background:var(--brand-indigo)"></div>
+        <div class="te-kpi-top">
+          <div class="te-kpi-icon" style="background:var(--brand-indigo)"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+          <span class="te-kpi-badge badge-up"><i class="fa-solid fa-arrow-up"></i></span>
+        </div>
+        <div class="te-kpi-val">₹{{ total_revenue|floatformat:0 }}</div>
+        <div class="te-kpi-label">Total Revenue</div>
+      </div>
+
+      <div class="te-kpi">
+        <div class="te-kpi-accent" style="background:var(--brand-pink)"></div>
+        <div class="te-kpi-top">
+          <div class="te-kpi-icon" style="background:var(--brand-pink)"><i class="fa-solid fa-users"></i></div>
+          <span class="te-kpi-badge badge-up"><i class="fa-solid fa-arrow-up"></i></span>
+        </div>
+        <div class="te-kpi-val">{{ active_users }}</div>
+        <div class="te-kpi-label">Active Users</div>
+      </div>
+
+      <div class="te-kpi">
+        <div class="te-kpi-accent" style="background:var(--brand-red)"></div>
+        <div class="te-kpi-top">
+          <div class="te-kpi-icon" style="background:var(--brand-red)"><i class="fa-solid fa-ban"></i></div>
+          <span class="te-kpi-badge badge-down"><i class="fa-solid fa-arrow-down"></i> {{ cancellation_pct }}%</span>
+        </div>
+        <div class="te-kpi-val">{{ total_cancelled }}</div>
+        <div class="te-kpi-label">Cancelled Bookings</div>
+      </div>
+
+      <div class="te-kpi">
+        <div class="te-kpi-accent" style="background:var(--brand-amber)"></div>
+        <div class="te-kpi-top">
+          <div class="te-kpi-icon" style="background:var(--brand-amber)"><i class="fa-solid fa-hourglass-half"></i></div>
+          <span class="te-kpi-badge badge-neu"><i class="fa-solid fa-minus"></i></span>
+        </div>
+        <div class="te-kpi-val">{{ total_pending }}</div>
+        <div class="te-kpi-label">Pending Bookings</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================================
+       SECTION 3 — Analytics Charts
+       ============================================================ -->
+  <div class="te-section">
+    <div class="te-section-title"><i class="fa-solid fa-chart-bar"></i> Analytics Charts</div>
+
+    <!-- Row 1: Monthly trend + Revenue trend -->
+    <div class="te-grid-2 mb-4">
+      <div class="te-card">
+        <div class="te-card-title"><i class="fa-solid fa-chart-bar"></i> Monthly Booking Trend</div>
+        <div class="te-chart-box">
+          <canvas id="monthlyBookingChart"></canvas>
+        </div>
+      </div>
+      <div class="te-card">
+        <div class="te-card-title"><i class="fa-solid fa-chart-line"></i> Revenue Trend</div>
+        <div class="te-chart-box">
+          <canvas id="revenueTrendChart"></canvas>
+        </div>
+      </div>
     </div>
 
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-label">Total Bookings</div>
-            <div class="stat-value">{{ total_bookings }}</div>
+    <!-- Row 2: Booking distribution + Booking status -->
+    <div class="te-grid-2 mb-4">
+      <div class="te-card">
+        <div class="te-card-title"><i class="fa-solid fa-chart-pie"></i> Booking Distribution</div>
+        <div class="te-chart-box" style="min-height:240px">
+          <canvas id="bookingDistChart"></canvas>
         </div>
-
-        <div class="stat-card">
-            <div class="stat-label">Flight Bookings</div>
-            <div class="stat-value">{{ flight_bookings }}</div>
+      </div>
+      <div class="te-card">
+        <div class="te-card-title"><i class="fa-solid fa-circle-half-stroke"></i> Booking Status</div>
+        <div class="te-chart-box" style="min-height:240px">
+          <canvas id="bookingStatusChart"></canvas>
         </div>
-
-        <div class="stat-card">
-            <div class="stat-label">Hotel Bookings</div>
-            <div class="stat-value">{{ hotel_bookings }}</div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-label">Package Bookings</div>
-            <div class="stat-value">{{ package_bookings }}</div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-label">Successful Payments</div>
-            <div class="stat-value">{{ successful_payments_count }}</div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-label">Total Revenue</div>
-            <div class="stat-value">₹{{ total_revenue }}</div>
-        </div>
+      </div>
     </div>
 
-    <div class="dashboard-grid-2">
-        <div class="dashboard-card">
-            <h3>Monthly Booking Trend</h3>
-            <div class="chart-wrap">
-                <canvas id="monthlyBookingChart"></canvas>
-            </div>
+    <!-- Row 3: Revenue by type + Payment method -->
+    <div class="te-grid-2 mb-4">
+      <div class="te-card">
+        <div class="te-card-title"><i class="fa-solid fa-bars-staggered"></i> Revenue by Booking Type</div>
+        <div class="te-chart-box" style="min-height:220px">
+          <canvas id="revenueByTypeChart"></canvas>
         </div>
-
-        <div class="dashboard-card">
-            <h3>Top Flight Destinations</h3>
-
-            {% if top_destinations %}
-                <ul class="simple-list">
-                    {% for destination, count in top_destinations %}
-                        <li>
-                            <span>{{ destination }}</span>
-                            <span class="pill">{{ count }} bookings</span>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p class="muted">No destination booking data found.</p>
-            {% endif %}
+      </div>
+      <div class="te-card">
+        <div class="te-card-title"><i class="fa-solid fa-wallet"></i> Payment Method Distribution</div>
+        <div class="te-chart-box" style="min-height:220px">
+          <canvas id="paymentMethodChart"></canvas>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       SECTION 4 — Business Insights
+       ============================================================ -->
+  <div class="te-section">
+    <div class="te-section-title"><i class="fa-solid fa-lightbulb"></i> Business Insights</div>
+    <div class="te-insight-grid">
+
+      <div class="te-insight">
+        <div class="te-insight-label"><i class="fa-solid fa-location-dot me-1"></i> Top Destination</div>
+        <div class="te-insight-val">{{ most_booked_destination }}</div>
+        <div class="te-insight-sub">Most booked flight route</div>
+      </div>
+
+      <div class="te-insight">
+        <div class="te-insight-label"><i class="fa-solid fa-hotel me-1"></i> Top Hotel City</div>
+        <div class="te-insight-val">{{ most_booked_hotel }}</div>
+        <div class="te-insight-sub">Most booked hotel city</div>
+      </div>
+
+      <div class="te-insight">
+        <div class="te-insight-label"><i class="fa-solid fa-box-open me-1"></i> Top Package</div>
+        <div class="te-insight-val">{{ most_booked_package }}</div>
+        <div class="te-insight-sub">Most booked package destination</div>
+      </div>
+
+      <div class="te-insight">
+        <div class="te-insight-label"><i class="fa-solid fa-crown me-1"></i> Top Spender</div>
+        <div class="te-insight-val" style="font-size:.95rem">{{ highest_spender_name }}</div>
+        <div class="te-insight-sub">₹{{ highest_spender_amount|floatformat:0 }} total spent</div>
+      </div>
+
+      <div class="te-insight">
+        <div class="te-insight-label"><i class="fa-solid fa-calculator me-1"></i> Avg Booking Value</div>
+        <div class="te-insight-val">₹{{ avg_booking_value|floatformat:0 }}</div>
+        <div class="te-insight-sub">Across all booking types</div>
+      </div>
+
+      <div class="te-insight">
+        <div class="te-insight-label"><i class="fa-solid fa-percent me-1"></i> Cancellation Rate</div>
+        <div class="te-insight-val" style="color:var(--brand-red)">{{ cancellation_pct }}%</div>
+        <div class="te-insight-sub">{{ total_cancelled }} of {{ total_bookings }} bookings</div>
+      </div>
+
+      <div class="te-insight">
+        <div class="te-insight-label"><i class="fa-solid fa-check-double me-1"></i> Confirmed</div>
+        <div class="te-insight-val" style="color:var(--brand-green)">{{ total_confirmed }}</div>
+        <div class="te-insight-sub">Confirmed bookings</div>
+      </div>
+
+      <div class="te-insight">
+        <div class="te-insight-label"><i class="fa-solid fa-hourglass me-1"></i> Pending</div>
+        <div class="te-insight-val" style="color:var(--brand-amber)">{{ total_pending }}</div>
+        <div class="te-insight-sub">Awaiting confirmation</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================================
+       SECTION 5 — Recent Activity
+       ============================================================ -->
+  <div class="te-section">
+    <div class="te-section-title"><i class="fa-solid fa-clock-rotate-left"></i> Recent Activity</div>
+    <div class="te-card">
+      <div class="te-card-title"><i class="fa-solid fa-list-check"></i> Latest Bookings</div>
+      {% if recent_activity %}
+        <div class="te-table-wrap">
+          <table class="te-table">
+            <thead>
+              <tr>
+                <th>Booking Ref</th>
+                <th>Customer</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Booking Status</th>
+                <th>Date</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in recent_activity %}
+              <tr>
+                <td><code style="font-size:.78rem;color:var(--brand-blue)">{{ item.ref }}</code></td>
+                <td>
+                  <div style="font-weight:600;font-size:.83rem">{{ item.customer }}</div>
+                </td>
+                <td>
+                  {% if item.type == 'Flight' %}
+                    <span class="te-badge te-badge-flight"><i class="fa-solid fa-plane"></i> Flight</span>
+                  {% elif item.type == 'Hotel' %}
+                    <span class="te-badge te-badge-hotel"><i class="fa-solid fa-hotel"></i> Hotel</span>
+                  {% else %}
+                    <span class="te-badge te-badge-package"><i class="fa-solid fa-box-open"></i> Package</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if item.amount %}
+                    <strong>₹{{ item.amount|floatformat:0 }}</strong>
+                  {% else %}
+                    <span style="color:var(--text-muted)">—</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if item.booking_status == 'confirmed' %}
+                    <span class="te-badge te-badge-confirmed"><i class="fa-solid fa-check"></i> Confirmed</span>
+                  {% elif item.booking_status == 'pending' %}
+                    <span class="te-badge te-badge-pending"><i class="fa-solid fa-hourglass"></i> Pending</span>
+                  {% elif item.booking_status == 'cancelled' %}
+                    <span class="te-badge te-badge-cancelled"><i class="fa-solid fa-xmark"></i> Cancelled</span>
+                  {% else %}
+                    <span class="te-badge badge-neu">{{ item.booking_status|capfirst }}</span>
+                  {% endif %}
+                </td>
+                <td style="color:var(--text-muted);font-size:.78rem">{{ item.date|date:"d M Y" }}</td>
+                <td>
+                  <a href="{{ item.detail_url }}" class="te-btn te-btn-outline" style="font-size:.73rem;padding:4px 10px">
+                    <i class="fa-solid fa-eye"></i> View
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="te-empty"><i class="fa-solid fa-inbox"></i> No recent bookings found.</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- ============================================================
+       SECTION 6 — Recent Payments
+       ============================================================ -->
+  <div class="te-section">
+    <div class="te-section-title"><i class="fa-solid fa-credit-card"></i> Recent Payments</div>
+    <div class="te-card">
+      <div class="te-card-title"><i class="fa-solid fa-money-bill-wave"></i> Payment Ledger (Last 10)</div>
+      {% if recent_payments_extended %}
+        <div class="te-table-wrap">
+          <table class="te-table">
+            <thead>
+              <tr>
+                <th>Payment ID</th>
+                <th>Customer</th>
+                <th>Booking Type</th>
+                <th>Amount</th>
+                <th>Method</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for pay in recent_payments_extended %}
+              <tr>
+                <td><code style="font-size:.78rem;color:var(--brand-purple)">#{{ pay.id }}</code></td>
+                <td style="font-weight:600;font-size:.83rem">
+                  {% if pay.user %}{{ pay.user.get_full_name|default:pay.user.username }}{% else %}—{% endif %}
+                </td>
+                <td>
+                  {% if pay.booking %}
+                    <span class="te-badge te-badge-flight"><i class="fa-solid fa-plane"></i> Flight</span>
+                  {% elif pay.hotel_booking %}
+                    <span class="te-badge te-badge-hotel"><i class="fa-solid fa-hotel"></i> Hotel</span>
+                  {% elif pay.package_booking %}
+                    <span class="te-badge te-badge-package"><i class="fa-solid fa-box-open"></i> Package</span>
+                  {% else %}
+                    <span class="te-badge badge-neu">—</span>
+                  {% endif %}
+                </td>
+                <td><strong>₹{{ pay.amount|floatformat:2 }}</strong></td>
+                <td style="color:var(--text-muted);font-size:.83rem">
+                  <i class="fa-solid fa-credit-card me-1"></i>
+                  {{ pay.payment_method|default:"—"|title }}
+                </td>
+                <td>
+                  {% if pay.payment_status == 'success' %}
+                    <span class="te-badge te-badge-success"><i class="fa-solid fa-check"></i> Success</span>
+                  {% elif pay.payment_status == 'failed' %}
+                    <span class="te-badge te-badge-failed"><i class="fa-solid fa-xmark"></i> Failed</span>
+                  {% else %}
+                    <span class="te-badge te-badge-pending"><i class="fa-solid fa-hourglass"></i> {{ pay.payment_status|capfirst }}</span>
+                  {% endif %}
+                </td>
+                <td style="color:var(--text-muted);font-size:.78rem">{{ pay.payment_date|date:"d M Y, h:i A" }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="te-empty"><i class="fa-solid fa-receipt"></i> No payment records found.</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- ============================================================
+       SECTION 7 — Top Lists
+       ============================================================ -->
+  <div class="te-section">
+    <div class="te-section-title"><i class="fa-solid fa-trophy"></i> Top Lists</div>
+    <div class="te-grid-3">
+
+      <!-- Top Flight Routes -->
+      <div class="te-card">
+        <div class="te-card-title"><i class="fa-solid fa-plane"></i> Top 5 Flight Routes</div>
+        {% if top_routes %}
+          <ul class="te-list">
+            {% for route, count in top_routes %}
+            <li>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span class="te-list-rank">{{ forloop.counter }}</span>
+                <span style="font-size:.83rem;font-weight:500">{{ route }}</span>
+              </div>
+              <span class="te-pill">{{ count }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="te-empty"><i class="fa-solid fa-plane-slash"></i> No route data.</div>
+        {% endif %}
+      </div>
+
+      <!-- Top Hotel Cities -->
+      <div class="te-card">
+        <div class="te-card-title"><i class="fa-solid fa-hotel"></i> Top 5 Hotel Cities</div>
+        {% if top_hotel_cities %}
+          <ul class="te-list">
+            {% for city, count in top_hotel_cities %}
+            <li>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span class="te-list-rank">{{ forloop.counter }}</span>
+                <span style="font-size:.83rem;font-weight:500">{{ city }}</span>
+              </div>
+              <span class="te-pill">{{ count }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="te-empty"><i class="fa-solid fa-city"></i> No hotel city data.</div>
+        {% endif %}
+      </div>
+
+      <!-- Top Package Destinations -->
+      <div class="te-card">
+        <div class="te-card-title"><i class="fa-solid fa-box-open"></i> Top 5 Package Destinations</div>
+        {% if top_package_destinations %}
+          <ul class="te-list">
+            {% for dest, count in top_package_destinations %}
+            <li>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span class="te-list-rank">{{ forloop.counter }}</span>
+                <span style="font-size:.83rem;font-weight:500">{{ dest }}</span>
+              </div>
+              <span class="te-pill">{{ count }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="te-empty"><i class="fa-solid fa-map-location-dot"></i> No package destination data.</div>
+        {% endif %}
+      </div>
+
     </div>
 
-    <div class="dashboard-grid-3">
-        <div class="dashboard-card">
-            <h3>Recent Successful Payments</h3>
-
-            {% if recent_payments %}
-                <div class="table-wrap">
-                    <table class="custom-table">
-                        <thead>
-                            <tr>
-                                <th>Type</th>
-                                <th>Amount</th>
-                                <th>Method</th>
-                                <th>Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for payment in recent_payments %}
-                                <tr>
-                                    <td>
-                                        {% if payment.booking %}
-                                            Flight
-                                        {% elif payment.hotel_booking %}
-                                            Hotel
-                                        {% elif payment.package_booking %}
-                                            Package
-                                        {% else %}
-                                            Payment
-                                        {% endif %}
-                                    </td>
-                                    <td>₹{{ payment.amount }}</td>
-                                    <td>{{ payment.payment_method }}</td>
-                                    <td>{{ payment.payment_date|date:"d M Y, h:i A" }}</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            {% else %}
-                <p class="muted">No successful payments found.</p>
-            {% endif %}
-        </div>
-
-        <div class="dashboard-card">
-            <h3>Analytics Notes</h3>
-            <ul class="simple-list">
-                <li>
-                    <span>Total revenue is based only on <strong>successful</strong> payments.</span>
-                </li>
-                <li>
-                    <span>Booking trend combines flight, hotel and package bookings month-wise.</span>
-                </li>
-                <li>
-                    <span>Top destinations currently use flight booking destination data.</span>
-                </li>
-            </ul>
-        </div>
+    <!-- Top Customers -->
+    <div class="mt-4">
+      <div class="te-card">
+        <div class="te-card-title"><i class="fa-solid fa-user-tie"></i> Top Customers by Spend</div>
+        {% if top_customers %}
+          <div class="te-table-wrap">
+            <table class="te-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Customer</th>
+                  <th>Total Spent</th>
+                  <th>Payments</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for c in top_customers %}
+                <tr>
+                  <td style="font-weight:700;color:var(--text-muted)">{{ forloop.counter }}</td>
+                  <td style="font-weight:600">{{ c.user__username|default:c.user__email|default:"—" }}</td>
+                  <td><strong style="color:var(--brand-green)">₹{{ c.total_spent|floatformat:0 }}</strong></td>
+                  <td><span class="te-pill">{{ c.bookings }}</span></td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="te-empty"><i class="fa-solid fa-users-slash"></i> No customer data found.</div>
+        {% endif %}
+      </div>
     </div>
+  </div>
 
-</div>
+  <!-- ============================================================
+       SECTION 9 — Export
+       ============================================================ -->
+  <div class="te-section">
+    <div class="te-section-title"><i class="fa-solid fa-file-export"></i> Export</div>
+    <div class="te-export-bar">
+      <span>Export Dashboard:</span>
+      <a href="#" class="te-btn te-btn-primary" onclick="window.print();return false;">
+        <i class="fa-solid fa-print"></i> Print
+      </a>
+      <a href="/dashboard/export/pdf/" class="te-btn" style="background:#e74c3c;color:#fff">
+        <i class="fa-solid fa-file-pdf"></i> PDF
+      </a>
+      <a href="/dashboard/export/excel/" class="te-btn te-btn-green">
+        <i class="fa-solid fa-file-excel"></i> Excel
+      </a>
+      <a href="/dashboard/export/csv/" class="te-btn te-btn-amber">
+        <i class="fa-solid fa-file-csv"></i> CSV
+      </a>
+    </div>
+  </div>
 
-{{ monthly_labels|json_script:"monthly-labels-data" }}
-{{ monthly_flights|json_script:"monthly-flights-data" }}
-{{ monthly_hotels|json_script:"monthly-hotels-data" }}
-{{ monthly_packages|json_script:"monthly-packages-data" }}
+  <!-- ============================================================
+       SECTION 10 — Quick Actions
+       ============================================================ -->
+  <div class="te-section">
+    <div class="te-section-title"><i class="fa-solid fa-bolt"></i> Quick Actions</div>
+    <div class="te-action-grid">
+      <a href="{% url 'bookings:list' %}" class="te-action-card">
+        <i class="fa-solid fa-plane"></i>
+        <span>Manage Flights</span>
+      </a>
+      <a href="{% url 'hotels:search' %}" class="te-action-card">
+        <i class="fa-solid fa-hotel"></i>
+        <span>Manage Hotels</span>
+      </a>
+      <a href="{% url 'packages:search' %}" class="te-action-card">
+        <i class="fa-solid fa-box-open"></i>
+        <span>Manage Packages</span>
+      </a>
+      <a href="/admin/auth/user/" class="te-action-card">
+        <i class="fa-solid fa-users"></i>
+        <span>Manage Users</span>
+      </a>
+      <a href="/admin/payments/payment/" class="te-action-card">
+        <i class="fa-solid fa-credit-card"></i>
+        <span>Manage Payments</span>
+      </a>
+      <a href="{% url 'dashboard:home' %}" class="te-action-card">
+        <i class="fa-solid fa-chart-pie"></i>
+        <span>View Reports</span>
+      </a>
+    </div>
+  </div>
 
+  <!-- ============================================================
+       SECTION 11 — Dashboard Notes
+       ============================================================ -->
+  <div class="te-section">
+    <div class="te-section-title"><i class="fa-solid fa-memo"></i> Dashboard Notes</div>
+    <div class="te-insight-grid">
+
+      <div class="te-insight" style="border-left:3px solid var(--brand-green)">
+        <div class="te-insight-label"><i class="fa-solid fa-arrow-trend-up me-1"></i> Highest Revenue Day</div>
+        <div class="te-insight-val" style="color:var(--brand-green)">₹{{ highest_rev_day_amount|floatformat:0 }}</div>
+        <div class="te-insight-sub">{{ highest_rev_day_label }}</div>
+      </div>
+
+      <div class="te-insight" style="border-left:3px solid var(--brand-red)">
+        <div class="te-insight-label"><i class="fa-solid fa-arrow-trend-down me-1"></i> Lowest Revenue Day</div>
+        <div class="te-insight-val" style="color:var(--brand-red)">₹{{ lowest_rev_day_amount|floatformat:0 }}</div>
+        <div class="te-insight-sub">{{ lowest_rev_day_label }}</div>
+      </div>
+
+      <div class="te-insight" style="border-left:3px solid var(--brand-blue)">
+        <div class="te-insight-label"><i class="fa-solid fa-calendar-day me-1"></i> Bookings Today</div>
+        <div class="te-insight-val">{{ bookings_today }}</div>
+        <div class="te-insight-sub">All booking types</div>
+      </div>
+
+      <div class="te-insight" style="border-left:3px solid var(--brand-indigo)">
+        <div class="te-insight-label"><i class="fa-solid fa-calendar-day me-1"></i> Revenue Today</div>
+        <div class="te-insight-val">₹{{ revenue_today|floatformat:0 }}</div>
+        <div class="te-insight-sub">Successful payments only</div>
+      </div>
+
+      <div class="te-insight" style="border-left:3px solid var(--brand-cyan)">
+        <div class="te-insight-label"><i class="fa-solid fa-calendar-week me-1"></i> Bookings This Month</div>
+        <div class="te-insight-val">{{ bookings_this_month }}</div>
+        <div class="te-insight-sub">All booking types</div>
+      </div>
+
+      <div class="te-insight" style="border-left:3px solid var(--brand-purple)">
+        <div class="te-insight-label"><i class="fa-solid fa-calendar-week me-1"></i> Revenue This Month</div>
+        <div class="te-insight-val">₹{{ revenue_this_month|floatformat:0 }}</div>
+        <div class="te-insight-sub">Successful payments only</div>
+      </div>
+
+    </div>
+  </div>
+
+</div>{# /te-wrap #}
+
+<!-- JSON data for Chart.js -->
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 <script>
-    const monthlyLabels = JSON.parse(
-        document.getElementById('monthly-labels-data').textContent
-    );
-    const monthlyFlights = JSON.parse(
-        document.getElementById('monthly-flights-data').textContent
-    );
-    const monthlyHotels = JSON.parse(
-        document.getElementById('monthly-hotels-data').textContent
-    );
-    const monthlyPackages = JSON.parse(
-        document.getElementById('monthly-packages-data').textContent
-    );
+/* ----------------------------------------------------------------
+   Read context data injected by Django
+   ---------------------------------------------------------------- */
+const teLabels   = JSON.parse(document.getElementById('te-monthly-labels').textContent);
+const teFlights  = JSON.parse(document.getElementById('te-monthly-flights').textContent);
+const teHotels   = JSON.parse(document.getElementById('te-monthly-hotels').textContent);
+const tePkgs     = JSON.parse(document.getElementById('te-monthly-packages').textContent);
+const teTotal    = JSON.parse(document.getElementById('te-monthly-total').textContent);
+const teRevenue  = JSON.parse(document.getElementById('te-monthly-revenue').textContent);
+const tePayMeth  = JSON.parse(document.getElementById('te-pay-methods').textContent);
+const tePayCnt   = JSON.parse(document.getElementById('te-pay-counts').textContent);
 
-    const monthlyCtx = document.getElementById('monthlyBookingChart');
+const palette = {
+  blue:   '#2563eb',
+  indigo: '#4f46e5',
+  green:  '#059669',
+  amber:  '#d97706',
+  red:    '#dc2626',
+  purple: '#7c3aed',
+  cyan:   '#0891b2',
+  pink:   '#db2777',
+};
 
-    if (monthlyCtx) {
-        new Chart(monthlyCtx, {
-            type: 'bar',
-            data: {
-                labels: monthlyLabels,
-                datasets: [
-                    {
-                        label: 'Flights',
-                        data: monthlyFlights,
-                        backgroundColor: '#2563eb',
-                        borderRadius: 8
-                    },
-                    {
-                        label: 'Hotels',
-                        data: monthlyHotels,
-                        backgroundColor: '#10b981',
-                        borderRadius: 8
-                    },
-                    {
-                        label: 'Packages',
-                        data: monthlyPackages,
-                        backgroundColor: '#f59e0b',
-                        borderRadius: 8
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: {
-                    mode: 'index',
-                    intersect: false
-                },
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            precision: 0
-                        }
-                    }
-                }
-            }
-        });
+const defOpts = {
+  responsive: true,
+  maintainAspectRatio: false,
+  animation: { duration: 700, easing: 'easeInOutQuart' },
+  plugins: {
+    legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
+    tooltip: { mode: 'index', intersect: false }
+  }
+};
+
+function emptyState(canvasId) {
+  const el = document.getElementById(canvasId);
+  if (!el) return;
+  el.style.display = 'none';
+  const msg = document.createElement('div');
+  msg.className = 'te-empty';
+  msg.innerHTML = '<i class="fa-solid fa-chart-simple"></i> No data available';
+  el.parentNode.appendChild(msg);
+}
+
+/* ----------------------------------------------------------------
+   Chart 1 — Monthly Booking Trend (Bar)
+   ---------------------------------------------------------------- */
+(function() {
+  const el = document.getElementById('monthlyBookingChart');
+  if (!el) return;
+  if (!teLabels.length) { emptyState('monthlyBookingChart'); return; }
+  new Chart(el, {
+    type: 'bar',
+    data: {
+      labels: teLabels,
+      datasets: [
+        { label: 'Flights',  data: teFlights, backgroundColor: palette.cyan,   borderRadius: 6 },
+        { label: 'Hotels',   data: teHotels,  backgroundColor: palette.green,  borderRadius: 6 },
+        { label: 'Packages', data: tePkgs,    backgroundColor: palette.amber,  borderRadius: 6 },
+      ]
+    },
+    options: {
+      ...defOpts,
+      scales: {
+        x: { stacked: false, grid: { display: false } },
+        y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: '#f1f5f9' } }
+      }
     }
+  });
+})();
+
+/* ----------------------------------------------------------------
+   Chart 2 — Revenue Trend (Line)
+   ---------------------------------------------------------------- */
+(function() {
+  const el = document.getElementById('revenueTrendChart');
+  if (!el) return;
+  if (!teLabels.length) { emptyState('revenueTrendChart'); return; }
+  new Chart(el, {
+    type: 'line',
+    data: {
+      labels: teLabels,
+      datasets: [{
+        label: 'Revenue (₹)',
+        data: teRevenue,
+        borderColor: palette.indigo,
+        backgroundColor: 'rgba(79,70,229,0.08)',
+        borderWidth: 2.5,
+        fill: true,
+        tension: 0.4,
+        pointBackgroundColor: palette.indigo,
+        pointRadius: 4,
+      }]
+    },
+    options: {
+      ...defOpts,
+      plugins: { ...defOpts.plugins, tooltip: { mode: 'index', intersect: false } },
+      scales: {
+        x: { grid: { display: false } },
+        y: { beginAtZero: true, grid: { color: '#f1f5f9' },
+             ticks: { callback: v => '₹' + v.toLocaleString('en-IN') } }
+      }
+    }
+  });
+})();
+
+/* ----------------------------------------------------------------
+   Chart 3 — Booking Distribution (Doughnut)
+   ---------------------------------------------------------------- */
+(function() {
+  const el = document.getElementById('bookingDistChart');
+  if (!el) return;
+  const f = teFlights.reduce((a,b) => a+b, 0);
+  const h = teHotels.reduce((a,b) => a+b, 0);
+  const p = tePkgs.reduce((a,b) => a+b, 0);
+  if (!f && !h && !p) { emptyState('bookingDistChart'); return; }
+  new Chart(el, {
+    type: 'doughnut',
+    data: {
+      labels: ['Flights', 'Hotels', 'Packages'],
+      datasets: [{
+        data: [f, h, p],
+        backgroundColor: [palette.cyan, palette.green, palette.amber],
+        borderWidth: 2,
+        borderColor: '#fff',
+      }]
+    },
+    options: { ...defOpts, cutout: '65%' }
+  });
+})();
+
+/* ----------------------------------------------------------------
+   Chart 4 — Booking Status (Pie)
+   ---------------------------------------------------------------- */
+(function() {
+  const el = document.getElementById('bookingStatusChart');
+  if (!el) return;
+  const confirmed = {{ total_confirmed }};
+  const pending   = {{ total_pending }};
+  const cancelled = {{ total_cancelled }};
+  if (!confirmed && !pending && !cancelled) { emptyState('bookingStatusChart'); return; }
+  new Chart(el, {
+    type: 'pie',
+    data: {
+      labels: ['Confirmed', 'Pending', 'Cancelled'],
+      datasets: [{
+        data: [confirmed, pending, cancelled],
+        backgroundColor: [palette.green, palette.amber, palette.red],
+        borderWidth: 2,
+        borderColor: '#fff',
+      }]
+    },
+    options: { ...defOpts }
+  });
+})();
+
+/* ----------------------------------------------------------------
+   Chart 5 — Revenue by Booking Type (Horizontal Bar)
+   ---------------------------------------------------------------- */
+(function() {
+  const el = document.getElementById('revenueByTypeChart');
+  if (!el) return;
+  const fr = {{ flight_revenue }};
+  const hr = {{ hotel_revenue }};
+  const pr = {{ package_revenue }};
+  if (!fr && !hr && !pr) { emptyState('revenueByTypeChart'); return; }
+  new Chart(el, {
+    type: 'bar',
+    data: {
+      labels: ['Flights', 'Hotels', 'Packages'],
+      datasets: [{
+        label: 'Revenue (₹)',
+        data: [fr, hr, pr],
+        backgroundColor: [palette.cyan, palette.green, palette.amber],
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      ...defOpts,
+      indexAxis: 'y',
+      plugins: { ...defOpts.plugins, legend: { display: false } },
+      scales: {
+        x: { beginAtZero: true, grid: { color: '#f1f5f9' },
+             ticks: { callback: v => '₹' + v.toLocaleString('en-IN') } },
+        y: { grid: { display: false } }
+      }
+    }
+  });
+})();
+
+/* ----------------------------------------------------------------
+   Chart 6 — Payment Method Distribution (Doughnut)
+   ---------------------------------------------------------------- */
+(function() {
+  const el = document.getElementById('paymentMethodChart');
+  if (!el) return;
+  if (!tePayMeth.length) { emptyState('paymentMethodChart'); return; }
+  const colors = [palette.blue, palette.purple, palette.cyan, palette.pink, palette.green, palette.amber];
+  new Chart(el, {
+    type: 'doughnut',
+    data: {
+      labels: tePayMeth,
+      datasets: [{
+        data: tePayCnt,
+        backgroundColor: colors.slice(0, tePayMeth.length),
+        borderWidth: 2,
+        borderColor: '#fff',
+      }]
+    },
+    options: { ...defOpts, cutout: '60%' }
+  });
+})();
 </script>
 {% endblock %}

@@ -305,26 +305,23 @@ def hotel_booking(request, room_id):
 
 
 @login_required
-def hotel_booking_detail(
-    request,
-    booking_id
-):
-    """Hotel booking details"""
+def hotel_booking_detail(request, booking_reference):
 
     booking = get_object_or_404(
-        HotelBooking,
-        id=booking_id,
+        HotelBooking.objects.select_related(
+            "hotel",
+            "room"
+        ),
+        booking_reference=booking_reference,
         user=request.user
     )
 
-    context = {
-        "booking": booking
-    }
-
     return render(
         request,
-        "hotels/booking_detail.html",
-        context
+        "hotels/hotel_booking_detail.html",
+        {
+            "booking": booking
+        }
     )
 
 @login_required
@@ -355,7 +352,7 @@ def hotel_payment(
 
         return redirect(
             'hotels:booking_detail',
-            booking_id=booking.id
+            booking_reference=booking.booking_reference
         )
 
     if request.method == "POST":
@@ -383,7 +380,7 @@ def hotel_payment(
 
             return redirect(
                 "hotels:booking_detail",
-                booking_id=booking.id
+                booking_reference=booking.booking_reference
             )
     else:
         form = HotelPaymentForm()
@@ -401,61 +398,40 @@ def hotel_payment(
     )
 
 @login_required
-def cancel_booking(
-    request,
-    booking_id
-):
+def cancel_booking(request, booking_reference):
 
     booking = get_object_or_404(
         HotelBooking,
-        id=booking_id,
+        booking_reference=booking_reference,
         user=request.user
     )
 
-    if request.method == "POST":
+    if booking.booking_status == "cancelled":
 
-        if booking.booking_status == "cancelled":
-            messages.info(
-                request,
-                "Booking is already cancelled."
-            )
-
-            return redirect(
-                "hotels:booking_detail",
-                booking_id=booking.id
-            )
-
-        booking.booking_status = "cancelled"
-        booking.save()
-
-        booking.room.available_rooms += (
-            booking.rooms_count
-        )
-
-        booking.room.save()
-
-        messages.success(
+        messages.warning(
             request,
-            "Booking cancelled successfully."
+            "Booking already cancelled."
         )
+
+        return redirect(
+            "hotels:booking_detail",
+            booking_reference=booking.booking_reference
+        )
+
+    booking.booking_status = "cancelled"
+
+    booking.save()
+
+    booking.room.available_rooms += booking.rooms_count
+
+    booking.room.save()
+
+    messages.success(
+        request,
+        "Hotel booking cancelled successfully."
+    )
 
     return redirect(
         "hotels:booking_detail",
-        booking_id=booking.id
-    )
-
-@login_required
-def hotel_booking_detail(request, booking_id):
-    booking = get_object_or_404(
-        HotelBooking.objects.select_related('hotel', 'room'),
-        id=booking_id,
-        user=request.user
-    )
-
-    return render(
-        request,
-        'hotels/hotel_booking_detail.html',
-        {
-            'booking': booking
-        }
+        booking_reference=booking.booking_reference
     )

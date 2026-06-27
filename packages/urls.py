@@ -34,4 +34,11 @@ urlpatterns = [
         views.package_booking_detail,
         name='booking_detail'
     ),
+
+    path(
+        "cancel-booking/<str:booking_reference>/",
+        views.cancel_booking,
+        name="cancel_booking",
+    ),
+    
     ]

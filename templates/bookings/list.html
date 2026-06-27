@@ -180,6 +180,30 @@ My Bookings - TripEase
                             ₹{{ booking.total_price }}
                         </h4>
 
+                        <div class="mt-3">
+
+                            <a
+                                class="btn btn-primary btn-sm"
+                                href="{% url 'hotels:booking_detail' booking.booking_reference %}">
+                                View Details
+                            </a>
+
+                            {% if booking.booking_status != "cancelled" %}
+
+                                <a
+                                    class="btn btn-danger btn-sm"
+                                    href="{% url 'hotels:cancel_booking' booking.booking_reference %}"
+                                    onclick="return confirm('Cancel this hotel booking?');">
+
+                                    Cancel
+
+                                </a>
+
+                            {% endif %}
+
+                        </div>
+
+
                     </div>
 
                 </div>
@@ -235,6 +259,27 @@ My Bookings - TripEase
             <h4 class="text-primary fw-bold">
                 ₹{{ booking.total_price }}
             </h4>
+
+            <div class="mt-3">
+
+                <a
+                    class="btn btn-primary btn-sm"
+                    href="{% url 'packages:booking_detail' booking.booking_reference %}">
+                    View Details
+                </a>
+
+                {% if booking.booking_status != "cancelled" %}
+
+                    <a
+                        class="btn btn-danger btn-sm"
+                        href="{% url 'packages:cancel_booking' booking.booking_reference %}"
+                        onclick="return confirm('Cancel this package booking?');">
+                        Cancel
+                    </a>
+
+                {% endif %}
+
+            </div>
 
         </div>
 

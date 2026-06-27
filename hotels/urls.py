@@ -30,17 +30,11 @@ urlpatterns = [
     ),
 
     path(
-        'booking-detail/<int:booking_id>/',
-        views.hotel_booking_detail,
-        name='booking_detail'
-    ),
-
-    path(
-        'cancel-booking/<int:booking_id>/',
+        'cancel-booking/<str:booking_reference>/',
         views.cancel_booking,
         name='cancel_booking'
     ),
-
+    
     path(
         'booking/<str:booking_reference>/',
         views.hotel_booking_detail,

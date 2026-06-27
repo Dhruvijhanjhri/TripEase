@@ -7,6 +7,7 @@ from .forms import PackageBookingForm
 from .models import PackageBooking
 from reviews.models import PackageReview
 from django.db.models import Avg
+from django.contrib import messages
 
 def package_search(request):
 
@@ -166,17 +167,44 @@ def booking_success(
     )
 
 @login_required
-def package_booking_detail(request, booking_id):
+def package_booking_detail(request, booking_reference):
+
     booking = get_object_or_404(
-        PackageBooking.objects.select_related('package'),
-        id=booking_id,
+        PackageBooking.objects.select_related("package"),
+        booking_reference=booking_reference,
         user=request.user
     )
 
     return render(
         request,
-        'packages/package_booking_detail.html',
+        "packages/package_booking_detail.html",
         {
-            'booking': booking
+            "booking": booking
         }
+    )
+
+@login_required
+def cancel_booking(request, booking_reference):
+
+    booking = get_object_or_404(
+        PackageBooking,
+        booking_reference=booking_reference,
+        user=request.user
+    )
+
+    if request.method == "POST":
+
+        if booking.booking_status != "cancelled":
+
+            booking.booking_status = "cancelled"
+            booking.save()
+
+            messages.success(
+                request,
+                "Package booking cancelled successfully."
+            )
+
+    return redirect(
+        "packages:booking_detail",
+        booking_reference=booking.booking_reference
     )

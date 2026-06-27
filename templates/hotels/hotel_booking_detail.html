@@ -5,6 +5,7 @@
 {% block content %}
 <div class="container" style="max-width:900px; margin:40px auto;">
     <div class="card shadow-sm p-4 rounded-4">
+
         <h2 class="mb-4">Hotel Booking Details</h2>
 
         <p><strong>Booking Reference:</strong> {{ booking.booking_reference }}</p>
@@ -17,6 +18,34 @@
         <p><strong>Rooms:</strong> {{ booking.rooms_count }}</p>
         <p><strong>Total Price:</strong> ₹{{ booking.total_price }}</p>
         <p><strong>Booked On:</strong> {{ booking.created_at|date:"d M Y, h:i A" }}</p>
+
     </div>
 </div>
+
+{% if booking.booking_status != "cancelled" %}
+
+<form
+    method="POST"
+    action="{% url 'hotels:cancel_booking' booking.booking_reference %}"
+>
+    {% csrf_token %}
+
+    <button
+        type="submit"
+        class="btn btn-danger mt-3"
+        onclick="return confirm('Are you sure you want to cancel this booking?');"
+    >
+        Cancel Booking
+    </button>
+
+</form>
+
+{% else %}
+
+<div class="alert alert-danger mt-3">
+    Booking Cancelled
+</div>
+
+{% endif %}
+
 {% endblock %}
