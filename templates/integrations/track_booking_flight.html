@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block title %}
+Track Flight
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <h2>✈ Track My Flight</h2>
+
+    <hr>
+
+    <h4>{{ booking.flight.airline }}</h4>
+
+    <p>
+
+        Flight Number:
+
+        <strong>
+
+            {{ booking.flight.get_display_flight_number }}
+
+        </strong>
+
+        <div class="mt-3">
+
+            <small class="text-muted">
+
+                <p>
+                    <strong>TripEase Flight ID:</strong>
+                    {{ booking.flight.tripease_flight_id }}
+                </p>
+
+                <p>
+                    <strong>Tracking Flight:</strong>
+                    {{ tracking_number }}
+                </p>
+                
+            </small>
+
+        </div>
+
+    </p>
+
+    <p>
+
+        {{ booking.flight.source.city }}
+
+        →
+
+        {{ booking.flight.destination.city }}
+
+    </p>
+
+    <p>
+
+        Booking Reference:
+
+        {{ booking.booking_reference }}
+
+    </p>
+
+    <div class="alert alert-info mt-4">
+
+        {% if live_flight %}
+
+        <hr class="my-4">
+
+        <h3>
+            ✈ Live Flight Status
+        </h3>
+
+        <div class="card p-4 shadow-sm">
+
+            <p>
+
+                <strong>Status:</strong>
+
+                {{ live_flight.flight_status|title }}
+
+            </p>
+
+            <p>
+
+                <strong>Airline:</strong>
+
+                {{ live_flight.airline.name }}
+
+            </p>
+
+            <p>
+
+                <strong>Flight:</strong>
+
+                {{ live_flight.flight.iata }}
+
+            </p>
+
+            <hr>
+
+            <h5>Departure</h5>
+
+            <p>
+
+                Airport:
+                {{ live_flight.departure.airport }}
+
+            </p>
+
+            <p>
+
+                Terminal:
+                {{ live_flight.departure.terminal|default:"N/A" }}
+
+            </p>
+
+            <p>
+
+                Gate:
+                {{ live_flight.departure.gate|default:"N/A" }}
+
+            </p>
+
+            <p>
+
+                Scheduled:
+                {{ live_flight.departure.scheduled }}
+
+            </p>
+
+            <hr>
+
+            <h5>Arrival</h5>
+
+            <p>
+
+                Airport:
+                {{ live_flight.arrival.airport }}
+
+            </p>
+
+            <p>
+
+                Terminal:
+                {{ live_flight.arrival.terminal|default:"N/A" }}
+
+            </p>
+
+            <p>
+
+                Gate:
+                {{ live_flight.arrival.gate|default:"N/A" }}
+
+            </p>
+
+            <p>
+
+                Scheduled:
+                {{ live_flight.arrival.scheduled }}
+
+            </p>
+
+        </div>
+
+        {% else %}
+
+        <hr class="my-4">
+
+        <div class="alert alert-warning">
+
+            No live tracking is available for this flight.
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

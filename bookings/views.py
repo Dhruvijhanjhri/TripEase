@@ -14,6 +14,7 @@ from packages.models import PackageBooking
 from django.contrib.auth.decorators import login_required
 from .models import Booking
 from django.utils import timezone
+from integrations.flight_status_service import FlightStatusService
 
 
 @login_required
@@ -258,11 +259,31 @@ def booking_detail(request, booking_reference):
         user=request.user
     )
 
+    live_status = None
+
+    try:
+        flight_number = booking.flight.get_display_flight_number()
+
+        print("=" * 50)
+        print("Flight Number Sent:", flight_number)
+        print("=" * 50)
+
+        response = FlightStatusService.get_flight_status(flight_number)
+
+        print(response)
+
+        if response.get("data"):
+            live_status = response["data"][0]
+
+    except Exception:
+        live_status = None
+
     return render(
         request,
         'bookings/booking_detail.html',
         {
-            'booking': booking
+            'booking': booking,
+            "live_status": live_status,
         }
     )
 

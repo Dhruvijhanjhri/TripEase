@@ -92,6 +92,107 @@
 
         </div>
 
+        {% if live_status %}
+
+        <div style="border-top: 1px solid #e2e8f0; padding-top:20px; margin-top:20px;">
+
+            <h4>✈ Live Flight Status</h4>
+
+            <div style="
+                background:#f8fafc;
+                padding:20px;
+                border-radius:10px;
+                margin-top:15px;
+            ">
+
+                <p>
+                    <strong>Status:</strong>
+
+                    <span style="
+                        color:
+                        {% if live_status.flight_status == 'active' %}
+                            green
+                        {% elif live_status.flight_status == 'scheduled' %}
+                            orange
+                        {% elif live_status.flight_status == 'landed' %}
+                            blue
+                        {% else %}
+                            red
+                        {% endif %};
+                        font-weight:bold;
+                    ">
+                        {{ live_status.flight_status|title }}
+                    </span>
+
+                </p>
+
+                <hr>
+
+                <h5>Departure</h5>
+
+                <p>
+
+                    <strong>Airport:</strong>
+                    {{ live_status.departure.airport }}
+
+                    <br>
+
+                    <strong>IATA:</strong>
+                    {{ live_status.departure.iata }}
+
+                    <br>
+
+                    <strong>Scheduled:</strong>
+                    {{ live_status.departure.scheduled }}
+
+                    <br>
+
+                    {% if live_status.departure.actual %}
+
+                        <strong>Actual:</strong>
+                        {{ live_status.departure.actual }}
+
+                    {% endif %}
+
+                </p>
+
+                <hr>
+
+                <h5>Arrival</h5>
+
+                <p>
+
+                    <strong>Airport:</strong>
+                    {{ live_status.arrival.airport }}
+
+                    <br>
+
+                    <strong>IATA:</strong>
+                    {{ live_status.arrival.iata }}
+
+                    <br>
+
+                    <strong>Scheduled:</strong>
+                    {{ live_status.arrival.scheduled }}
+
+                    <br>
+
+                    {% if live_status.arrival.delay %}
+
+                        <strong>Delay:</strong>
+
+                        {{ live_status.arrival.delay }} minutes
+
+                    {% endif %}
+
+                </p>
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
         <!-- Passenger Details -->
 
         <div style="border-top: 1px solid #e2e8f0; padding-top: 20px; margin-top: 20px;">
@@ -114,6 +215,7 @@
             {% endfor %}
 
         </div>
+        
 
         <!-- Payment Details -->
 

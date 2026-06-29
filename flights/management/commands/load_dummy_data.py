@@ -14,6 +14,7 @@ from flights.realism import (
     normalize_airline_name,
 )
 import random
+import uuid
 
 
 class Command(BaseCommand):
@@ -52,6 +53,46 @@ class Command(BaseCommand):
             'Akasa Air',
             'SpiceJet',
         ]
+
+        tracking_numbers = {
+            "IndiGo": [
+                "6E203",
+                "6E449",
+                "6E6314",
+                "6E512",
+                "6E725",
+                "6E315"
+            ],
+
+            "Air India": [
+                "AI101",
+                "AI302",
+                "AI507",
+                "AI401",
+                "AI605"
+            ],
+
+            "Air India Express": [
+                "IX344",
+                "IX196",
+                "IX1458",
+                "IX276"
+            ],
+
+            "Akasa Air": [
+                "QP1405",
+                "QP1123",
+                "QP1712",
+                "QP1810"
+            ],
+
+            "SpiceJet": [
+                "SG8169",
+                "SG202",
+                "SG468",
+                "SG871"
+            ]
+        }
         
         # Create Airports
         airports_dict = {}
@@ -123,8 +164,14 @@ class Command(BaseCommand):
                     airline_code = get_airline_code(airline)
                     route_code = f"{source_code}{dest_code}"
                     flight_num = random.randint(100, 999)
-                    flight_number = f"{airline_code}-{flight_num}-{route_code}-{day}-{flight_num}"
-                    
+                    flight_number = f"{airline_code}-{route_code}-{uuid.uuid4().hex[:8]}"
+
+                    tripease_flight_id = f"TP{100000 + flight_count}"
+
+                    tracking_flight_number = random.choice(
+                        tracking_numbers.get(airline, [])
+                    )
+
                     # Check if flight already exists
                     if Flight.objects.filter(
                         flight_number=flight_number
@@ -140,6 +187,8 @@ class Command(BaseCommand):
                     
                     flight = Flight.objects.create(
                         flight_number=flight_number,
+                        tripease_flight_id=tripease_flight_id,
+                        tracking_flight_number=tracking_flight_number,
                         airline=airline,
                         source=source,
                         destination=destination,

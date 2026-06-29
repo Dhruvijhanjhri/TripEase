@@ -19,6 +19,7 @@ urlpatterns = [
     path('planner/',include('ai_planner.urls')),
     path('reviews/',include('reviews.urls')),
     path('dashboard/', include('dashboard.urls')),
+    path('tools/', include('integrations.urls')),
 ]
 
 # Serve media files in development

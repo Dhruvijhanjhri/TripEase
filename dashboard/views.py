@@ -225,20 +225,52 @@ def dashboard_home(request):
     most_booked_package = top_package_destinations[0][0] if top_package_destinations else 'N/A'
 
     # Highest spending customer
-    top_spender = (
-        Payment.objects
-        .filter(payment_status='success')
-        .values('user__username', 'user__email')
-        .annotate(spent=Sum('amount'))
-        .order_by('-spent')
-        .first()
-    )
-    highest_spender_name = (
-        top_spender['user__username'] or top_spender['user__email']
-        if top_spender else 'N/A'
-    )
-    highest_spender_amount = float(top_spender['spent']) if top_spender else 0
+    customer_spending = {}
 
+    payments = Payment.objects.select_related(
+        "booking__user",
+        "hotel_booking__user",
+        "package_booking__user",
+    ).filter(payment_status="success")
+
+    for payment in payments:
+
+        if payment.booking:
+            user = payment.booking.user
+
+        elif payment.hotel_booking:
+            user = payment.hotel_booking.user
+
+        elif payment.package_booking:
+            user = payment.package_booking.user
+
+        else:
+            continue
+
+        if user.id not in customer_spending:
+            customer_spending[user.id] = {
+                "name": user.get_full_name() or user.username,
+                "spent": 0
+            }
+
+        customer_spending[user.id]["spent"] += float(payment.amount)
+
+    if customer_spending:
+
+        top_spender = max(
+            customer_spending.values(),
+            key=lambda x: x["spent"]
+        )
+
+        highest_spender_name = top_spender["name"]
+        highest_spender_amount = top_spender["spent"]
+
+    else:
+
+        highest_spender_name = "N/A"
+        highest_spender_amount = 0
+
+    
     # ------------------------------------------------------------------
     # NEW: Recent bookings table (all types merged, last 10)
     # ------------------------------------------------------------------
@@ -265,7 +297,7 @@ def dashboard_home(request):
             'amount': None,          # amount comes from payment
             'booking_status': b.booking_status,
             'date': b.created_at,
-            'detail_url': f"/bookings/detail/{b.booking_reference}/",
+            'detail_url': f"/bookings/{b.booking_reference}/",
         })
     for b in recent_hotel_bookings:
         recent_activity.append({
@@ -275,7 +307,7 @@ def dashboard_home(request):
             'amount': b.total_price,
             'booking_status': b.booking_status,
             'date': b.created_at,
-            'detail_url': f"/hotels/booking-detail/{b.id}/",
+            'detail_url': f"/hotels/booking/{b.booking_reference}/",
         })
     for b in recent_pkg_bookings:
         recent_activity.append({
@@ -297,20 +329,55 @@ def dashboard_home(request):
     # ------------------------------------------------------------------
     recent_payments_extended = (
         Payment.objects
-        .select_related('user', 'booking', 'hotel_booking', 'package_booking')
-        .order_by('-payment_date')[:10]
+        .select_related(
+            "booking__user",
+            "hotel_booking__user",
+            "package_booking__user"
+        )
+        .order_by("-payment_date")[:10]
     )
 
     # ------------------------------------------------------------------
     # NEW: Top customers by spend
     # ------------------------------------------------------------------
-    top_customers = (
-        Payment.objects
-        .filter(payment_status='success')
-        .values('user__username', 'user__email')
-        .annotate(total_spent=Sum('amount'), bookings=Count('id'))
-        .order_by('-total_spent')[:5]
-    )
+    customer_stats = {}
+
+    payments = Payment.objects.select_related(
+        "booking__user",
+        "hotel_booking__user",
+        "package_booking__user"
+    ).filter(payment_status="success")
+
+    for payment in payments:
+
+        if payment.booking:
+            user = payment.booking.user
+
+        elif payment.hotel_booking:
+            user = payment.hotel_booking.user
+
+        elif payment.package_booking:
+            user = payment.package_booking.user
+
+        else:
+            continue
+
+        if user.id not in customer_stats:
+
+            customer_stats[user.id] = {
+                "username": user.get_full_name() or user.username,
+                "total_spent": 0,
+                "bookings": 0,
+            }
+
+        customer_stats[user.id]["total_spent"] += float(payment.amount)
+        customer_stats[user.id]["bookings"] += 1
+
+    top_customers = sorted(
+        customer_stats.values(),
+        key=lambda x: x["total_spent"],
+        reverse=True
+    )[:5]
 
     # ------------------------------------------------------------------
     # NEW: Highest / lowest revenue day

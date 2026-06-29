@@ -23,6 +23,7 @@ from reviews.models import HotelReview
 from django.db.models import Avg
 from django.contrib.auth.decorators import login_required
 from .models import HotelBooking
+from integrations.services import LocationService
 
 def hotel_search(request):
 
@@ -89,6 +90,10 @@ def hotel_detail(request, hotel_id):
         id=hotel_id
     )
 
+    live_location = LocationService.get_coordinates(
+        hotel.city
+    )
+
     rooms = hotel.rooms.filter(
         available_rooms__gt=0
     )
@@ -132,6 +137,7 @@ def hotel_detail(request, hotel_id):
         "reviews": reviews,
         "can_review": can_review,
         "already_reviewed": already_reviewed,
+        "live_location": live_location,
     }
 
     return render(

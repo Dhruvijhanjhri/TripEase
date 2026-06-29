@@ -5,6 +5,9 @@ Django settings for TripEase project.
 from pathlib import Path
 import os
 import dj_database_url
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -51,6 +54,7 @@ INSTALLED_APPS = [
     'reviews',
     'ai_planner',
     'dashboard',
+    'integrations',
 ]
 
 MIDDLEWARE = [
@@ -223,4 +227,8 @@ LOGGING = {
     },
 }
 
+# ============================
+# Live API Keys
+# ============================
 
+AVIATIONSTACK_API_KEY = "14a14cf387cda2f9f08f94ba556dec7a"

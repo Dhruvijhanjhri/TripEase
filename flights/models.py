@@ -34,6 +34,22 @@ class Flight(models.Model):
     ]
 
     flight_number = models.CharField(max_length=20, unique=True)
+
+    # Internal TripEase ID (shown to users)
+    tripease_flight_id = models.CharField(
+        max_length=20,
+        unique=True,
+        blank=True,
+        null=True,
+    )
+
+    # Real airline flight number used for live tracking
+    tracking_flight_number = models.CharField(
+        max_length=20,
+        blank=True,
+        null=True,
+    )
+    
     airline = models.CharField(max_length=100)
     source = models.ForeignKey(Airport, on_delete=models.CASCADE, related_name='departures')
     destination = models.ForeignKey(Airport, on_delete=models.CASCADE, related_name='arrivals')

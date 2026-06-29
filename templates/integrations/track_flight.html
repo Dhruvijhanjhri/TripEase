@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Track Flight
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <h2 class="fw-bold mb-4">
+        ✈ Live Flight Tracker
+    </h2>
+
+    <form method="get" class="row g-3 mb-5">
+
+        <div class="col-md-8">
+
+            <input
+                type="text"
+                name="flight_number"
+                class="form-control form-control-lg"
+                placeholder="Example: AI101 or 6E203"
+                value="{{ flight_number }}"
+                required
+            >
+
+        </div>
+
+        <div class="col-md-4">
+
+            <button class="btn btn-primary btn-lg w-100">
+                Track Flight
+            </button>
+
+        </div>
+
+    </form>
+
+
+    {% if searched %}
+
+        {% if flight_data %}
+
+        <div class="card shadow border-0">
+
+            <div class="card-body">
+
+                <h3 class="fw-bold mb-3">
+
+                    {{ flight_data.airline.name }}
+
+                    ({{ flight_data.flight.iata }})
+
+                </h3>
+
+                <hr>
+
+                <div class="row">
+
+                    <div class="col-md-6">
+
+                        <h5>Departure</h5>
+
+                        <p>
+
+                            <strong>Airport:</strong>
+                            {{ flight_data.departure.airport }}
+
+                            <br>
+
+                            <strong>Terminal:</strong>
+                            {{ flight_data.departure.terminal|default:"N/A" }}
+
+                            <br>
+
+                            <strong>Gate:</strong>
+                            {{ flight_data.departure.gate|default:"N/A" }}
+
+                            <br>
+
+                            <strong>Scheduled:</strong>
+                            {{ flight_data.departure.scheduled }}
+
+                        </p>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <h5>Arrival</h5>
+
+                        <p>
+
+                            <strong>Airport:</strong>
+                            {{ flight_data.arrival.airport }}
+
+                            <br>
+
+                            <strong>Terminal:</strong>
+                            {{ flight_data.arrival.terminal|default:"N/A" }}
+
+                            <br>
+
+                            <strong>Gate:</strong>
+                            {{ flight_data.arrival.gate|default:"N/A" }}
+
+                            <br>
+
+                            <strong>Scheduled:</strong>
+                            {{ flight_data.arrival.scheduled }}
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <hr>
+
+                <h5>
+
+                    Flight Status :
+
+                    <span class="badge bg-success">
+
+                        {{ flight_data.flight_status|title }}
+
+                    </span>
+
+                </h5>
+
+                <p>
+
+                    <strong>Aircraft:</strong>
+
+                    {{ flight_data.aircraft.icao24|default:"Not Available" }}
+
+                </p>
+
+            </div>
+
+        </div>
+
+        {% else %}
+
+        <div class="alert alert-warning">
+
+            No live flight found.
+
+        </div>
+
+        {% endif %}
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

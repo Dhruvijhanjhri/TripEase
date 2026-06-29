@@ -7,6 +7,7 @@ from django.db.models import Avg
 from reviews.models import FlightReview
 from bookings.models import Booking
 
+
 def flight_search(request):
 
     form = FlightSearchForm(request.GET or None)

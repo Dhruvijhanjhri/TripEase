@@ -53,6 +53,37 @@
                 Starting from ₹{{ rooms.first.price_per_night }}
             </h3>
 
+            <hr class="my-4">
+
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-body">
+
+                    <h5 class="fw-bold mb-3">
+                        📍 Location
+                    </h5>
+
+                    <p class="mb-2">
+                        <strong>Address:</strong><br>
+                        {{ live_location.display_name }}
+                    </p>
+
+                    <p class="mb-2">
+                        <strong>Coordinates:</strong><br>
+                        {{ live_location.latitude }},
+                        {{ live_location.longitude }}
+                    </p>
+
+                    <a
+                        href="https://www.google.com/maps?q={{ live_location.latitude }},{{ live_location.longitude }}"
+                        target="_blank"
+                        class="btn btn-outline-primary btn-sm"
+                    >
+                        Open in Google Maps
+                    </a>
+
+                </div>
+            </div>
+
         </div>
 
     </div>

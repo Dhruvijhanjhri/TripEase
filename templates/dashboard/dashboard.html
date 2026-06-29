@@ -1039,7 +1039,7 @@ body { background: var(--surface); }
                 {% for c in top_customers %}
                 <tr>
                   <td style="font-weight:700;color:var(--text-muted)">{{ forloop.counter }}</td>
-                  <td style="font-weight:600">{{ c.user__username|default:c.user__email|default:"—" }}</td>
+                 <td style="font-weight:600">{{ c.username }}</td>
                   <td><strong style="color:var(--brand-green)">₹{{ c.total_spent|floatformat:0 }}</strong></td>
                   <td><span class="te-pill">{{ c.bookings }}</span></td>
                 </tr>
