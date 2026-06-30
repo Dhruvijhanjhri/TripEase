@@ -29,4 +29,10 @@ urlpatterns = [
         name="cancel"
     ),
 
+    path(
+        "select-seats/<str:booking_reference>/",
+        views.select_seats,
+        name="select_seats",
+    ),
+
 ]

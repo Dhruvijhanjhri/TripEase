@@ -21,6 +21,68 @@
         <p><strong>Route:</strong> {{ booking.flight.source.code }} → {{ booking.flight.destination.code }}</p>
         <p><strong>Departure:</strong> {{ booking.flight.departure_time|date:"d M Y, h:i A" }}</p>
         <p><strong>Arrival:</strong> {{ booking.flight.arrival_time|date:"d M Y, h:i A" }}</p>
+
+        <hr>
+
+        <h4>Passenger Details</h4>
+
+        <table class="table table-bordered table-striped">
+
+            <thead>
+
+                <tr>
+
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>Gender</th>
+                    <th>Seat</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+            {% for passenger in booking.passengers.all %}
+
+                <tr>
+
+                    <td>
+
+                        {{ passenger.first_name }}
+                        {{ passenger.last_name }}
+
+                    </td>
+
+                    <td>
+
+                        {{ passenger.age }}
+
+                    </td>
+
+                    <td>
+
+                        {{ passenger.gender }}
+
+                    </td>
+
+                    <td>
+
+                        <strong>
+
+                            {{ passenger.seat_number|default:"Not Selected" }}
+
+                        </strong>
+
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
     </div>
 </div>
 <hr>

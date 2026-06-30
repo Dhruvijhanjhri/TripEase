@@ -20,7 +20,12 @@
         </div>
         
         <div style="margin-top: 30px;">
-            <a href="{% url 'bookings:detail' booking.id %}" class="btn btn-primary">View Booking Details</a>
+            <a href="{% url 'bookings:detail' booking.booking_reference %}"
+                class="btn btn-primary">
+
+                View Booking Details
+
+            </a>
             <a href="{% url 'bookings:list' %}" class="btn btn-outline" style="margin-left: 10px;">My Bookings</a>
         </div>
     </div>

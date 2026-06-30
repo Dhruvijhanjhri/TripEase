@@ -19,8 +19,12 @@ class Passenger(models.Model):
     last_name = models.CharField(max_length=100)
     age = models.IntegerField()
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
-    seat_number = models.CharField(max_length=10, blank=True, null=True)
-
+    seat_number = models.CharField(
+        max_length=4,
+        blank=True,
+        null=True
+    )
+    
     class Meta:
         ordering = ['id']
 

@@ -1,0 +1,379 @@
+{% extends "base.html" %}
+
+{% block title %}Select Seats{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="card shadow-lg p-4 rounded-4">
+
+        <h2 class="text-center mb-2">
+            ✈ Select Your Seat
+        </h2>
+
+        <p class="text-center text-muted">
+
+            {{ booking.flight.airline }}
+
+            •
+
+            {{ booking.flight.get_display_flight_number }}
+
+            <br>
+
+            {{ booking.flight.source.city }}
+
+            →
+
+            {{ booking.flight.destination.city }}
+
+        </p>
+
+        <hr>
+
+        <div class="text-center mb-4">
+
+            <div class="legend">
+
+                <span>
+                🟩 Available
+                </span>
+
+                <span>
+                🟥 Booked
+                </span>
+
+                <span>
+                🟦 Selected
+                </span>
+
+                <span>
+                🪟 Window
+                </span>
+
+                <span>
+                🚶 Aisle
+                </span>
+
+                </div>
+
+            <div class="text-center mt-2 mb-4">
+
+                <small class="text-muted">
+
+                    🪟 Window Seat &nbsp;&nbsp;
+
+                    🚶 Aisle Seat
+
+                </small>
+
+            </div>
+
+        </div>
+
+        <div class="text-center mb-4">
+
+            <h5>Front of Aircraft</h5>
+
+            ✈
+
+        </div>
+
+        <form method="post">
+
+            {% csrf_token %}
+
+            <div class="aircraft">
+
+            <div class="text-center front-icon">
+
+            ✈
+
+            </div>
+
+            <div class="text-center mb-3">
+
+            <strong>Front of Aircraft</strong>
+
+            </div>
+
+            <div class="seat-map">
+
+                <div class="seat-header">
+
+                    <span>A</span>
+                    <span>B</span>
+                    <span>C</span>
+
+                    <span class="aisle-space"></span>
+
+                    <span>D</span>
+                    <span>E</span>
+                    <span>F</span>
+
+                </div>
+
+                {% for row in seat_map %}
+
+                <div class="seat-row">
+
+                    {% for seat in row %}
+
+                        {% if forloop.counter == 4 %}
+                            <div class="aisle-space"></div>
+                        {% endif %}
+
+                        {% if seat.booked %}
+
+                            <button
+                                type="button"
+                                class="btn btn-danger seat-btn"
+                                disabled>
+
+                                {% if seat.seat_number|slice:"-1:" == "A" or seat.seat_number|slice:"-1:" == "F" %}
+                                    🪟<br>
+                                {% elif seat.seat_number|slice:"-1:" == "C" or seat.seat_number|slice:"-1:" == "D" %}
+                                    🚶<br>
+                                {% endif %}
+
+                                {{ seat.seat_number }}
+
+                            </button>
+
+                        {% else %}
+
+                            <input
+                                type="checkbox"
+                                class="btn-check"
+                                name="seats"
+                                value="{{ seat.seat_number }}"
+                                id="{{ seat.seat_number }}">
+
+                            <label
+                                class="btn btn-outline-success seat-btn"
+                                for="{{ seat.seat_number }}">
+
+                                {% if seat.seat_number|slice:"-1:" == "A" or seat.seat_number|slice:"-1:" == "F" %}
+                                    🪟<br>
+                                {% elif seat.seat_number|slice:"-1:" == "C" or seat.seat_number|slice:"-1:" == "D" %}
+                                    🚶<br>
+                                {% endif %}
+
+                                {{ seat.seat_number }}
+
+                            </label>
+
+                        {% endif %}
+
+                    {% endfor %}
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+            <div class="text-center mt-5">
+
+                <button
+                    class="btn btn-primary btn-lg">
+
+                    Continue to Payment
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<style>
+
+.seat-map{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+}
+
+.seat-header{
+
+    display:grid;
+    grid-template-columns:repeat(3,70px) 45px repeat(3,70px);
+    gap:12px;
+
+    margin-bottom:18px;
+
+    font-weight:700;
+    color:#555;
+    text-align:center;
+}
+
+.seat-row{
+
+    display:grid;
+    grid-template-columns:repeat(3,70px) 45px repeat(3,70px);
+
+    gap:12px;
+
+    margin-bottom:14px;
+
+}
+
+.aisle-space{
+
+    width:45px;
+
+}
+
+.seat-btn{
+
+    width:70px;
+    height:65px;
+
+    border-radius:14px;
+
+    font-size:12px;
+
+    font-weight:600;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    transition:all .25s ease;
+
+    box-shadow:0 3px 8px rgba(0,0,0,.08);
+
+}
+
+.seat-btn:hover{
+
+    transform:translateY(-4px);
+
+    box-shadow:0 8px 18px rgba(0,0,0,.18);
+
+}
+
+.btn-outline-success{
+
+    background:#f8fff8;
+
+}
+
+.btn-danger{
+
+    background:#dc3545 !important;
+
+    color:white !important;
+
+}
+
+.btn-check:checked + .seat-btn{
+
+    background:#0d6efd !important;
+
+    color:white;
+
+    border-color:#0d6efd;
+
+    transform:scale(1.06);
+
+}
+
+.aircraft{
+
+    width:520px;
+
+    max-width:100%;
+
+    margin:auto;
+
+    background:white;
+
+    border-radius:220px 220px 35px 35px;
+
+    padding:35px 20px;
+
+    border:2px solid #e5e7eb;
+
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+
+}
+
+.front-icon{
+
+    font-size:34px;
+
+    margin-bottom:12px;
+
+}
+
+.legend{
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:20px;
+
+    flex-wrap:wrap;
+
+    margin-bottom:25px;
+
+}
+
+.legend span{
+
+    font-size:14px;
+
+    color:#555;
+
+}
+
+@media(max-width:768px){
+
+.seat-header{
+
+grid-template-columns:repeat(3,55px) 25px repeat(3,55px);
+
+gap:8px;
+
+}
+
+.seat-row{
+
+grid-template-columns:repeat(3,55px) 25px repeat(3,55px);
+
+gap:8px;
+
+}
+
+.seat-btn{
+
+width:55px;
+
+height:52px;
+
+font-size:10px;
+
+}
+
+.aircraft{
+
+padding:20px;
+
+}
+
+}
+
+</style>
+
+{% endblock %}

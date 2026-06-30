@@ -4,7 +4,6 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db import transaction
-
 from flights.models import Flight
 from flights.realism import format_duration_minutes, get_route_price
 from .models import Booking, Passenger
@@ -15,7 +14,7 @@ from django.contrib.auth.decorators import login_required
 from .models import Booking
 from django.utils import timezone
 from integrations.flight_status_service import FlightStatusService
-
+from bookings.seat_utils import generate_seat_map
 
 @login_required
 def create_booking(request, flight_id):
@@ -172,12 +171,11 @@ def create_booking(request, flight_id):
 
                     messages.success(
                         request,
-                        f'Booking created successfully! '
-                        f'Reference: {booking.booking_reference}'
+                        "Passenger details saved successfully. Please select your seats."
                     )
 
                     return redirect(
-                        'bookings:detail',
+                        "bookings:select_seats",
                         booking_reference=booking.booking_reference
                     )
 
@@ -328,4 +326,105 @@ def cancel_booking(request, booking_reference):
     return redirect(
         "bookings:detail",
         booking_reference=booking.booking_reference
+    )
+
+@login_required
+def select_seats(request, booking_reference):
+
+    booking = get_object_or_404(
+        Booking,
+        booking_reference=booking_reference,
+        user=request.user
+    )
+
+    booked_seats = list(
+        Passenger.objects.filter(
+            booking__flight=booking.flight
+        ).exclude(
+            seat_number__isnull=True
+        ).exclude(
+            seat_number=""
+        ).values_list(
+            "seat_number",
+            flat=True
+        )
+    )
+
+    seat_map = generate_seat_map(booked_seats)
+
+    if request.method == "POST":
+
+        selected_seats = request.POST.getlist("seats")
+
+        already_booked = set(
+            Passenger.objects.filter(
+                booking__flight=booking.flight,
+                seat_number__in=selected_seats
+            ).values_list(
+                "seat_number",
+                flat=True
+            )
+        )
+
+        if already_booked:
+
+            messages.error(
+                request,
+                f"Seat(s) already booked: {', '.join(already_booked)}"
+            )
+
+            return render(
+                request,
+                "bookings/select_seats.html",
+                {
+                    "booking": booking,
+                    "seat_map": generate_seat_map(
+                        list(
+                            Passenger.objects.filter(
+                                booking__flight=booking.flight
+                            ).exclude(
+                                seat_number__isnull=True
+                            ).exclude(
+                                seat_number=""
+                            ).values_list(
+                                "seat_number",
+                                flat=True
+                            )
+                        )
+                    ),
+                }
+        )
+
+        if len(selected_seats) != booking.number_of_passengers:
+
+            messages.error(
+                request,
+                f"Please select exactly {booking.number_of_passengers} seat(s)."
+            )
+
+        else:
+
+            passengers = booking.passengers.all()
+
+            for passenger, seat in zip(passengers, selected_seats):
+                passenger.seat_number = seat
+                passenger.save()
+
+            messages.success(
+                request,
+                "Seats selected successfully."
+            )
+
+            return redirect(
+                "payments:payment",
+                booking.id
+            )
+
+    return render(
+        request,
+        "bookings/select_seats.html",
+        {
+            "booking": booking,
+            "seat_map": seat_map,
+        }
     )
