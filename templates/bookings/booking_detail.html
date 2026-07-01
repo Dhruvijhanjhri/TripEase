@@ -9,6 +9,30 @@
 
         <p><strong>Booking Reference:</strong> {{ booking.booking_reference }}</p>
         <p><strong>Status:</strong> {{ booking.booking_status }}</p>
+
+        {% if booking.checked_in %}
+
+        <p>
+            <strong>Check-in:</strong>
+
+            <span class="badge bg-success">
+
+                ✓ Completed
+
+            </span>
+
+        </p>
+
+        <p>
+
+            <strong>Checked in at:</strong>
+
+            {{ booking.checked_in_at|date:"d M Y, h:i A" }}
+
+        </p>
+
+        {% endif %}
+
         <p><strong>Passengers:</strong> {{ booking.number_of_passengers }}</p>
         <p><strong>Cabin Class:</strong> {{ booking.cabin_class }}</p>
         <p><strong>Total Price:</strong> ₹{{ booking.total_price }}</p>
@@ -108,6 +132,18 @@
     {{ booking.payment.transaction_id }}
 
 </div>
+
+{% endif %}
+
+{% if booking.booking_status == "confirmed" and not booking.checked_in %}
+
+<a
+    href="{% url 'bookings:check_in' booking.booking_reference %}"
+    class="btn btn-primary mt-3">
+
+    ✈ Check-in
+
+</a>
 
 {% endif %}
 

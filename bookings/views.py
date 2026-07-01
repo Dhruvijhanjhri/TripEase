@@ -329,6 +329,54 @@ def cancel_booking(request, booking_reference):
     )
 
 @login_required
+def check_in(request, booking_reference):
+
+    booking = get_object_or_404(
+        Booking,
+        booking_reference=booking_reference,
+        user=request.user
+    )
+
+    if booking.booking_status != "confirmed":
+
+        messages.error(
+            request,
+            "Only confirmed bookings can be checked in."
+        )
+
+        return redirect(
+            "bookings:detail",
+            booking_reference=booking.booking_reference
+        )
+
+    if booking.checked_in:
+
+        messages.info(
+            request,
+            "You have already checked in."
+        )
+
+        return redirect(
+            "bookings:detail",
+            booking_reference=booking.booking_reference
+        )
+
+    booking.checked_in = True
+    booking.checked_in_at = timezone.now()
+
+    booking.save()
+
+    messages.success(
+        request,
+        "Check-in completed successfully!"
+    )
+
+    return redirect(
+        "bookings:detail",
+        booking_reference=booking.booking_reference
+    )
+
+@login_required
 def select_seats(request, booking_reference):
 
     booking = get_object_or_404(

@@ -30,6 +30,12 @@ urlpatterns = [
     ),
 
     path(
+        "check-in/<str:booking_reference>/",
+        views.check_in,
+        name="check_in",
+    ),
+
+    path(
         "select-seats/<str:booking_reference>/",
         views.select_seats,
         name="select_seats",
