@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <style>
+
+        body{
+
+            font-family:Arial,sans-serif;
+
+            padding:40px;
+
+            background:white;
+
+        }
+
+        .ticket{
+
+            border:2px solid #2563eb;
+
+            border-radius:15px;
+
+            overflow:hidden;
+
+        }
+
+        .header{
+
+            background:#2563eb;
+
+            color:white;
+
+            padding:20px;
+
+            text-align:center;
+
+        }
+
+        .content{
+
+            padding:25px;
+
+        }
+
+        table{
+
+            width:100%;
+
+            border-collapse:collapse;
+
+        }
+
+        td{
+
+            padding:10px;
+
+            vertical-align:top;
+
+        }
+
+        .label{
+
+            color:gray;
+
+            font-size:13px;
+
+        }
+
+        .value{
+
+            font-size:18px;
+
+            font-weight:bold;
+
+        }
+
+        .seat{
+
+            font-size:32px;
+
+            color:#2563eb;
+
+            font-weight:bold;
+
+        }
+
+        .footer{
+
+            margin-top:30px;
+
+            text-align:center;
+
+            color:gray;
+
+            font-size:12px;
+
+        }
+
+        img{
+
+            width:170px;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="ticket">
+
+<div class="header">
+
+<h1>TripEase</h1>
+
+<h2>BOARDING PASS</h2>
+
+</div>
+
+<div class="content">
+
+<table>
+
+<tr>
+
+<td>
+
+<div class="label">
+
+Passenger
+
+</div>
+
+<div class="value">
+
+{{ passenger.name }}
+
+</div>
+
+</td>
+
+<td>
+
+<div class="label">
+
+Booking Reference
+
+</div>
+
+<div class="value">
+
+{{ booking.booking_reference }}
+
+</div>
+
+</td>
+
+</tr>
+
+<tr>
+
+<td>
+
+<div class="label">
+
+Flight
+
+</div>
+
+<div class="value">
+
+{{ booking.flight.get_display_flight_number }}
+
+</div>
+
+</td>
+
+<td>
+
+<div class="label">
+
+Airline
+
+</div>
+
+<div class="value">
+
+{{ booking.flight.airline }}
+
+</div>
+
+</td>
+
+</tr>
+
+<tr>
+
+<td>
+
+<div class="label">
+
+From
+
+</div>
+
+<div class="value">
+
+{{ booking.flight.source.code }}
+
+</div>
+
+</td>
+
+<td>
+
+<div class="label">
+
+To
+
+</div>
+
+<div class="value">
+
+{{ booking.flight.destination.code }}
+
+</div>
+
+</td>
+
+</tr>
+
+<tr>
+
+<td>
+
+<div class="label">
+
+Departure
+
+</div>
+
+<div class="value">
+
+{{ booking.travel_date }}
+
+</div>
+
+</td>
+
+<td>
+
+<div class="label">
+
+Seat
+
+</div>
+
+<div class="seat">
+
+{{ passenger.seat_number }}
+
+</div>
+
+</td>
+
+</tr>
+
+</table>
+
+<br>
+
+<img src="{{ qr_path }}">
+
+</div>
+
+<div class="footer">
+
+Powered by TripEase
+
+</div>
+
+</div>
+
+</body>
+
+</html>
