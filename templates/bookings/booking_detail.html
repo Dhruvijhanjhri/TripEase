@@ -40,12 +40,87 @@
 
         <hr>
 
-        <h4>Flight Info</h4>
-        <p><strong>Flight:</strong> {{ booking.flight.flight_number }} - {{ booking.flight.airline }}</p>
-        <p><strong>Route:</strong> {{ booking.flight.source.code }} → {{ booking.flight.destination.code }}</p>
-        <p><strong>Departure:</strong> {{ booking.flight.departure_time|date:"d M Y, h:i A" }}</p>
-        <p><strong>Arrival:</strong> {{ booking.flight.arrival_time|date:"d M Y, h:i A" }}</p>
+        <h4>Flight Information</h4>
 
+        <!-- First Flight -->
+
+        <div class="card p-3 mb-3">
+
+            <h5>Flight 1</h5>
+
+            <p>
+                <strong>Airline:</strong>
+                {{ booking.flight.airline }}
+            </p>
+
+            <p>
+                <strong>Flight:</strong>
+                {{ booking.flight.get_display_flight_number }}
+            </p>
+
+            <p>
+                <strong>Route:</strong>
+                {{ booking.flight.source.city }}
+                →
+                {{ booking.flight.destination.city }}
+            </p>
+
+            <p>
+                <strong>Departure:</strong>
+                {{ booking.flight.departure_time|date:"d M Y, h:i A" }}
+            </p>
+
+            <p>
+                <strong>Arrival:</strong>
+                {{ booking.flight.arrival_time|date:"d M Y, h:i A" }}
+            </p>
+
+        </div>
+
+        {% if booking.second_flight %}
+
+        <div class="text-center mb-3">
+
+            <h3>⬇</h3>
+
+            <small>Connecting Flight</small>
+
+        </div>
+
+        <div class="card p-3">
+
+            <h5>Flight 2</h5>
+
+            <p>
+                <strong>Airline:</strong>
+                {{ booking.second_flight.airline }}
+            </p>
+
+            <p>
+                <strong>Flight:</strong>
+                {{ booking.second_flight.get_display_flight_number }}
+            </p>
+
+            <p>
+                <strong>Route:</strong>
+                {{ booking.second_flight.source.city }}
+                →
+                {{ booking.second_flight.destination.city }}
+            </p>
+
+            <p>
+                <strong>Departure:</strong>
+                {{ booking.second_flight.departure_time|date:"d M Y, h:i A" }}
+            </p>
+
+            <p>
+                <strong>Arrival:</strong>
+                {{ booking.second_flight.arrival_time|date:"d M Y, h:i A" }}
+            </p>
+
+        </div>
+
+        {% endif %}
         <hr>
 
         <h4>Passenger Details</h4>
@@ -138,10 +213,22 @@
 {% if booking.booking_status == "confirmed" and not booking.checked_in %}
 
 <a
-    href="{% url 'bookings:check_in' booking.booking_reference %}"
+    href="{% url 'bookings:check_in_confirm' booking.booking_reference %}"
+    class="btn btn-primary">
+
+    Check In
+
+</a>  
+
+{% endif %}
+
+{% if booking.boarding_pass %}
+
+<a
+    href="{% url 'bookings:download_boarding_pass' booking.booking_reference %}"
     class="btn btn-primary mt-3">
 
-    ✈ Check-in
+    Download Boarding Pass
 
 </a>
 

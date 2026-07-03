@@ -26,42 +26,224 @@ My Bookings - TripEase
 
                     <div class="card-body">
 
-                        <span class="badge bg-primary mb-3">
-                            Flight Booking
-                        </span>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+
+                            <span class="badge bg-primary">
+
+                                Flight Booking
+
+                            </span>
+
+                            {% if booking.booking_status == "confirmed" %}
+
+                                <span
+                                    style="
+                                        background:#10b981;
+                                        color:white;
+                                        padding:4px 12px;
+                                        border-radius:20px;
+                                        font-size:12px;
+                                    "
+                                >
+                                    Confirmed
+                                </span>
+
+                            {% elif booking.booking_status == "pending" %}
+
+                                <span
+                                    style="
+                                        background:#f59e0b;
+                                        color:white;
+                                        padding:4px 12px;
+                                        border-radius:20px;
+                                        font-size:12px;
+                                    "
+                                >
+                                    Pending
+                                </span>
+
+                            {% elif booking.booking_status == "cancelled" %}
+
+                                <span
+                                    style="
+                                        background:#ef4444;
+                                        color:white;
+                                        padding:4px 12px;
+                                        border-radius:20px;
+                                        font-size:12px;
+                                    "
+                                >
+                                    Cancelled
+                                </span>
+
+                            {% endif %}
+
+                            {% if booking.booking_status == "confirmed" %}
+
+                                <div class="mb-3">
+
+                                    {% if booking.checked_in %}
+
+                                        <span
+                                            style="
+                                                background:#3b82f6;
+                                                color:white;
+                                                padding:4px 12px;
+                                                border-radius:20px;
+                                                font-size:12px;
+                                            "
+                                        >
+                                            ✈ Check-in Completed
+                                        </span>
+
+                                    {% else %}
+
+                                        <span
+                                            style="
+                                                background:#6b7280;
+                                                color:white;
+                                                padding:4px 12px;
+                                                border-radius:20px;
+                                                font-size:12px;
+                                            "
+                                        >
+                                            ⏳ Check-in Pending
+                                        </span>
+
+                                    {% endif %}
+
+                                </div>
+
+                            {% endif %}
+
+                        </div>
 
                         <h4 class="fw-bold">
+
                             {{ booking.flight.airline }}
+
                         </h4>
 
-                        <p class="mb-1">
+                        <p class="mb-3">
+
                             {{ booking.flight.get_display_flight_number }}
+
+                        </p>
+
+                        {% if booking.second_flight %}
+
+                        <p class="fw-bold text-primary">
+
+                            {{ booking.journey_route }}
+
                         </p>
 
                         <p class="text-muted">
-                            {{ booking.flight.source.city }}
-                            →
-                            {{ booking.flight.destination.city }}
+
+                            Via {{ booking.via_city }}
+
+                        </p>
+
+                        <div class="card p-2 mb-3 bg-light">
+
+                            <small>
+
+                                <strong>Flight 1</strong><br>
+
+                                {{ booking.flight.source.city }}
+                                →
+
+                                {{ booking.flight.destination.city }}
+
+                                <br>
+
+                                {{ booking.flight.get_display_flight_number }}
+
+                            </small>
+
+                            <hr>
+
+                            <small>
+
+                                <strong>Flight 2</strong><br>
+
+                                {{ booking.second_flight.source.city }}
+                                →
+
+                                {{ booking.second_flight.destination.city }}
+
+                                <br>
+
+                                {{ booking.second_flight.get_display_flight_number }}
+
+                            </small>
+
+                        </div>
+
+                        <p>
+
+                            <strong>Total Journey Duration:</strong>
+
+                            {{ booking.total_duration_display }}
+
+                        </p>
+
+                        {% else %}
+
+                        <p class="text-muted">
+
+                            {{ booking.journey_route }}
+
                         </p>
 
                         <p>
-                            <strong>Date:</strong>
-                            {{ booking.travel_date|date:"M d, Y" }}
-                        </p>
 
-                        <p>
-                            <strong>Passengers:</strong>
-                            {{ booking.number_of_passengers }}
-                        </p>
-
-                        <p>
-                            <strong>Booking Ref:</strong>
-                            {{ booking.booking_reference }}
-                        </p>
-
-                        <p>
                             <strong>Duration:</strong>
+
                             {{ booking.flight.get_duration_display }}
+
+                        </p>
+
+                        {% endif %}
+
+                        <p>
+
+                            <strong>Date:</strong>
+
+                            {{ booking.travel_date|date:"M d, Y" }}
+
+                        </p>
+
+                        <p>
+
+                            <strong>Passengers:</strong>
+
+                            {{ booking.number_of_passengers }}
+
+                            {% if booking.checked_in %}
+
+                            <p>
+
+                                <strong>Seat:</strong>
+
+                                {% for passenger in booking.passengers.all %}
+
+                                    {{ passenger.seat_number }}{% if not forloop.last %}, {% endif %}
+
+                                {% endfor %}
+
+                            </p>
+
+                            {% endif %}
+
+                        </p>
+
+                        <p>
+
+                            <strong>Booking Ref:</strong>
+
+                            {{ booking.booking_reference }}
+
                         </p>
 
                         <h4 class="text-primary fw-bold">
@@ -71,18 +253,29 @@ My Bookings - TripEase
                         <div class="mt-3">
 
                             <a
-                            class="btn btn-primary btn-sm"
-                            href="{% url 'bookings:detail' booking.booking_reference %}"
-                            >
-
-                            View Details
-
+                                class="btn btn-primary btn-sm"
+                                href="{% url 'bookings:detail' booking.booking_reference %}">
+                                View Details
                             </a>
 
-                            <a href="{% url 'integrations:track_booking_flight' booking.booking_reference %}"
-                                class="btn btn-outline-primary">
+                            {% if booking.checked_in and booking.boarding_pass_pdf %}
 
-                                ✈ Track My Flight
+                                <a
+                                    class="btn btn-success btn-sm"
+                                    href="{{ booking.boarding_pass_pdf.url }}"
+                                    target="_blank">
+
+                                    📄 Boarding Pass
+
+                                </a>
+
+                            {% endif %}
+
+                            <a
+                                href="{% url 'integrations:track_booking_flight' booking.booking_reference %}"
+                                class="btn btn-outline-primary btn-sm">
+
+                                ✈ Track Flight
 
                             </a>
 

@@ -1,39 +1,246 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Payment Success - TripEase{% endblock %}
-
-{% block content %}
-<div class="container" style="padding: 40px 0; text-align: center;">
-    <div class="card" style="padding: 40px; max-width: 600px; margin: 0 auto;">
-        <div style="font-size: 4rem; color: #10b981; margin-bottom: 20px;">✓</div>
-        <h2 style="color: #10b981; margin-bottom: 20px;">Payment Successful!</h2>
-        
-        <div style="text-align: left; margin: 30px 0;">
-            <p><strong>Booking Reference:</strong> {{ booking.booking_reference }}</p>
-            <p><strong>Flight:</strong> {{ booking.flight.airline }}</p>
-            <p><strong>{{ booking.flight.get_display_flight_number }}</strong></p>
-            <p><strong>Travel Date:</strong> {{ booking.travel_date|date:"D, M d, Y" }}</p>
-            <p><strong>Transaction ID:</strong> {{ payment.transaction_id }}</p>
-            <p><strong>Amount Paid:</strong> ₹{{ payment.amount|floatformat:0 }}</p>
-            <p><strong>Payment Method:</strong> {{ payment.get_payment_method_display }}</p>
-        </div>
-        
-        <div style="margin-top: 30px;">
-            <a href="{% url 'bookings:detail' booking.booking_reference %}"
-                class="btn btn-primary">
-
-                View Booking Details
-
-            </a>
-            <a href="{% url 'bookings:list' %}" class="btn btn-outline" style="margin-left: 10px;">My Bookings</a>
-        </div>
-    </div>
-</div>
+{% block title %}
+Payment Success - TripEase
 {% endblock %}
 
+{% block content %}
 
+<div class="container py-5">
 
+    <div class="row justify-content-center">
 
+        <div class="col-lg-8">
 
+            <div class="card shadow border-0 rounded-4">
 
+                <div class="card-body p-5">
+
+                    <div class="text-center mb-4">
+
+                        <div
+                            class="rounded-circle d-inline-flex justify-content-center align-items-center"
+                            style="
+                                width:90px;
+                                height:90px;
+                                background:#dcfce7;
+                                font-size:42px;
+                                color:#16a34a;
+                            "
+                        >
+
+                            ✓
+
+                        </div>
+
+                        <h2 class="fw-bold text-success mt-3">
+
+                            Payment Successful!
+
+                        </h2>
+
+                        <p class="text-muted">
+
+                            Your booking has been confirmed.
+
+                        </p>
+
+                    </div>
+
+                    <hr>
+
+                    <h4 class="mb-3">
+
+                        Journey Summary
+
+                    </h4>
+
+                    <div class="card border-0 bg-light mb-4">
+
+                        <div class="card-body">
+
+                            <h5 class="fw-bold text-primary">
+
+                                {{ booking.journey_route }}
+
+                            </h5>
+
+                            {% if booking.second_flight %}
+
+                                <p class="text-muted">
+
+                                    Via {{ booking.via_city }}
+
+                                </p>
+
+                            {% endif %}
+
+                            <hr>
+
+                            <div class="mb-3">
+
+                                <strong>Flight 1</strong>
+
+                                <br>
+
+                                {{ booking.flight.airline }}
+
+                                •
+
+                                {{ booking.flight.get_display_flight_number }}
+
+                                <br>
+
+                                {{ booking.flight.source.city }}
+
+                                →
+
+                                {{ booking.flight.destination.city }}
+
+                            </div>
+
+                            {% if booking.second_flight %}
+
+                                <div class="text-center mb-3">
+
+                                    ⬇
+
+                                </div>
+
+                                <div>
+
+                                    <strong>Flight 2</strong>
+
+                                    <br>
+
+                                    {{ booking.second_flight.airline }}
+
+                                    •
+
+                                    {{ booking.second_flight.get_display_flight_number }}
+
+                                    <br>
+
+                                    {{ booking.second_flight.source.city }}
+
+                                    →
+
+                                    {{ booking.second_flight.destination.city }}
+
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-md-6">
+
+                            <p>
+
+                                <strong>Booking Reference:</strong>
+
+                                {{ booking.booking_reference }}
+
+                            </p>
+
+                            <p>
+
+                                <strong>Travel Date:</strong>
+
+                                {{ booking.travel_date|date:"D, M d, Y" }}
+
+                            </p>
+
+                            <p>
+
+                                <strong>Passengers:</strong>
+
+                                {{ booking.number_of_passengers }}
+
+                            </p>
+
+                            <p>
+
+                                <strong>Cabin Class:</strong>
+
+                                {{ booking.cabin_class|title }}
+
+                            </p>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <p>
+
+                                <strong>Total Journey Duration:</strong>
+
+                                {{ booking.total_duration_display }}
+
+                            </p>
+
+                            <p>
+
+                                <strong>Transaction ID:</strong>
+
+                                {{ payment.transaction_id }}
+
+                            </p>
+
+                            <p>
+
+                                <strong>Payment Method:</strong>
+
+                                {{ payment.get_payment_method_display }}
+
+                            </p>
+
+                            <p class="fw-bold text-success fs-5">
+
+                                Amount Paid:
+                                ₹{{ payment.amount|floatformat:0 }}
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <hr>
+
+                    <div class="text-center mt-4">
+
+                        <a
+                            href="{% url 'bookings:detail' booking.booking_reference %}"
+                            class="btn btn-primary me-2">
+
+                            View Booking Details
+
+                        </a>
+
+                        <a
+                            href="{% url 'bookings:list' %}"
+                            class="btn btn-outline-primary">
+
+                            My Bookings
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

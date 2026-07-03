@@ -30,6 +30,12 @@ urlpatterns = [
     ),
 
     path(
+        "check-in/confirm/<str:booking_reference>/",
+        views.check_in_confirm,
+        name="check_in_confirm",
+    ),
+
+    path(
         "check-in/<str:booking_reference>/",
         views.check_in,
         name="check_in",
@@ -39,6 +45,12 @@ urlpatterns = [
         "select-seats/<str:booking_reference>/",
         views.select_seats,
         name="select_seats",
+    ),
+
+    path(
+        "boarding-pass/<str:booking_reference>/",
+        views.download_boarding_pass,
+        name="download_boarding_pass",
     ),
 
 ]

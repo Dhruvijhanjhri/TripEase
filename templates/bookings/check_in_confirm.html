@@ -1,0 +1,308 @@
+{% extends "base.html" %}
+
+{% block title %}Flight Check-in{% endblock %}
+
+{% block content %}
+
+<div class="container py-5" style="max-width:700px;">
+
+    <div class="card shadow p-4 rounded-4">
+
+        <h2 class="mb-4">
+            ✈ Flight Check-in
+        </h2>
+
+        <hr>
+
+        <h5>Passenger</h5>
+
+        {% for passenger in booking.passengers.all %}
+
+            <div class="card p-2 mb-2">
+
+            <strong>
+
+            {{ passenger.first_name }}
+            {{ passenger.last_name }}
+
+            </strong>
+
+            <br>
+
+            Age:
+            {{ passenger.age }}
+
+            |
+
+            Gender:
+            {{ passenger.get_gender_display }}
+
+            |
+
+            Seat:
+
+            <strong>
+
+            {{ passenger.seat_number }}
+
+            </strong>
+
+            </div>
+
+        {% endfor %}
+
+        <hr>
+
+        <h5>Journey</h5>
+
+            <h4 class="fw-bold text-primary">
+
+                {{ booking.journey_route }}
+
+            </h4>
+
+            {% if booking.second_flight %}
+
+            <p class="text-muted">
+
+                Via {{ booking.via_city }}
+
+            </p>
+
+            {% endif %}
+
+            <p>
+
+                <strong>Travel Date:</strong>
+
+                {{ booking.travel_date }}
+
+            </p>
+
+            <p>
+
+                <strong>Total Journey Duration:</strong>
+
+                {{ booking.total_duration_display }}
+
+            </p>
+
+            <hr>
+
+            <div class="card p-3 mb-3">
+
+                <h6 class="fw-bold">
+
+                    Flight 1
+
+                </h6>
+
+                <p class="mb-1">
+
+                    {{ booking.flight.airline }}
+
+                </p>
+
+                <p class="mb-1">
+
+                    {{ booking.flight.get_display_flight_number }}
+
+                </p>
+
+                <p class="mb-0">
+
+                    {{ booking.flight.source.city }}
+
+                    →
+
+                    {{ booking.flight.destination.city }}
+
+                </p>
+
+            </div>
+
+            {% if booking.second_flight %}
+
+            <div class="text-center mb-3">
+
+                ⬇
+
+                <br>
+
+                <small class="text-muted">
+
+                    Connecting Flight
+
+                </small>
+
+            </div>
+
+            <div class="card p-3 mb-3">
+
+                <h6 class="fw-bold">
+
+                    Flight 2
+
+                </h6>
+
+                <p class="mb-1">
+
+                    {{ booking.second_flight.airline }}
+
+                </p>
+
+                <p class="mb-1">
+
+                    {{ booking.second_flight.get_display_flight_number }}
+
+                </p>
+
+                <p class="mb-0">
+
+                    {{ booking.second_flight.source.city }}
+
+                    →
+
+                    {{ booking.second_flight.destination.city }}
+
+                </p>
+
+            </div>
+
+            {% endif %}
+
+        <hr>
+
+        <h5>Airport Information</h5>
+
+        <p>
+
+        <strong>Terminal:</strong>
+
+        {{ booking.terminal|default:"Will be assigned after check-in." }}
+
+        </p>
+
+        <p>
+
+        <strong>Gate:</strong>
+
+        {{ booking.gate|default:"Will be assigned after check-in." }}
+
+        </p>
+
+        <p>
+
+        <strong>Boarding Time:</strong>
+
+        {% if booking.boarding_time %}
+
+        {{ booking.boarding_time|date:"d M Y, h:i A" }}
+
+        {% else %}
+
+        Available after check-in.
+
+        {% endif %}
+
+        </p>
+
+        <hr>
+
+        <h5>Baggage</h5>
+
+        <ul>
+
+            <li>Cabin Baggage : 7 kg</li>
+
+            <li>Check-in Baggage : 15 kg</li>
+
+        </ul>
+
+        <hr>
+
+        {% if booking.checked_in %}
+
+        <div class="alert alert-success">
+
+            <h5>
+
+                ✅ Check-in Completed
+
+            </h5>
+
+            <p class="mb-0">
+
+                Checked in at
+
+                {{ booking.checked_in_at|date:"d M Y, h:i A" }}
+
+            </p>
+
+        </div>
+
+        <a
+            href="{{ booking.boarding_pass_pdf.url }}"
+            target="_blank"
+            class="btn btn-primary w-100">
+
+            📄 Download Boarding Pass
+
+        </a>
+
+        {% else %}
+
+        <div class="form-check mb-4">
+
+            <input
+                class="form-check-input"
+                type="checkbox"
+                id="confirm">
+
+            <label
+                class="form-check-label"
+                for="confirm">
+
+                I confirm the above information is correct.
+
+            </label>
+
+        </div>
+
+        <form
+            method="post"
+            action="{% url 'bookings:check_in' booking.booking_reference %}">
+
+            {% csrf_token %}
+
+            <button
+                id="checkinBtn"
+                class="btn btn-success w-100"
+                disabled>
+
+                Complete Check-in
+
+            </button>
+
+        </form>
+
+        {% endif %}
+    </div>
+
+</div>
+
+<script>
+
+const checkbox = document.getElementById("confirm");
+
+const button = document.getElementById("checkinBtn");
+
+checkbox.addEventListener("change", function(){
+
+    button.disabled = !this.checked;
+
+});
+
+</script>
+
+{% endblock %}

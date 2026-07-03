@@ -15,6 +15,10 @@ from .models import Booking
 from django.utils import timezone
 from integrations.flight_status_service import FlightStatusService
 from bookings.seat_utils import generate_seat_map
+from bookings.boarding_pass import generate_boarding_pass
+import random
+from datetime import timedelta
+from django.http import FileResponse
 
 @login_required
 def create_booking(request, flight_id):
@@ -145,6 +149,7 @@ def create_booking(request, flight_id):
                     booking = Booking.objects.create(
                         user=request.user,
                         flight=flight,
+                        second_flight=second_leg,
                         cabin_class=cabin_class,
                         number_of_passengers=passengers,
                         total_price=total_price,
@@ -329,6 +334,25 @@ def cancel_booking(request, booking_reference):
     )
 
 @login_required
+def check_in_confirm(request, booking_reference):
+
+    booking = get_object_or_404(
+        Booking,
+        booking_reference=booking_reference,
+        user=request.user
+    )
+
+    context = {
+        "booking": booking,
+    }
+
+    return render(
+        request,
+        "bookings/check_in_confirm.html",
+        context
+    )
+
+@login_required
 def check_in(request, booking_reference):
 
     booking = get_object_or_404(
@@ -363,8 +387,30 @@ def check_in(request, booking_reference):
 
     booking.checked_in = True
     booking.checked_in_at = timezone.now()
+    booking.terminal = f"T{random.randint(1,3)}"
+
+    booking.gate = f"G{random.randint(1,25)}"
+
+    booking.boarding_time = (
+        booking.flight.departure_time
+        - timedelta(minutes=45)
+    )
 
     booking.save()
+
+    pdf_path = generate_boarding_pass(booking)
+
+    print("=" * 60)
+    print("Returned path:", pdf_path)
+    print("=" * 60)
+
+    booking.boarding_pass.name = pdf_path
+    booking.save()
+
+    booking.refresh_from_db()
+
+    print("Saved in DB:", booking.boarding_pass.name)
+    print("=" * 60)
 
     messages.success(
         request,
@@ -475,4 +521,31 @@ def select_seats(request, booking_reference):
             "booking": booking,
             "seat_map": seat_map,
         }
+    )
+
+@login_required
+def download_boarding_pass(request, booking_reference):
+
+    booking = get_object_or_404(
+        Booking,
+        booking_reference=booking_reference,
+        user=request.user
+    )
+
+    if not booking.boarding_pass:
+
+        messages.error(
+            request,
+            "Boarding pass not available."
+        )
+
+        return redirect(
+            "bookings:detail",
+            booking_reference=booking_reference
+        )
+
+    return FileResponse(
+        booking.boarding_pass.open("rb"),
+        as_attachment=True,
+        filename=f"{booking.booking_reference}.pdf"
     )

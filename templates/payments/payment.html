@@ -21,19 +21,114 @@ Flight Payment
 
                 <div class="card-body p-4 p-md-5">
 
-                    <div class="mb-4">
-                        <div class="text-muted small mb-1">Flight</div>
-                        <h3 class="fw-bold mb-1">{{ booking.flight.airline }}</h3>
-                        <p class="mb-1">{{ booking.flight.get_display_flight_number }}</p>
-                        <p class="text-muted mb-0">
-                            {{ booking.flight.source.code }} → {{ booking.flight.destination.code }}
-                        </p>
+                    <h4 class="mb-3">
+
+                        Journey Summary
+
+                    </h4>
+
+                    <div class="card border-0 shadow-sm mb-4">
+
+                        <div class="card-body">
+
+                            <h5 class="fw-bold text-primary">
+
+                                {{ booking.journey_route }}
+
+                            </h5>
+
+                            {% if booking.second_flight %}
+
+                                <p class="text-muted mb-3">
+
+                                    Via {{ booking.via_city }}
+
+                                </p>
+
+                            {% endif %}
+
+                            <hr>
+
+                            <div class="mb-3">
+
+                                <strong>Flight 1</strong>
+
+                                <br>
+
+                                {{ booking.flight.airline }}
+
+                                •
+
+                                {{ booking.flight.get_display_flight_number }}
+
+                                <br>
+
+                                {{ booking.flight.source.city }}
+
+                                →
+
+                                {{ booking.flight.destination.city }}
+
+                            </div>
+
+                            {% if booking.second_flight %}
+
+                            <div class="text-center mb-3">
+
+                                ⬇
+
+                            </div>
+
+                            <div>
+
+                                <strong>Flight 2</strong>
+
+                                <br>
+
+                                {{ booking.second_flight.airline }}
+
+                                •
+
+                                {{ booking.second_flight.get_display_flight_number }}
+
+                                <br>
+
+                                {{ booking.second_flight.source.city }}
+
+                                →
+
+                                {{ booking.second_flight.destination.city }}
+
+                            </div>
+
+                            {% endif %}
+
+                        </div>
+
                     </div>
 
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
                             <div class="p-3 rounded-4 bg-light h-100">
-                                <p class="mb-2"><strong>Route:</strong> {{ booking.flight.source.code }} → {{ booking.flight.destination.code }}</p>
+                                <p class="mb-2">
+
+                                <strong>Journey:</strong>
+
+                                {{ booking.journey_route }}
+
+                                </p>
+
+                                {% if booking.second_flight %}
+
+                                <p class="mb-2">
+
+                                <strong>Via:</strong>
+
+                                {{ booking.via_city }}
+
+                                </p>
+
+                                {% endif %}
                                 <p class="mb-2"><strong>Travel Date:</strong> {{ booking.travel_date|date:"D, M d, Y" }}</p>
                                 <p class="mb-0"><strong>Cabin Class:</strong> {{ booking.cabin_class|title }}</p>
                             </div>
@@ -42,7 +137,13 @@ Flight Payment
                             <div class="p-3 rounded-4 bg-light h-100">
                                 <p class="mb-2"><strong>Passengers:</strong> {{ booking.number_of_passengers }}</p>
                                 <p class="mb-2"><strong>Booking Reference:</strong> {{ booking.booking_reference }}</p>
-                                <p class="mb-2"><strong>Duration:</strong> {{ booking.flight.get_duration_display }}</p>
+                                <p class="mb-2">
+
+                                <strong>Total Journey Duration:</strong>
+
+                                {{ booking.total_duration_display }}
+
+                                </p>
                                 <p class="mb-0"><strong>Total Amount:</strong> ₹{{ booking.total_price|floatformat:0 }}</p>
                             </div>
                         </div>
