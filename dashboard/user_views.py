@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.urls import reverse
 from django.utils import timezone
 from collections import defaultdict, Counter
 from decimal import Decimal, ROUND_HALF_UP
@@ -81,6 +82,64 @@ def user_dashboard(request):
 
     upcoming_trips = upcoming_flights + upcoming_hotels + upcoming_packages
 
+    # ─────────────────────────────────────────────
+    # NEXT UPCOMING TRIP
+    # ─────────────────────────────────────────────
+
+    next_trip = None
+
+    upcoming_items = []
+
+    # Flights
+    for booking in flight_bookings:
+
+        if (
+            booking.travel_date
+            and booking.travel_date >= today
+            and booking.booking_status in ("pending", "confirmed")
+        ):
+
+            upcoming_items.append({
+                "type": "Flight",
+                "date": booking.travel_date,
+                "booking": booking,
+            })
+
+    # Hotels
+    for booking in hotel_bookings:
+
+        if (
+            booking.check_in_date
+            and booking.check_in_date >= today
+            and booking.booking_status in ("pending", "confirmed")
+        ):
+
+            upcoming_items.append({
+                "type": "Hotel",
+                "date": booking.check_in_date,
+                "booking": booking,
+            })
+
+    # Packages
+    for booking in package_bookings:
+
+        if (
+            booking.travel_date
+            and booking.travel_date >= today
+            and booking.booking_status in ("pending", "confirmed")
+        ):
+
+            upcoming_items.append({
+                "type": "Package",
+                "date": booking.travel_date,
+                "booking": booking,
+            })
+
+    if upcoming_items:
+
+        upcoming_items.sort(key=lambda x: x["date"])
+
+        next_trip = upcoming_items[0]
     # ─────────────────────────────────────────────────────────────
     # 4. COMPLETED TRIPS
     # ─────────────────────────────────────────────────────────────
@@ -285,6 +344,35 @@ def user_dashboard(request):
             travel_frequency = round(total_bookings / months_active, 1)
 
     # ─────────────────────────────────────────────────────────────
+    # 10.5 USER TRAVEL LEVEL
+    # ─────────────────────────────────────────────────────────────
+
+    if total_bookings == 0:
+        travel_level = "New Explorer"
+        next_level = "Explorer"
+        bookings_needed = 1
+
+    elif total_bookings < 5:
+        travel_level = "Explorer"
+        next_level = "Traveller"
+        bookings_needed = 5 - total_bookings
+
+    elif total_bookings < 10:
+        travel_level = "Traveller"
+        next_level = "Frequent Traveller"
+        bookings_needed = 10 - total_bookings
+
+    elif total_bookings < 20:
+        travel_level = "Frequent Traveller"
+        next_level = "Globetrotter"
+        bookings_needed = 20 - total_bookings
+
+    else:
+        travel_level = "Globetrotter"
+        next_level = None
+        bookings_needed = 0
+
+    # ─────────────────────────────────────────────────────────────
     # 11. AI-STYLE TRAVEL INSIGHTS (DYNAMIC, GENERATED IN PYTHON)
     # ─────────────────────────────────────────────────────────────
 
@@ -364,36 +452,40 @@ def user_dashboard(request):
 
     for b in flight_bookings:
         recent_activity.append({
-            'type':   'Flight',
-            'title':  (
+            'type': 'Flight',
+            'title': (
                 f"{b.flight.source.city} → {b.flight.destination.city}"
                 f" ({b.flight.airline})"
             ),
-            'date':   b.created_at,
+            'date': b.created_at,
             'status': b.booking_status.capitalize(),
             'amount': b.total_price,
+            'reference': b.booking_reference,
         })
-
+    
     for b in hotel_bookings:
         recent_activity.append({
-            'type':   'Hotel',
-            'title':  f"{b.hotel.name}, {b.hotel.city}",
-            'date':   b.created_at,
+            'type': 'Hotel',
+            'title': f"{b.hotel.name}, {b.hotel.city}",
+            'date': b.created_at,
             'status': b.booking_status.capitalize(),
             'amount': b.total_price,
+            'reference': b.booking_reference,
         })
 
     for b in package_bookings:
-        recent_activity.append({
-            'type':   'Package',
-            'title':  f"{b.package.name} — {b.package.destination}",
-            'date':   b.created_at,
+       recent_activity.append({
+            'type': 'Package',
+            'title': f"{b.package.name} — {b.package.destination}",
+            'date': b.created_at,
             'status': b.booking_status.capitalize(),
             'amount': b.total_price,
+            'reference': b.booking_reference,
         })
 
     recent_activity.sort(key=lambda x: x['date'], reverse=True)
     recent_activity = recent_activity[:10]
+
 
     # ─────────────────────────────────────────────────────────────
     # 13. CONTEXT — SINGLE DICTIONARY, NO DUPLICATES
@@ -408,6 +500,13 @@ def user_dashboard(request):
         'total_spending':          total_spending,
         'upcoming_trips':          upcoming_trips,
         'completed_trips':         completed_trips,
+        'next_trip': next_trip,
+        'travel_level': travel_level,
+        'next_level': next_level,
+        'bookings_needed': bookings_needed,
+        'cancelled_count': cancelled_count,
+        'favourite_destination': favourite_destination,
+        
 
         # ── Distribution chart
         'booking_distribution_labels': booking_distribution_labels,

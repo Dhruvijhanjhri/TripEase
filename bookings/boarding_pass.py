@@ -136,4 +136,4 @@ def generate_boarding_pass(booking):
 
     pdf.output(pdf_path)
 
-    return f"boarding_passes/{booking.booking_reference}.pdf"
+    

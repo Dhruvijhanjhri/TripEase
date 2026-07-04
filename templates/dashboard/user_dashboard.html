@@ -173,8 +173,35 @@
     }
 
     .kpi-card:hover {
-      transform  : translateY(-5px);
-      box-shadow : var(--shadow-hover);
+
+      transform: translateY(-7px) scale(1.02);
+
+      box-shadow:
+          0 18px 40px rgba(0,0,0,.12),
+          0 0 0 1px rgba(13,110,253,.08);
+
+    }
+
+    .kpi-card{
+
+        cursor:pointer;
+
+    }
+
+    .kpi-link{
+
+        text-decoration:none;
+
+        color:inherit;
+
+        display:block;
+
+    }
+
+    .kpi-link:hover{
+
+        color:inherit;
+
     }
 
     .kpi-card:hover::after {
@@ -584,6 +611,62 @@
     @media (max-width: 575.98px) {
       .timeline { padding-left: 2rem; }
     }
+
+    .quick-action{
+
+      display:flex;
+
+      flex-direction:column;
+
+      align-items:center;
+
+      justify-content:center;
+
+      gap:10px;
+
+      text-decoration:none;
+
+      color:#212529;
+
+      background:#ffffff;
+
+      border-radius:18px;
+
+      padding:25px 15px;
+
+      border:1px solid #edf0f5;
+
+      transition:.25s;
+
+      box-shadow:0 5px 18px rgba(0,0,0,.05);
+
+  }
+
+  .quick-action:hover{
+
+      transform:translateY(-5px);
+
+      text-decoration:none;
+
+      color:#0d6efd;
+
+      box-shadow:0 14px 32px rgba(13,110,253,.15);
+
+  }
+
+  .quick-action{
+
+      font-size:28px;
+
+  }
+
+  .quick-action span{
+
+      font-size:15px;
+
+      font-weight:600;
+
+  }
   </style>
 </head>
 
@@ -671,98 +754,383 @@
 
         <!-- Total Bookings -->
         <div class="col-6 col-sm-4 col-lg-2">
-          <div class="card kpi-card h-100" style="--kpi-accent:#0d6efd;">
-            <div class="card-body p-3 d-flex flex-column gap-2">
-              <div class="kpi-icon" style="background:#e8f0fe;">
-                <i class="bi bi-ticket-perforated-fill" style="color:#0d6efd;"></i>
+
+          <a href="{% url 'bookings:list' %}"
+            class="kpi-link">
+
+              <div class="card kpi-card h-100"
+                  style="--kpi-accent:#0d6efd; cursor:pointer;">
+
+                  <div class="card-body p-3 d-flex flex-column gap-2">
+
+                      <div class="kpi-icon" style="background:#e8f0fe;">
+                          <i class="bi bi-ticket-perforated-fill"
+                            style="color:#0d6efd;"></i>
+                      </div>
+
+                      <div>
+                          <p class="kpi-value text-primary">{{ total_bookings }}</p>
+                          <p class="kpi-label">Total Bookings</p>
+                      </div>
+
+                  </div>
+
               </div>
-              <div>
-                <p class="kpi-value text-primary">{{ total_bookings }}</p>
-                <p class="kpi-label">Total Bookings</p>
-              </div>
-            </div>
-          </div>
+
+          </a>
         </div>
 
         <!-- Flights -->
         <div class="col-6 col-sm-4 col-lg-2">
-          <div class="card kpi-card h-100" style="--kpi-accent:#0dcaf0;">
-            <div class="card-body p-3 d-flex flex-column gap-2">
-              <div class="kpi-icon" style="background:#e0f9f8;">
-                <i class="bi bi-airplane-fill" style="color:#0894a6;"></i>
-              </div>
-              <div>
-                <p class="kpi-value" style="color:#0894a6;">{{ total_flight_bookings }}</p>
-                <p class="kpi-label">Flights</p>
+          <a href="{% url 'flights:search' %}"
+            class="kpi-link">
+            <div class="card kpi-card h-100" style="--kpi-accent:#0dcaf0;">
+              <div class="card-body p-3 d-flex flex-column gap-2">
+                <div class="kpi-icon" style="background:#e0f9f8;">
+                  <i class="bi bi-airplane-fill" style="color:#0894a6;"></i>
+                </div>
+                <div>
+                  <p class="kpi-value" style="color:#0894a6;">{{ total_flight_bookings }}</p>
+                  <p class="kpi-label">Flights</p>
+                </div>
               </div>
             </div>
-          </div>
+          </a>
         </div>
 
         <!-- Hotels -->
         <div class="col-6 col-sm-4 col-lg-2">
-          <div class="card kpi-card h-100" style="--kpi-accent:#6610f2;">
-            <div class="card-body p-3 d-flex flex-column gap-2">
-              <div class="kpi-icon" style="background:#f3e8ff;">
-                <i class="bi bi-building-fill" style="color:#6610f2;"></i>
-              </div>
-              <div>
-                <p class="kpi-value" style="color:#6610f2;">{{ total_hotel_bookings }}</p>
-                <p class="kpi-label">Hotels</p>
+          <a href="{% url 'hotels:search' %}"
+            class="kpi-link">
+              <div class="card kpi-card h-100" style="--kpi-accent:#6610f2;">
+                <div class="card-body p-3 d-flex flex-column gap-2">
+                  <div class="kpi-icon" style="background:#f3e8ff;">
+                    <i class="bi bi-building-fill" style="color:#6610f2;"></i>
+                  </div>
+                <div>
+                  <p class="kpi-value" style="color:#6610f2;">{{ total_hotel_bookings }}</p>
+                  <p class="kpi-label">Hotels</p>
+                </div>
               </div>
             </div>
-          </div>
+          </a>
         </div>
 
         <!-- Packages -->
         <div class="col-6 col-sm-4 col-lg-2">
-          <div class="card kpi-card h-100" style="--kpi-accent:#fd7e14;">
-            <div class="card-body p-3 d-flex flex-column gap-2">
-              <div class="kpi-icon" style="background:#fff4e6;">
-                <i class="bi bi-briefcase-fill" style="color:#fd7e14;"></i>
-              </div>
-              <div>
-                <p class="kpi-value" style="color:#fd7e14;">{{ total_package_bookings }}</p>
-                <p class="kpi-label">Packages</p>
+          <a href="{% url 'packages:search' %}"
+            class="kpi-link">
+              <div class="card kpi-card h-100" style="--kpi-accent:#fd7e14;">
+                <div class="card-body p-3 d-flex flex-column gap-2">
+                <div class="kpi-icon" style="background:#fff4e6;">
+                  <i class="bi bi-briefcase-fill" style="color:#fd7e14;"></i>
+                </div>
+                <div>
+                  <p class="kpi-value" style="color:#fd7e14;">{{ total_package_bookings }}</p>
+                  <p class="kpi-label">Packages</p>
+                </div>
               </div>
             </div>
-          </div>
+          </a>
         </div>
 
         <!-- Upcoming Trips -->
         <div class="col-6 col-sm-4 col-lg-2">
-          <div class="card kpi-card h-100" style="--kpi-accent:#198754;">
-            <div class="card-body p-3 d-flex flex-column gap-2">
-              <div class="kpi-icon" style="background:#e6f9f0;">
-                <i class="bi bi-calendar-event-fill" style="color:#198754;"></i>
-              </div>
-              <div>
-                <p class="kpi-value text-success">{{ upcoming_trips }}</p>
-                <p class="kpi-label">Upcoming</p>
+          <a href="{% if next_trip %}
+                {% url 'bookings:detail' next_trip.booking_reference %}
+            {% else %}
+                {% url 'bookings:list' %}
+            {% endif %}"
+            class="kpi-link">
+            <div class="card kpi-card h-100" style="--kpi-accent:#198754;">
+              <div class="card-body p-3">
+
+                  {% if next_trip %}
+
+                      <div class="d-flex justify-content-between align-items-start mb-2">
+
+                          <div>
+
+                              <small class="text-muted fw-semibold">
+                                  YOUR NEXT TRIP
+                              </small>
+
+                              <h6 class="fw-bold mt-1 mb-0">
+
+                                  {{ next_trip.flight.source.city }}
+                                  →
+
+                                  {{ next_trip.journey_destination }}
+
+                              </h6>
+
+                          </div>
+
+                          <i class="bi bi-airplane-fill text-primary"></i>
+
+                      </div>
+
+                      <hr class="my-2">
+
+                      <small class="text-muted">
+
+                          {{ next_trip.travel_date|date:"d M Y" }}
+
+                      </small>
+
+                      <br>
+
+                      <strong>
+
+                          {{ next_trip.flight.get_display_flight_number }}
+
+                      </strong>
+
+                      <br>
+
+                      <span class="badge bg-success mt-2">
+
+                          {{ next_trip.booking_status|title }}
+
+                      </span>
+
+                  {% else %}
+
+                      <div class="text-center py-3">
+
+                          <i class="bi bi-airplane fs-2 text-muted"></i>
+
+                          <p class="mt-2 mb-0">
+
+                              No Upcoming Trips
+
+                          </p>
+
+                      </div>
+
+                  {% endif %}
+
               </div>
             </div>
-          </div>
+          </a>
         </div>
 
         <!-- Total Spending -->
         <div class="col-6 col-sm-4 col-lg-2">
-          <div class="card kpi-card h-100" style="--kpi-accent:#dc3545;">
-            <div class="card-body p-3 d-flex flex-column gap-2">
-              <div class="kpi-icon" style="background:#fdecea;">
-                <i class="bi bi-currency-rupee" style="color:#dc3545;"></i>
-              </div>
-              <div>
-                <p class="kpi-value text-danger" style="font-size:1.5rem;">
-                  ₹{{ total_spending|floatformat:0 }}
-                </p>
-                <p class="kpi-label">Total Spent</p>
+          <a href="{% url 'bookings:list' %}"
+            class="kpi-link">
+            <div class="card kpi-card h-100" style="--kpi-accent:#dc3545;">
+              <div class="card-body p-3 d-flex flex-column gap-2">
+                <div class="kpi-icon" style="background:#fdecea;">
+                  <i class="bi bi-currency-rupee" style="color:#dc3545;"></i>
+                </div>
+                <div>
+                  <p class="kpi-value text-danger" style="font-size:1.5rem;">
+                    ₹{{ total_spending|floatformat:0 }}
+                  </p>
+                  <p class="kpi-label">Total Spent</p>
+                </div>
               </div>
             </div>
-          </div>
+          </a>
         </div>
 
       </div>
       <!-- /ROW 1 -->
+
+      <!-- ========================================================= -->
+      <!-- QUICK ACTIONS -->
+      <!-- ========================================================= -->
+
+      <div class="card shadow-sm border-0 rounded-4 mt-4 mb-4">
+
+          <div class="card-body">
+
+              <h5 class="fw-bold mb-4">
+                  🚀 Quick Actions
+              </h5>
+
+              <div class="row g-3">
+
+                  <div class="col-md-4 col-6">
+
+                      <a href="{% url 'flights:search' %}" class="quick-action">
+
+                          ✈
+
+                          <span>Book Flight</span>
+
+                      </a>
+
+                  </div>
+
+                  <div class="col-md-4 col-6">
+
+                      <a href="{% url 'hotels:search' %}" class="quick-action">
+
+                          🏨
+
+                          <span>Book Hotel</span>
+
+                      </a>
+
+                  </div>
+
+                  <div class="col-md-4 col-6">
+
+                      <a href="{% url 'packages:search' %}" class="quick-action">
+
+                          🎒
+
+                          <span>Book Package</span>
+
+                      </a>
+
+                  </div>
+
+                  <div class="col-md-4 col-6">
+
+                      <a href="{% url 'ai_planner:planner' %}" class="quick-action">
+
+                          🤖
+
+                          <span>AI Planner</span>
+
+                      </a>
+
+                  </div>
+
+                  <div class="col-md-4 col-6">
+
+                      <a href="{% url 'bookings:list' %}" class="quick-action">
+
+                          📋
+
+                          <span>My Bookings</span>
+
+                      </a>
+
+                  </div>
+
+                  <div class="col-md-4 col-6">
+
+                      <a href="{% url 'accounts:profile' %}" class="quick-action">
+
+                          👤
+
+                          <span>My Account </span>
+
+                      </a>
+
+                  </div>
+
+              </div>
+
+          </div>
+
+      </div>
+
+      <!-- ═══ TRAVEL SUMMARY ═══ -->
+      <div class="row g-4 mb-4">
+
+          <div class="col-12">
+
+              <div class="section-card card">
+
+                  <div class="card-header">
+
+                      <i class="bi bi-stars text-primary"></i>
+
+                      Travel Summary
+
+                  </div>
+
+                  <div class="card-body">
+
+                      <div class="row text-center g-4">
+
+                          <div class="col-md-2 col-6">
+                              <h3 class="fw-bold text-primary">
+                                  {{ total_bookings }}
+                              </h3>
+                              <small class="text-muted">
+                                  Total Trips
+                              </small>
+                          </div>
+
+                          <div class="col-md-2 col-6">
+                              <h3 class="fw-bold text-success">
+                                  {{ upcoming_trips }}
+                              </h3>
+                              <small class="text-muted">
+                                  Upcoming
+                              </small>
+                          </div>
+
+                          <div class="col-md-2 col-6">
+                              <h3 class="fw-bold text-info">
+                                  {{ completed_trips }}
+                              </h3>
+                              <small class="text-muted">
+                                  Completed
+                              </small>
+                          </div>
+
+                          <div class="col-md-2 col-6">
+                              <h3 class="fw-bold text-danger">
+                                  {{ cancelled_count }}
+                              </h3>
+                              <small class="text-muted">
+                                  Cancelled
+                              </small>
+                          </div>
+
+                          <div class="col-md-2 col-6">
+                              <h3 class="fw-bold text-warning">
+                                  ₹{{ total_spending|floatformat:0 }}
+                              </h3>
+                              <small class="text-muted">
+                                  Total Spend
+                              </small>
+                          </div>
+
+                          <div class="col-md-2 col-6">
+
+                              {% if favourite_destination %}
+
+                                  <h5 class="fw-bold text-dark">
+
+                                      {{ favourite_destination }}
+
+                                  </h5>
+
+                              {% else %}
+
+                                  <h5 class="fw-bold text-muted">
+
+                                      —
+
+                                  </h5>
+
+                              {% endif %}
+
+                              <small class="text-muted">
+
+                                  Favourite Destination
+
+                              </small>
+
+                          </div>
+
+                      </div>
+
+                  </div>
+
+              </div>
+
+          </div>
+
+      </div>
 
       <!-- ═══ ROW 2: CHARTS — Distribution + Status ═ -->
       <div class="row g-4 mb-4">
@@ -818,6 +1186,70 @@
 
       </div>
       <!-- /ROW 2 -->
+
+      <!-- ═══ Travel Level Card ═══ -->
+      <div class="row g-4 mb-4">
+
+        <div class="col-12">
+
+          <div class="card border-0 shadow-sm">
+
+            <div class="card-body d-flex justify-content-between align-items-center flex-wrap">
+
+              <div>
+
+                <h6 class="text-muted mb-2">
+                  <i class="bi bi-award-fill text-warning"></i>
+                  Travel Level
+                </h6>
+
+                <h3 class="fw-bold mb-1">
+                  {{ travel_level }}
+                </h3>
+
+                {% if next_level %}
+
+                <p class="text-muted mb-0">
+                  Only
+                  <strong>{{ bookings_needed }}</strong>
+                  more booking{{ bookings_needed|pluralize }}
+                  to become
+                  <strong>{{ next_level }}</strong>.
+                </p>
+
+                {% else %}
+
+                <p class="text-success mb-0">
+                  🎉 You've reached the highest travel level!
+                </p>
+
+                {% endif %}
+
+              </div>
+
+              <div class="display-3 text-warning">
+
+                {% if travel_level == "New Explorer" %}
+                  🧭
+                {% elif travel_level == "Explorer" %}
+                  ✈️
+                {% elif travel_level == "Traveller" %}
+                  🌍
+                {% elif travel_level == "Frequent Traveller" %}
+                  🛫
+                {% else %}
+                  👑
+                {% endif %}
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
 
       <!-- ═══ ROW 3: MONTHLY SPENDING LINE CHART ════ -->
       <div class="row g-4 mb-4">
@@ -1161,15 +1593,15 @@
                         <!-- Action row -->
                         <div class="timeline-actions d-flex align-items-center gap-2 flex-wrap">
                           {% if activity.type == 'Flight' %}
-                            <a href="{% url 'bookings:list' %}" class="btn-view">
+                            <a href="{% url 'bookings:detail' activity.reference %}" class="btn-view">
                               <i class="bi bi-eye me-1"></i>View Details
                             </a>
                           {% elif activity.type == 'Hotel' %}
-                            <a href="{% url 'bookings:list' %}" class="btn-view">
+                            <a href="{% url 'hotels:booking_detail' activity.reference %}" class="btn-view">
                               <i class="bi bi-eye me-1"></i>View Details
                             </a>
                           {% else %}
-                            <a href="{% url 'bookings:list' %}" class="btn-view">
+                            <a href="{% url 'packages:booking_detail' activity.reference %}" class="btn-view">
                               <i class="bi bi-eye me-1"></i>View Details
                             </a>
                           {% endif %}
@@ -1330,11 +1762,38 @@
         options: {
           responsive         : true,
           maintainAspectRatio: false,
+          onClick: function (evt, elements) {
+
+              if (!elements.length) return;
+
+              const index = elements[0].index;
+
+              const label = labels[index];
+
+              if (label === "Flights") {
+                  window.location.href = "/bookings/";
+              }
+
+              else if (label === "Hotels") {
+                  window.location.href = "/hotels/";
+              }
+
+              else if (label === "Packages") {
+                  window.location.href = "/packages/";
+              }
+
+          },
           cutout             : '68%',
           plugins: {
             legend: {
               position: 'bottom',
               labels  : { usePointStyle: true, pointStyle: 'circle' },
+            },
+            onHover: function (event, elements) {
+
+                event.native.target.style.cursor =
+                    elements.length ? "pointer" : "default";
+
             },
             tooltip: {
               callbacks: {
@@ -1393,6 +1852,37 @@
         options: {
           responsive         : true,
           maintainAspectRatio: false,
+          onClick: function (evt, elements) {
+
+              if (!elements.length) return;
+
+              const index = elements[0].index;
+
+              const label = filteredLabels[index];
+
+              if (label === "Pending") {
+                  window.location.href = "/bookings/?status=pending";
+              }
+
+              else if (label === "Confirmed") {
+                  window.location.href = "/bookings/?status=confirmed";
+              }
+
+              else if (label === "Cancelled") {
+                  window.location.href = "/bookings/?status=cancelled";
+              }
+
+              else if (label === "Completed") {
+                  window.location.href = "/bookings/?status=completed";
+              }
+
+          },
+          onHover: function (event, elements) {
+
+              event.native.target.style.cursor =
+                  elements.length ? "pointer" : "default";
+
+          },
           plugins: {
             legend: {
               position: 'bottom',
@@ -1446,6 +1936,25 @@
         options: {
           responsive         : true,
           maintainAspectRatio: false,
+          onClick: function (evt, elements) {
+
+              if (!elements.length) return;
+
+              const index = elements[0].index;
+
+              const month = labels[index];
+
+              window.location.href =
+                  "/bookings/?month=" + encodeURIComponent(month);
+
+          },
+
+          onHover: function (event, elements) {
+
+              event.native.target.style.cursor =
+                  elements.length ? "pointer" : "default";
+
+          },
           interaction        : { mode: 'index', intersect: false },
           scales: {
             x: {

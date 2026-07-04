@@ -226,17 +226,67 @@ def create_booking(request, flight_id):
 @login_required
 def booking_list(request):
 
+    status = request.GET.get("status")
+    month = request.GET.get("month")
+
     flight_bookings = Booking.objects.filter(
         user=request.user
     ).order_by('-created_at')
 
+    if status:
+        flight_bookings = flight_bookings.filter(
+            booking_status=status
+        )
+
     hotel_bookings = HotelBooking.objects.filter(
         user=request.user
-    ).order_by('-created_at')
+    )
+
+    if status:
+        hotel_bookings = hotel_bookings.filter(
+            booking_status=status
+        )
+
+    hotel_bookings = hotel_bookings.order_by('-created_at')
 
     package_bookings = PackageBooking.objects.filter(
         user=request.user
-    ).order_by('-created_at')
+    )
+
+    if status:
+        package_bookings = package_bookings.filter(
+            booking_status=status
+        )
+
+    package_bookings = package_bookings.order_by('-created_at')
+
+    if month:
+
+        try:
+
+            month_date = datetime.strptime(
+                month,
+                "%b %Y"
+            )
+
+            flight_bookings = flight_bookings.filter(
+                travel_date__year=month_date.year,
+                travel_date__month=month_date.month
+            )
+
+            hotel_bookings = hotel_bookings.filter(
+                check_in_date__year=month_date.year,
+                check_in_date__month=month_date.month
+            )
+
+            package_bookings = package_bookings.filter(
+                travel_date__year=month_date.year,
+                travel_date__month=month_date.month
+            )
+
+        except:
+
+            pass
 
     context = {
         'flight_bookings': flight_bookings,
