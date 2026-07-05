@@ -1082,7 +1082,7 @@ body { background: var(--surface); }
   <div class="te-section">
     <div class="te-section-title"><i class="fa-solid fa-bolt"></i> Quick Actions</div>
     <div class="te-action-grid">
-      <a href="{% url 'bookings:list' %}" class="te-action-card">
+      <a href="{% url 'flights:search' %}" class="te-action-card">
         <i class="fa-solid fa-plane"></i>
         <span>Manage Flights</span>
       </a>
@@ -1094,13 +1094,14 @@ body { background: var(--surface); }
         <i class="fa-solid fa-box-open"></i>
         <span>Manage Packages</span>
       </a>
-      <a href="/admin/auth/user/" class="te-action-card">
-        <i class="fa-solid fa-users"></i>
-        <span>Manage Users</span>
+      <a href="/admin/accounts/user/" class="te-action-card">
+          <i class="fa-solid fa-users"></i>
+          <span>Manage Users</span>
       </a>
+
       <a href="/admin/payments/payment/" class="te-action-card">
-        <i class="fa-solid fa-credit-card"></i>
-        <span>Manage Payments</span>
+          <i class="fa-solid fa-credit-card"></i>
+          <span>Manage Payments</span>
       </a>
       <a href="{% url 'dashboard:home' %}" class="te-action-card">
         <i class="fa-solid fa-chart-pie"></i>
