@@ -244,6 +244,40 @@ Flight Details
 
     </div>
 
+    {% if predicted_price %}
+
+    <div class="card mt-4 shadow-sm border-primary">
+
+        <div class="card-header bg-primary text-white">
+            🤖 TripEase AI Fare Prediction
+        </div>
+
+        <div class="card-body">
+
+            <table class="table table-borderless mb-0">
+
+                <tr>
+                    <th width="45%">Current Fare</th>
+                    <td>
+                        ₹ {{ total_price|floatformat:0 }}
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>Predicted Fare</th>
+                    <td>
+                        ₹ {{ predicted_price|floatformat:0 }}
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
     <!-- BOOK NOW -->
     <div style="margin-top:30px;">
 

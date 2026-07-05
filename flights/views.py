@@ -6,6 +6,7 @@ from .realism import format_duration_minutes, get_route_price
 from django.db.models import Avg
 from reviews.models import FlightReview
 from bookings.models import Booking
+from ml.fare_service import fare_predictor
 
 
 def flight_search(request):
@@ -330,6 +331,40 @@ def flight_detail(request, flight_id):
 
         can_review = booking_exists and not already_reviewed
 
+    # ==================================
+    # AI Fare Prediction
+    # ==================================
+
+    predicted_price = None
+
+    try:
+
+        predicted_price = fare_predictor.predict(
+
+            source=flight.source.city,
+
+            destination=(
+                second_leg.destination.city
+                if second_leg
+                else flight.destination.city
+            ),
+
+            stops=1 if second_leg else 0,
+
+            duration_minutes=total_duration,
+
+            departure_date=selected_departure_date,
+
+            departure_hour=flight.departure_time.hour,
+
+            airline=flight.airline,
+
+        )
+
+    except Exception as e:
+
+        print("AI Prediction Error:", e)
+
     context = {
         'flight': flight,
         'second_leg': second_leg,
@@ -351,6 +386,7 @@ def flight_detail(request, flight_id):
         "reviews": reviews,
         "can_review": can_review,
         "already_reviewed": already_reviewed,
+        "predicted_price": predicted_price,
     }
 
     return render(
