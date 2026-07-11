@@ -16,7 +16,7 @@ def planner_home(request):
             budget = form.cleaned_data["budget"]
             days = form.cleaned_data["days"]
             interests = form.cleaned_data["interests"]
-
+            
             planner_output = generate_trip_plan(
                 destination=destination,
                 budget=budget,

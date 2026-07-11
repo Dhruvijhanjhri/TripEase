@@ -22,4 +22,9 @@ urlpatterns = [
         exports.export_pdf,
         name="export_pdf",
     ),
+    path(
+        "analytics/bookings/",
+        views.booking_trend,
+        name="booking_trend",
+    ),
 ]

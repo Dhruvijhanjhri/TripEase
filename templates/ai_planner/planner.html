@@ -2,17 +2,180 @@
 
 {% block content %}
 
-<h2>AI Travel Planner</h2>
+<div class="container py-5">
 
-<p>
-    <a href="{% url 'ai_planner:history' %}">My Plans</a>
-</p>
+    <div class="row justify-content-center">
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
+        <div class="col-lg-9 col-xl-8">
 
-    <button type="submit">Generate Plan</button>
-</form>
+            <div class="card shadow-lg border-0 rounded-4 p-2">
+
+                <div class="card-body p-5">
+
+                    <div class="text-center mb-5">
+
+                        <h1 class="display-4 fw-bold">
+
+                            ✈️ AI Travel Planner
+
+                        </h1>
+
+                        <p class="lead text-muted">
+
+                            Create your personalized trip in seconds using
+                            Google Gemini AI.
+
+                        </p>
+
+                        <p class="text-muted mb-0">
+                            Let Gemini AI create your perfect itinerary
+                            based on your destination, budget and interests.
+                        </p>
+
+                    </div>
+
+                    <form method="POST">
+
+                        {% csrf_token %}
+
+                        <div class="mb-4">
+
+                            <label class="form-label fw-semibold">
+                                📍 Destination
+                            </label>
+
+                            {{ form.destination }}
+
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-md-6 mb-4">
+
+                                <label class="form-label fw-semibold">
+                                    💰 Budget (₹)
+                                </label>
+
+                                <div class="form-text">
+                                    AI will recommend hotels and packages within your budget.
+                                </div>
+
+                                {{ form.budget }}
+
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+
+                                <label class="form-label fw-semibold">
+                                    📅 Number of Days
+                                </label>
+                                <div class="form-text">
+                                    Plan trips from 1 to 30 days.
+                                </div>
+
+                                {{ form.days }}
+
+                            </div>
+
+                        </div>
+
+                        <div class="mb-4">
+
+                            <label class="form-label fw-semibold">
+                                ❤️ Interests
+                            </label>
+
+                            {{ form.interests }}
+
+                            <small class="text-muted">
+                                Example: Snow, Cafes, Photography, Nature, Adventure
+                            </small>
+
+                        </div>
+
+                        <div class="row text-center mt-5">
+
+                            <div class="col-md-4 mb-3">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body">
+                                        <h1>🤖</h1>
+                                        <h5>Gemini AI</h5>
+                                        <p class="text-muted">
+                                            Personalized travel itineraries generated using Google's Gemini AI.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body">
+                                        <h1>🏨</h1>
+                                        <h5>Smart Hotels</h5>
+                                        <p class="text-muted">
+                                            Automatically recommends hotels that fit your budget.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body">
+                                        <h1>🎒</h1>
+                                        <h5>Travel Packages</h5>
+                                        <p class="text-muted">
+                                            Finds matching travel packages based on your interests.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="d-grid gap-3">
+
+                            <button
+                                class="btn btn-primary btn-lg w-100 rounded-pill shadow-sm"
+                                type="submit"
+                                id="generateBtn">
+
+                                ✨ Generate Smart Trip
+
+                            </button>
+
+                            <a href="{% url 'ai_planner:history' %}"
+                               class="btn btn-outline-secondary">
+
+                                📋 My Saved Plans
+
+                            </a>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+<script>
+document.querySelector("form").addEventListener("submit", function () {
+
+    const btn = document.getElementById("generateBtn");
+
+    btn.disabled = true;
+
+    btn.innerHTML = `
+        <span class="spinner-border spinner-border-sm me-2"></span>
+        Gemini AI is planning your trip...
+    `;
+});
+</script>
 
 {% endblock %}

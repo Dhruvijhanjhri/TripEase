@@ -1,5 +1,5 @@
 from decimal import Decimal
-
+from .gemini_service import generate_ai_itinerary
 from hotels.models import Hotel
 from packages.models import TravelPackage
 
@@ -189,8 +189,8 @@ def estimate_total_cost(hotel_cost, package_cost, budget):
 
     return total
 
-
 def generate_trip_plan(destination, budget, days, interests):
+
     hotels, hotel_ids, hotel_cost = get_matching_hotels(
         destination,
         budget,
@@ -204,9 +204,10 @@ def generate_trip_plan(destination, budget, days, interests):
         interests
     )
 
-    itinerary_text = build_day_wise_plan(
+    itinerary_text = generate_ai_itinerary(
         destination,
         days,
+        budget,
         interests
     )
 

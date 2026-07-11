@@ -1,57 +1,411 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<style>
 
-<h2>Trip Plan</h2>
+.trip-card{
+    border:none;
+    border-radius:20px;
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+}
 
-<p><strong>Destination:</strong> {{ trip.destination }}</p>
-<p><strong>Budget:</strong> ₹{{ trip.budget }}</p>
-<p><strong>Days:</strong> {{ trip.days }}</p>
-<p><strong>Interests:</strong> {{ trip.interests }}</p>
-<p><strong>Estimated Cost:</strong> ₹{{ trip.estimated_cost }}</p>
+.section-title{
+    font-weight:700;
+    color:#0d6efd;
+    margin-bottom:20px;
+}
 
-<h3>Generated Itinerary</h3>
-<pre>{{ trip.generated_plan }}</pre>
+.markdown-body{
+    font-size:16px;
+    line-height:1.8;
+}
 
-<h3>Recommended Hotels</h3>
-{% if hotels %}
-    <ul>
-        {% for hotel in hotels %}
-            <li>
-                <strong>{{ hotel.name }}</strong> - {{ hotel.city }}
-                | Rating: {{ hotel.user_rating }}
-            </li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>No hotel recommendations found.</p>
-{% endif %}
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3{
+    margin-top:30px;
+    margin-bottom:15px;
+    font-weight:700;
+}
 
-<h3>Recommended Packages</h3>
-{% if packages %}
-    <ul>
-        {% for package in packages %}
-            <li>
-                <strong>{{ package.name }}</strong> - {{ package.destination }}
-                | ₹{{ package.price }}
-                | {{ package.duration_days }} days
-                {% if package.is_budget_friendly %}
-                    | Budget-friendly
-                {% else %}
-                    | Above current budget
-                {% endif %}
-            </li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>No package recommendations found.</p>
-{% endif %}
+.markdown-body ul{
+    padding-left:20px;
+}
 
-<hr>
+.markdown-body li{
+    margin-bottom:8px;
+}
 
-<p>
-    <a href="{% url 'ai_planner:planner' %}">Plan Another Trip</a> |
-    <a href="{% url 'ai_planner:history' %}">View My Plans</a>
-</p>
+.summary-box{
+    border-radius:15px;
+    background:#f8f9fa;
+    padding:20px;
+}
+
+</style>
+
+<div class="container-fluid py-5 px-lg-5">
+
+    <!-- Header -->
+
+    <div class="card shadow-lg border-0 rounded-4 mb-4">
+
+        <div class="text-center mb-5">
+
+            <h1 class="fw-bold text-primary">
+
+            ✈️ Your AI Trip is Ready
+
+            </h1>
+
+            <p class="text-muted">
+
+            Generated using Google Gemini AI
+
+            </p>
+
+        </div>
+
+        <div class="row text-center mb-4">
+
+        <div class="col-md-3">
+        <div class="summary-box">
+
+        📍<br>
+
+        <h6>Destination</h6>
+
+        <b>{{ trip.destination }}</b>
+
+        </div>
+        </div>
+
+        <div class="col-md-3">
+        <div class="summary-box">
+
+        💰<br>
+
+        <h6>Budget</h6>
+
+        <b>₹{{ trip.budget }}</b>
+
+        </div>
+        </div>
+
+        <div class="col-md-3">
+        <div class="summary-box">
+
+        📅<br>
+
+        <h6>Duration</h6>
+
+        <b>{{ trip.days }} Days</b>
+
+        </div>
+        </div>
+
+        <div class="col-md-3">
+        <div class="summary-box">
+
+        💵<br>
+
+        <h6>Estimated Cost</h6>
+
+        <b class="text-success">
+
+        ₹{{ trip.estimated_cost }}
+
+        </b>
+
+        </div>
+        </div>
+
+        </div>
+
+
+    <!-- Interests -->
+
+    <div class="alert alert-info rounded-4 shadow-sm">
+
+        <strong>❤️ Interests:</strong>
+
+        {{ trip.interests }}
+
+    </div>
+
+
+    <!-- AI Itinerary -->
+
+    <div class="card trip-card mt-4">
+
+        <div class="card-body">
+
+            <h4 class="section-title">
+                🤖 AI Generated Itinerary
+            </h4>
+
+            <div class="markdown-body">
+
+                {{ trip.generated_plan|safe }}
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Hotels -->
+
+    <h3 class="section-title mt-5">
+        🏨 Recommended Hotels
+    </h3>
+
+    <div class="row">
+
+    {% for hotel in hotels %}
+
+    <div class="col-md-4 mb-4">
+
+    <div class="card recommend-card">
+
+    <div class="card-body text-center">
+
+    <div class="recommend-icon">
+    🏨
+    </div>
+
+    <h5 class="mt-3">
+    {{ hotel.name }}
+    </h5>
+
+    <p class="text-muted mb-1">
+
+    {{ hotel.city }}
+
+    </p>
+
+    <p class="rating">
+
+    ⭐ {{ hotel.user_rating }}
+
+    </p>
+
+    <p class="price">
+
+    ₹{{ hotel.price_per_night }}/night
+
+    </p>
+
+    <p>
+
+    {{ hotel.hotel_type }}
+
+    </p>
+
+    <a href="{% url 'hotels:detail' hotel.id %}"
+    class="btn btn-primary btn-sm">
+
+    View Hotel
+
+    </a>
+
+    </div>
+
+    </div>
+
+    </div>
+
+    {% empty %}
+
+    <div class="col-12">
+
+    <div class="alert alert-warning">
+
+    No hotels matched your budget.
+    Try increasing your budget or choosing nearby locations.
+
+    </div>
+
+    </div>
+
+    {% endfor %}
+
+    </div>
+
+
+    <!-- Packages -->
+
+    <div class="card shadow-sm border-0 mt-4">
+        <div class="card-body">
+
+            <h4 class="fw-bold mb-4">
+                🎒 Recommended Travel Packages
+            </h4>
+
+            {% if packages %}
+
+                <div class="row">
+
+                    {% for package in packages %}
+
+                    <div class="col-md-6 col-lg-4 mb-4">
+
+                        <div class="card h-100 border-0 shadow-sm">
+
+                            <div class="card-body">
+
+                                <h5 class="fw-bold">
+                                    {{ package.name }}
+                                </h5>
+
+                                <p class="text-muted mb-2">
+                                    📍 {{ package.destination }}
+                                </p>
+
+                                <span class="badge bg-primary">
+                                    {{ package.duration_days }} Days
+                                </span>
+
+                                <br><br>
+
+                                <h4 class="text-success">
+                                    ₹{{ package.price }}
+                                </h4>
+
+                                <p>
+
+                                    {% if package.is_budget_friendly %}
+
+                                        <span class="badge bg-success">
+                                            Budget Friendly
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="badge bg-warning text-dark">
+                                            Premium Package
+                                        </span>
+
+                                    {% endif %}
+
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <div class="alert alert-warning">
+
+                    No matching packages found for this destination.
+
+                </div>
+
+            {% endif %}
+
+        </div>
+    </div>
+
+    <!-- Buttons -->
+
+    <div class="text-center mt-5">
+
+        <a href="{% url 'ai_planner:planner' %}"
+
+           class="btn btn-primary btn-lg rounded-pill me-3">
+
+            ✨ Plan Another Trip
+
+        </a>
+
+        <a href="{% url 'ai_planner:history' %}"
+
+           class="btn btn-outline-primary btn-lg rounded-pill">
+
+            📋 View My Plans
+
+        </a>
+
+    </div>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<script>
+const container = document.getElementById("itinerary-content");
+container.innerHTML = marked.parse(container.textContent);
+</script>
+<style>
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3{
+    margin-top:25px;
+    font-weight:700;
+}
+
+.markdown-body ul{
+    padding-left:25px;
+}
+
+.markdown-body li{
+    margin-bottom:8px;
+}
+
+.markdown-body p{
+    line-height:1.8;
+}
+
+.markdown-body hr{
+    margin:30px 0;
+}
+
+.markdown-body strong{
+    color:#0d6efd;
+}
+.recommend-card{
+    border:none;
+    border-radius:18px;
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+    transition:.3s;
+    height:100%;
+}
+
+.recommend-card:hover{
+    transform:translateY(-6px);
+}
+
+.recommend-icon{
+    font-size:45px;
+}
+
+.price{
+    color:#198754;
+    font-size:20px;
+    font-weight:700;
+}
+
+.rating{
+    color:#f39c12;
+    font-weight:600;
+}
+
+.badge-budget{
+    background:#198754;
+    color:white;
+}
+
+.badge-expensive{
+    background:#dc3545;
+    color:white;
+}
+</style>
 
 {% endblock %}

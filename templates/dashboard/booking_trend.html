@@ -1,0 +1,562 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <h2 class="mb-4">
+        📈 Booking Trend Analysis
+    </h2>
+
+    <div class="card shadow-sm mb-5">
+
+        <div class="card-body">
+
+            <h4 class="mb-3">
+                Flight Bookings
+            </h4>
+
+            <canvas id="flightChart"></canvas>
+
+        </div>
+
+    </div>
+
+
+    <div class="card shadow-sm mb-5">
+
+        <div class="card-body">
+
+            <h4 class="mb-3">
+                Hotel Bookings
+            </h4>
+
+            <canvas id="hotelChart"></canvas>
+
+        </div>
+
+    </div>
+
+
+    <div class="card shadow-sm">
+
+        <div class="card-body">
+
+            <h4 class="mb-3">
+                Package Bookings
+            </h4>
+
+            <canvas id="packageChart"></canvas>
+
+        </div>
+
+    </div>
+
+</div>
+<hr class="my-5">
+
+<div class="card shadow-sm">
+
+    <div class="card-header">
+        <h4 class="mb-0">✈ Most Popular Flight Routes</h4>
+    </div>
+
+    <div class="card-body">
+
+        <table class="table table-striped">
+
+            <thead>
+
+                <tr>
+                    <th>Route</th>
+                    <th>Total Bookings</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for route in popular_routes %}
+
+                <tr>
+
+                    <td>
+                        {{ route.flight__source__city }}
+                        →
+                        {{ route.flight__destination__city }}
+                    </td>
+
+                    <td>
+                        {{ route.total }}
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+
+                    <td colspan="2">
+                        No booking data available.
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+<hr class="my-5">
+
+<div class="card shadow-sm">
+
+    <div class="card-header">
+        <h4 class="mb-0">
+            🛫 Most Popular Airlines
+        </h4>
+    </div>
+
+    <div class="card-body">
+
+        <table class="table table-striped">
+
+            <thead>
+
+                <tr>
+
+                    <th>Airline</th>
+
+                    <th>Total Bookings</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for airline in popular_airlines %}
+
+                <tr>
+
+                    <td>
+
+                        {{ airline.flight__airline }}
+
+                    </td>
+
+                    <td>
+
+                        {{ airline.total }}
+
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+
+                    <td colspan="2">
+
+                        No booking data available.
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<hr class="my-5">
+
+<h3 class="mb-4">
+    🔥 Peak Booking Analysis
+</h3>
+
+<div class="row">
+
+    <div class="col-md-6">
+
+        <div class="card shadow-sm">
+
+            <div class="card-header">
+
+                Peak Booking Weekday
+
+            </div>
+
+            <div class="card-body">
+
+                <canvas id="weekdayChart"></canvas>
+
+                <hr>
+
+                <strong>
+
+                    Most bookings occur on
+
+                    {{ peak_day }}
+
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-6">
+
+        <div class="card shadow-sm">
+
+            <div class="card-header">
+
+                Peak Booking Hour
+
+            </div>
+
+            <div class="card-body">
+
+                <canvas id="hourChart"></canvas>
+
+                <hr>
+
+                <strong>
+
+                    Peak booking hour:
+
+                    {{ peak_hour }}:00
+
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+<hr class="my-5">
+
+<div class="card shadow-sm">
+
+    <div class="card-header">
+
+        <h4>
+
+            📈 Revenue Forecast (Next 30 Days)
+
+        </h4>
+
+    </div>
+
+    <div class="card-body">
+
+        <canvas id="forecastChart"></canvas>
+
+    </div>
+
+</div>
+
+<hr class="my-5">
+
+<h2 class="mb-4">
+    Revenue Forecast (Next 30 Days)
+</h2>
+
+<div class="card shadow-sm">
+
+    <div class="card-body">
+
+        <canvas id="revenueForecastChart" height="110"></canvas>
+
+    </div>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+new Chart(
+    document.getElementById("flightChart"),
+    {
+        type: "line",
+
+        data: {
+
+            labels: {{ flight_labels|safe }},
+
+            datasets: [
+
+                {
+
+                    label: "Flight Bookings",
+
+                    data: {{ flight_data|safe }},
+
+                    borderWidth: 3,
+
+                    tension: 0.3,
+
+                    fill: false
+
+                }
+
+            ]
+        }
+    }
+);
+
+
+new Chart(
+    document.getElementById("hotelChart"),
+    {
+
+        type: "bar",
+
+        data: {
+
+            labels: {{ hotel_labels|safe }},
+
+            datasets: [
+
+                {
+
+                    label: "Hotel Bookings",
+
+                    data: {{ hotel_data|safe }}
+
+                }
+
+            ]
+        }
+
+    }
+);
+
+
+new Chart(
+    document.getElementById("packageChart"),
+    {
+
+        type: "line",
+
+        data: {
+
+            labels: {{ package_labels|safe }},
+
+            datasets: [
+
+                {
+
+                    label: "Package Bookings",
+
+                    data: {{ package_data|safe }},
+
+                    borderWidth: 3,
+
+                    tension: 0.3
+
+                }
+
+            ]
+
+        }
+
+    }
+);
+
+new Chart(document.getElementById("weekdayChart"),{
+
+    type:"bar",
+
+    data:{
+
+        labels: {{ weekday_labels|safe }},
+
+        datasets:[{
+
+            label:"Bookings",
+
+            data: {{ weekday_data|safe }}
+
+        }]
+
+    }
+
+});
+
+new Chart(document.getElementById("hourChart"),{
+
+    type:"line",
+
+    data:{
+
+        labels: {{ hour_labels|safe }},
+
+        datasets:[{
+
+            label:"Bookings",
+
+            data: {{ hour_data|safe }}
+
+        }]
+
+    }
+
+});
+
+new Chart(
+
+document.getElementById("forecastChart"),
+
+{
+
+type:"line",
+
+data:{
+
+labels: {{ forecast_labels|safe }},
+
+datasets:[{
+
+label:"Predicted Revenue",
+
+data: {{ forecast_data|safe }},
+
+borderWidth:3,
+
+fill:false
+
+}]
+
+}
+
+}
+
+);
+
+const forecastCtx =
+document.getElementById(
+    "revenueForecastChart"
+).getContext("2d");
+
+new Chart(forecastCtx, {
+
+    type: "line",
+
+    data: {
+
+        labels: {{ forecast_labels|safe }},
+
+        datasets: [
+
+            {
+                label: "Predicted Revenue",
+
+                data: {{ forecast_data|safe }},
+
+                borderColor: "#2563eb",
+
+                backgroundColor: "rgba(37,99,235,.15)",
+
+                borderWidth: 3,
+
+                tension: .35,
+
+                fill: false
+            },
+
+            {
+                label: "Upper Forecast",
+
+                data: {{ forecast_upper|safe }},
+
+                borderColor: "#16a34a",
+
+                borderDash: [6,6],
+
+                tension: .35,
+
+                fill: false
+            },
+
+            {
+                label: "Lower Forecast",
+
+                data: {{ forecast_lower|safe }},
+
+                borderColor: "#dc2626",
+
+                borderDash: [6,6],
+
+                tension: .35,
+
+                fill: false
+            }
+
+        ]
+    },
+
+    options: {
+
+        responsive: true,
+
+        interaction: {
+
+            intersect: false,
+
+            mode: "index"
+
+        },
+
+        plugins: {
+
+            legend: {
+
+                position: "top"
+
+            }
+
+        },
+
+        scales: {
+
+            y: {
+
+                beginAtZero: true,
+
+                title: {
+
+                    display: true,
+
+                    text: "Revenue (₹)"
+
+                }
+
+            }
+
+        }
+
+    }
+
+});
+
+
+</script>
+
+{% endblock %}

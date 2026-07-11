@@ -244,39 +244,206 @@ Flight Details
 
     </div>
 
-    {% if predicted_price %}
-
-    <div class="card mt-4 shadow-sm border-primary">
+    {% if weather %}
+    <div class="card shadow-sm border-0 mt-4">
 
         <div class="card-header bg-primary text-white">
-            🤖 TripEase AI Fare Prediction
+            🌤 Destination Weather
         </div>
 
         <div class="card-body">
 
-            <table class="table table-borderless mb-0">
+            <div class="row align-items-center">
 
-                <tr>
-                    <th width="45%">Current Fare</th>
-                    <td>
-                        ₹ {{ total_price|floatformat:0 }}
-                    </td>
-                </tr>
+                <div class="col-md-3 text-center">
 
-                <tr>
-                    <th>Predicted Fare</th>
-                    <td>
-                        ₹ {{ predicted_price|floatformat:0 }}
-                    </td>
-                </tr>
+                    <img
+                        src="https://openweathermap.org/img/wn/{{ weather.icon }}@2x.png"
+                        width="80"
+                    >
 
-            </table>
+                </div>
+
+                <div class="col-md-9">
+
+                    <h4>{{ weather.city }}</h4>
+
+                    <p class="mb-1">
+                        <strong>{{ weather.description }}</strong>
+                    </p>
+
+                    <p class="mb-1">
+                        🌡 Temperature:
+                        {{ weather.temperature }}°C
+                    </p>
+
+                    <p class="mb-1">
+                        🤗 Feels Like:
+                        {{ weather.feels_like }}°C
+                    </p>
+
+                    <p class="mb-1">
+                        💧 Humidity:
+                        {{ weather.humidity }}%
+                    </p>
+
+                    <p class="mb-0">
+                        💨 Wind:
+                        {{ weather.wind_speed }} km/h
+                    </p>
+
+                </div>
+
+            </div>
 
         </div>
 
     </div>
-
     {% endif %}
+
+            {% if predicted_price %}
+
+                <div class="card shadow-sm border-0 mt-4">
+
+                    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+
+                        <div>
+                            🤖 <strong>TripEase AI Fare Insight</strong>
+                        </div>
+
+                        <div>
+
+                            {% if deal_status == "excellent" %}
+                                <span class="badge bg-success">Excellent Deal</span>
+
+                            {% elif deal_status == "good" %}
+                                <span class="badge bg-primary">Good Deal</span>
+
+                            {% elif deal_status == "fair" %}
+                                <span class="badge bg-warning text-dark">Fair Price</span>
+
+                            {% else %}
+                                <span class="badge bg-danger">Expensive</span>
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                    <div class="card-body">
+
+                        <div class="row text-center">
+
+                            <div class="col-md-4">
+
+                                <h6 class="text-muted">
+                                    Current Fare
+                                </h6>
+
+                                <h4 class="fw-bold">
+                                    ₹ {{ total_price|floatformat:0 }}
+                                </h4>
+
+                            </div>
+
+                            <div class="col-md-4">
+
+                                <h6 class="text-muted">
+                                    AI Predicted Fare
+                                </h6>
+
+                                <h4 class="fw-bold text-primary">
+                                    ₹ {{ predicted_price|floatformat:0 }}
+                                </h4>
+
+                            </div>
+
+                            <div class="col-md-4">
+
+                                <h6 class="text-muted">
+                                    Difference
+                                </h6>
+
+                                {% if price_difference > 0 %}
+
+                                    <h4 class="text-success">
+
+                                        ₹ {{ price_difference|floatformat:0 }}
+
+                                    </h4>
+
+                                    <small>
+                                        Cheaper than expected
+                                    </small>
+
+                                {% elif price_difference < 0 %}
+
+                                    <h4 class="text-danger">
+
+                                        ₹ {{ price_difference|floatformat:0|cut:"-" }}
+
+                                    </h4>
+
+                                    <small>
+                                        Costlier than expected
+                                    </small>
+
+                                {% else %}
+
+                                    <h4>₹0</h4>
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                        <hr>
+
+                        <div class="row">
+
+                            <div class="col-md-6">
+
+                                <strong>Price Difference</strong>
+
+                                <br>
+
+                                {{ price_difference_percent }}%
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <strong>AI Recommendation</strong>
+
+                                <br>
+
+                                {{ deal_message }}
+
+                            </div>
+
+                        </div>
+
+                        <hr>
+
+                        <div class="alert alert-light mb-0">
+
+                            <strong>AI Insight</strong>
+
+                            <br>
+
+                            This prediction is generated using a Machine Learning model
+                            trained on historical airline pricing data. It compares today's
+                            fare with expected market pricing to help you decide whether to
+                            book now or wait.
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            {% endif %}
 
     <!-- BOOK NOW -->
     <div style="margin-top:30px;">

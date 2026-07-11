@@ -1,16 +1,22 @@
 from collections import defaultdict, Counter
 from datetime import datetime, date, timedelta
-
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import get_user_model
 from django.db.models import Sum, Count, Avg, Q
 from django.shortcuts import render
 from django.utils import timezone
-
 from bookings.models import Booking
 from hotels.models import HotelBooking
 from packages.models import PackageBooking
 from payments.models import Payment
+from django.db.models import Count, Sum
+from django.db.models.functions import TruncDate
+from bookings.models import Booking
+from hotels.models import HotelBooking
+from packages.models import PackageBooking
+from django.contrib.admin.views.decorators import staff_member_required
+import pandas as pd
+from ml.revenue_forecaster import RevenueForecaster
 
 User = get_user_model()
 
@@ -466,3 +472,199 @@ def dashboard_home(request):
     }
 
     return render(request, 'dashboard/dashboard.html', context)
+
+@staff_member_required
+def booking_trend(request):
+
+    flight_trend = (
+        Booking.objects
+        .annotate(day=TruncDate("created_at"))
+        .values("day")
+        .annotate(total=Count("id"))
+        .order_by("day")
+    )
+
+    hotel_trend = (
+        HotelBooking.objects
+        .annotate(day=TruncDate("created_at"))
+        .values("day")
+        .annotate(total=Count("id"))
+        .order_by("day")
+    )
+
+    package_trend = (
+        PackageBooking.objects
+        .annotate(day=TruncDate("created_at"))
+        .values("day")
+        .annotate(total=Count("id"))
+        .order_by("day")
+    )
+
+    popular_routes = (
+        Booking.objects
+        .filter(flight__isnull=False)
+        .values(
+            "flight__source__city",
+            "flight__destination__city",
+        )
+        .annotate(total=Count("id"))
+        .order_by("-total")[:10]
+    
+    )
+
+    popular_airlines = (
+        Booking.objects
+        .filter(flight__isnull=False)
+        .values("flight__airline")
+        .annotate(total=Count("id"))
+        .order_by("-total")[:10]
+    )
+
+    # ---------------------------------------
+    # Peak Booking Analysis
+    # ---------------------------------------
+
+    weekday_counter = Counter()
+    hour_counter = Counter()
+
+    for booking in Booking.objects.all():
+
+        weekday_counter[
+            booking.created_at.strftime("%A")
+        ] += 1
+
+        hour_counter[
+            booking.created_at.hour
+        ] += 1
+
+    weekday_order = [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday",
+    ]
+
+    weekday_labels = weekday_order
+
+    weekday_data = [
+        weekday_counter.get(day, 0)
+        for day in weekday_order
+    ]
+
+    hour_labels = list(range(24))
+
+    hour_data = [
+        hour_counter.get(hour, 0)
+        for hour in hour_labels
+    ]
+
+    peak_day = max(
+        weekday_counter,
+        key=weekday_counter.get,
+        default="N/A"
+    )
+
+    peak_hour = max(
+        hour_counter,
+        key=hour_counter.get,
+        default=0
+    )
+
+    # ----------------------------------------------------
+    # Revenue Forecasting (Weighted Moving Average)
+    # ----------------------------------------------------
+
+    daily_revenue = (
+        Payment.objects
+        .filter(payment_status="success")
+        .annotate(day=TruncDate("payment_date"))
+        .values("day")
+        .annotate(
+            revenue=Sum("amount")
+        )
+        .order_by("day")
+    )
+
+    revenue_history = [
+        float(item["revenue"])
+        for item in daily_revenue
+    ]
+
+    forecast_labels = []
+    forecast_data = []
+    forecast_upper = []
+    forecast_lower = []
+
+    if revenue_history:
+
+        forecaster = RevenueForecaster()
+
+        (
+            forecast_data,
+            forecast_upper,
+            forecast_lower,
+        ) = forecaster.forecast(
+            revenue_history,
+            future_days=30,
+        )
+
+        forecast_labels = [
+            f"Day {i}"
+            for i in range(1, 31)
+        ]
+
+    context = {
+
+        "flight_labels": [
+            x["day"].strftime("%d %b")
+            for x in flight_trend
+        ],
+
+        "flight_data": [
+            x["total"]
+            for x in flight_trend
+        ],
+
+        "hotel_labels": [
+            x["day"].strftime("%d %b")
+            for x in hotel_trend
+        ],
+
+        "hotel_data": [
+            x["total"]
+            for x in hotel_trend
+        ],
+
+        "package_labels": [
+            x["day"].strftime("%d %b")
+            for x in package_trend
+        ],
+
+        "package_data": [
+            x["total"]
+            for x in package_trend
+        ],
+        "popular_routes": popular_routes,
+        "popular_airlines": popular_airlines,
+        "weekday_labels": weekday_labels,
+        "weekday_data": weekday_data,
+
+        "hour_labels": hour_labels,
+        "hour_data": hour_data,
+
+        "peak_day": peak_day,
+        "peak_hour": peak_hour,
+        "forecast_labels": forecast_labels,
+        "forecast_data": forecast_data,
+        "forecast_upper": forecast_upper,
+        "forecast_lower": forecast_lower,
+    }
+
+    return render(
+        request,
+        "dashboard/booking_trend.html",
+        context
+    )

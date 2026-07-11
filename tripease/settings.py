@@ -4,10 +4,20 @@ Django settings for TripEase project.
 
 from pathlib import Path
 import os
+import certifi
+import ssl
 import dj_database_url
 from dotenv import load_dotenv
 
 load_dotenv()
+
+# -----------------------------
+# SSL Certificate Configuration
+# -----------------------------
+os.environ["SSL_CERT_FILE"] = certifi.where()
+os.environ["REQUESTS_CA_BUNDLE"] = certifi.where()
+
+ssl._create_default_https_context = ssl.create_default_context
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -231,4 +241,6 @@ LOGGING = {
 # Live API Keys
 # ============================
 
-AVIATIONSTACK_API_KEY = "14a14cf387cda2f9f08f94ba556dec7a"
+AVIATIONSTACK_API_KEY = os.getenv("AVIATIONSTACK_API_KEY")
+OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")

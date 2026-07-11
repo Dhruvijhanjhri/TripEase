@@ -7,6 +7,7 @@ from django.db.models import Avg
 from reviews.models import FlightReview
 from bookings.models import Booking
 from ml.fare_service import fare_predictor
+from utils.weather import get_weather
 
 
 def flight_search(request):
@@ -365,6 +366,47 @@ def flight_detail(request, flight_id):
 
         print("AI Prediction Error:", e)
 
+    deal_status = None
+    deal_message = None
+    price_difference = None
+    price_difference_percent = None
+
+    if predicted_price:
+
+        current_price = float(total_price)
+
+        price_difference = round(
+            predicted_price - current_price,
+            2
+        )
+
+        price_difference_percent = round(
+            abs(price_difference) / predicted_price * 100,
+            1
+        )
+
+        if current_price <= predicted_price * 0.80:
+            deal_status = "excellent"
+            deal_message = "Excellent Deal! This fare is significantly below the expected market price."
+
+        elif current_price <= predicted_price * 0.95:
+            deal_status = "good"
+            deal_message = "Good Deal! This fare is below the expected market price."
+
+        elif current_price <= predicted_price * 1.10:
+            deal_status = "fair"
+            deal_message = "Fair Price. This fare is close to the expected market price."
+
+        else:
+            deal_status = "expensive"
+            deal_message = "Expensive. This fare is above the expected market price."
+
+    # weather 
+    if second_leg:
+        weather = get_weather(second_leg.destination.city)
+    else:
+        weather = get_weather(flight.destination.city)
+
     context = {
         'flight': flight,
         'second_leg': second_leg,
@@ -387,6 +429,11 @@ def flight_detail(request, flight_id):
         "can_review": can_review,
         "already_reviewed": already_reviewed,
         "predicted_price": predicted_price,
+        "deal_status": deal_status,
+        "deal_message": deal_message,
+        "price_difference": price_difference,
+        "price_difference_percent": price_difference_percent,
+        "weather": weather,
     }
 
     return render(
