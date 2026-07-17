@@ -27,4 +27,9 @@ urlpatterns = [
         views.booking_trend,
         name="booking_trend",
     ),
+    path(
+        "analytics/revenue/",
+        views.revenue_forecast,
+        name="revenue_forecast",
+    ),
 ]

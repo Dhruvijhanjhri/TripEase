@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <div class="card shadow border-0">
+
+        <div class="card-body">
+
+            <h2 class="fw-bold mb-4">
+                Revenue Forecast
+            </h2>
+
+            <canvas id="forecastChart" height="120"></canvas>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+{{ labels|json_script:"labels-data" }}
+{{ revenue_history|json_script:"history-data" }}
+{{ prediction_labels|json_script:"prediction-labels" }}
+{{ predictions|json_script:"prediction-data" }}
+{{ upper|json_script:"upper-data" }}
+{{ lower|json_script:"lower-data" }}
+
+<script>
+
+const historyLabels =
+    JSON.parse(document.getElementById("labels-data").textContent);
+
+const historyRevenue =
+    JSON.parse(document.getElementById("history-data").textContent);
+
+const predictionLabels =
+    JSON.parse(document.getElementById("prediction-labels").textContent);
+
+const predictionRevenue =
+    JSON.parse(document.getElementById("prediction-data").textContent);
+
+const upper =
+    JSON.parse(document.getElementById("upper-data").textContent);
+
+const lower =
+    JSON.parse(document.getElementById("lower-data").textContent);
+
+const labels = historyLabels.concat(predictionLabels);
+
+const historyData =
+    historyRevenue.concat(
+        new Array(predictionRevenue.length).fill(null)
+    );
+
+const forecastData =
+    new Array(historyRevenue.length).fill(null)
+        .concat(predictionRevenue);
+
+const upperBand =
+    new Array(historyRevenue.length).fill(null)
+        .concat(upper);
+
+const lowerBand =
+    new Array(historyRevenue.length).fill(null)
+        .concat(lower);
+
+new Chart(
+    document.getElementById("forecastChart"),
+    {
+
+        type: "line",
+
+        data: {
+
+            labels: labels,
+
+            datasets: [
+
+                {
+                    label: "Historical Revenue",
+                    data: historyData,
+                    borderWidth: 3,
+                    tension: 0.3
+                },
+
+                {
+                    label: "Forecast",
+                    data: forecastData,
+                    borderDash: [6,6],
+                    borderWidth: 3,
+                    tension: 0.3
+                },
+
+                {
+                    label: "Upper Confidence",
+                    data: upperBand,
+                    borderDash: [2,2],
+                    borderWidth: 1
+                },
+
+                {
+                    label: "Lower Confidence",
+                    data: lowerBand,
+                    borderDash: [2,2],
+                    borderWidth: 1
+                }
+
+            ]
+
+        },
+
+        options: {
+
+            responsive: true,
+
+            interaction: {
+                mode: "index",
+                intersect: false
+            },
+
+            plugins: {
+
+                legend: {
+
+                    position: "top"
+
+                }
+
+            }
+
+        }
+
+    }
+
+);
+
+</script>
+
+{% endblock %}

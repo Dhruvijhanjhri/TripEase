@@ -702,6 +702,47 @@ body { background: var(--surface); }
   </div>
 
   <!-- ============================================================
+       SECTION 10 — Quick Actions
+       ============================================================ -->
+  <div class="te-section">
+    <div class="te-section-title"><i class="fa-solid fa-bolt"></i> Quick Actions</div>
+    <div class="te-action-grid">
+      <a href="{% url 'flights:search' %}" class="te-action-card">
+        <i class="fa-solid fa-plane"></i>
+        <span>Manage Flights</span>
+      </a>
+      <a href="{% url 'hotels:search' %}" class="te-action-card">
+        <i class="fa-solid fa-hotel"></i>
+        <span>Manage Hotels</span>
+      </a>
+      <a href="{% url 'packages:search' %}" class="te-action-card">
+        <i class="fa-solid fa-box-open"></i>
+        <span>Manage Packages</span>
+      </a>
+      <a href="/admin/accounts/user/" class="te-action-card">
+          <i class="fa-solid fa-users"></i>
+          <span>Manage Users</span>
+      </a>
+
+      <a href="/admin/payments/payment/" class="te-action-card">
+          <i class="fa-solid fa-credit-card"></i>
+          <span>Manage Payments</span>
+      </a>
+
+      <a href="{% url 'dashboard:booking_trend' %}" class="te-action-card">
+          <i class="fa-solid fa-chart-line"></i>
+          <span>Booking Analytics</span>
+      </a>
+
+      <a href="{% url 'dashboard:booking_trend' %}" class="te-action-card">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>View Reports</span>
+      </a>
+    </div>
+  </div>
+
+
+  <!-- ============================================================
        SECTION 3 — Analytics Charts
        ============================================================ -->
   <div class="te-section">
@@ -1072,40 +1113,6 @@ body { background: var(--surface); }
       </a>
       <a href="/dashboard/export/csv/" class="te-btn te-btn-amber">
         <i class="fa-solid fa-file-csv"></i> CSV
-      </a>
-    </div>
-  </div>
-
-  <!-- ============================================================
-       SECTION 10 — Quick Actions
-       ============================================================ -->
-  <div class="te-section">
-    <div class="te-section-title"><i class="fa-solid fa-bolt"></i> Quick Actions</div>
-    <div class="te-action-grid">
-      <a href="{% url 'flights:search' %}" class="te-action-card">
-        <i class="fa-solid fa-plane"></i>
-        <span>Manage Flights</span>
-      </a>
-      <a href="{% url 'hotels:search' %}" class="te-action-card">
-        <i class="fa-solid fa-hotel"></i>
-        <span>Manage Hotels</span>
-      </a>
-      <a href="{% url 'packages:search' %}" class="te-action-card">
-        <i class="fa-solid fa-box-open"></i>
-        <span>Manage Packages</span>
-      </a>
-      <a href="/admin/accounts/user/" class="te-action-card">
-          <i class="fa-solid fa-users"></i>
-          <span>Manage Users</span>
-      </a>
-
-      <a href="/admin/payments/payment/" class="te-action-card">
-          <i class="fa-solid fa-credit-card"></i>
-          <span>Manage Payments</span>
-      </a>
-      <a href="{% url 'dashboard:home' %}" class="te-action-card">
-        <i class="fa-solid fa-chart-pie"></i>
-        <span>View Reports</span>
       </a>
     </div>
   </div>

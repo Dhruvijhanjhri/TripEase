@@ -2,7 +2,7 @@ from collections import defaultdict, Counter
 from datetime import datetime, date, timedelta
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import get_user_model
-from django.db.models import Sum, Count, Avg, Q
+from django.db.models import Max, Sum, Count, Avg, Q,F
 from django.shortcuts import render
 from django.utils import timezone
 from bookings.models import Booking
@@ -17,12 +17,67 @@ from packages.models import PackageBooking
 from django.contrib.admin.views.decorators import staff_member_required
 import pandas as pd
 from ml.revenue_forecaster import RevenueForecaster
+from .analytics import get_revenue_forecast_data
+from .analytics import get_booking_analytics
+from django.utils import timezone
+from datetime import timedelta
 
 User = get_user_model()
 
 
 @staff_member_required
 def dashboard_home(request):
+
+    # -------------------------------------------------------
+    # Dashboard Filters
+    # -------------------------------------------------------
+
+    period = request.GET.get("period", "all")
+    booking_type = request.GET.get("booking_type", "all")
+    payment_status = request.GET.get("payment_status", "all")
+    booking_status = request.GET.get("booking_status", "all")
+    flight_bookings = Booking.objects.all()
+    hotel_bookings = HotelBooking.objects.all()
+    package_bookings = PackageBooking.objects.all()
+    payments = Payment.objects.all()
+
+    today = timezone.now()
+
+    if period == "today":
+        flight_bookings = flight_bookings.filter(created_at__date=today.date())
+        hotel_bookings = hotel_bookings.filter(created_at__date=today.date())
+        package_bookings = package_bookings.filter(created_at__date=today.date())
+        payments = payments.filter(payment_date__date=today.date())
+
+    elif period == "this_week":
+        start = today - timedelta(days=today.weekday())
+
+        flight_bookings = flight_bookings.filter(created_at__gte=start)
+        hotel_bookings = hotel_bookings.filter(created_at__gte=start)
+        package_bookings = package_bookings.filter(created_at__gte=start)
+        payments = payments.filter(payment_date__gte=start)
+
+    elif period == "this_month":
+
+        flight_bookings = flight_bookings.filter(
+            created_at__month=today.month,
+            created_at__year=today.year
+        )
+
+        hotel_bookings = hotel_bookings.filter(
+            created_at__month=today.month,
+            created_at__year=today.year
+        )
+
+        package_bookings = package_bookings.filter(
+            created_at__month=today.month,
+            created_at__year=today.year
+        )
+
+        payments = payments.filter(
+            payment_date__month=today.month,
+            payment_date__year=today.year
+        )
 
     # ------------------------------------------------------------------
     # Base querysets — unchanged from original
@@ -574,6 +629,193 @@ def booking_trend(request):
     )
 
     # ----------------------------------------------------
+    # Cancellation Analytics
+    # ----------------------------------------------------
+
+    flight_cancelled = Booking.objects.filter(
+        booking_status="cancelled"
+    ).count()
+
+    hotel_cancelled = HotelBooking.objects.filter(
+        booking_status="cancelled"
+    ).count()
+
+    package_cancelled = PackageBooking.objects.filter(
+        booking_status="cancelled"
+    ).count()
+
+    total_cancelled = (
+        flight_cancelled +
+        hotel_cancelled +
+        package_cancelled
+    )
+
+    total_bookings_all = (
+        Booking.objects.count() +
+        HotelBooking.objects.count() +
+        PackageBooking.objects.count()
+    )
+
+    cancellation_rate = (
+        round((total_cancelled / total_bookings_all) * 100, 2)
+        if total_bookings_all else 0
+    )
+
+    refund_total = (
+        Booking.objects.aggregate(
+            total=Sum("refund_amount")
+        )["total"] or 0
+    )
+
+    # ----------------------------------------------------
+    # Customer Analytics
+    # ----------------------------------------------------
+
+    total_customers = Booking.objects.values("user").distinct().count()
+
+    average_booking_value = (
+        Payment.objects.filter(payment_status="success")
+        .aggregate(avg=Avg("amount"))["avg"] or 0
+    )
+
+    repeat_customers = (
+        Booking.objects
+        .values("user")
+        .annotate(total=Count("id"))
+        .filter(total__gt=1)
+        .count()
+    )
+
+    repeat_percentage = (
+        round((repeat_customers / total_customers) * 100, 1)
+        if total_customers else 0
+    )
+
+    top_customers = (
+        Booking.objects
+        .values(
+            "user__first_name",
+            "user__last_name",
+            "user__email",
+        )
+        .annotate(
+            bookings=Count("id"),
+            total_spent=Sum("payment__amount"),
+        )
+        .order_by("-total_spent")[:10]
+    )
+
+    # ----------------------------------------------------
+    # Customer Segmentation
+    # ----------------------------------------------------
+
+    customer_segments = []
+
+    for customer in top_customers:
+
+        spent = float(customer["total_spent"] or 0)
+        bookings = customer["bookings"]
+
+        if bookings >= 15 or spent >= 60000:
+            segment = "VIP"
+
+        elif bookings >= 8:
+            segment = "Frequent"
+
+        elif bookings >= 3:
+            segment = "Returning"
+
+        else:
+            segment = "New"
+
+        customer_segments.append({
+            "name": (
+                f'{customer["user__first_name"]} '
+                f'{customer["user__last_name"]}'
+            ).strip(),
+            "email": customer["user__email"],
+            "bookings": bookings,
+            "spent": spent,
+            "segment": segment,
+        })
+
+    # ----------------------------------------------------
+    # Revenue Distribution
+    # ----------------------------------------------------
+
+    flight_revenue = (
+        Payment.objects.filter(
+            payment_status="success",
+            booking__isnull=False
+        ).aggregate(total=Sum("amount"))["total"] or 0
+    )
+
+    hotel_revenue = (
+        Payment.objects.filter(
+            payment_status="success",
+            hotel_booking__isnull=False
+        ).aggregate(total=Sum("amount"))["total"] or 0
+    )
+
+    package_revenue = (
+        Payment.objects.filter(
+            payment_status="success",
+            package_booking__isnull=False
+        ).aggregate(total=Sum("amount"))["total"] or 0
+    )
+
+    segment_counts = {
+        "VIP": 0,
+        "Frequent": 0,
+        "Returning": 0,
+        "New": 0,
+    }
+
+    for customer in customer_segments:
+        segment_counts[customer["segment"]] += 1
+
+    # ----------------------------------------------------
+    # Booking Status Analytics
+    # ----------------------------------------------------
+
+    booking_status = (
+        Booking.objects
+        .values("booking_status")
+        .annotate(total=Count("id"))
+    )
+
+    status_labels = [
+        item["booking_status"].title()
+        for item in booking_status
+    ]
+
+    status_data = [
+        item["total"]
+        for item in booking_status
+    ]
+
+    # ----------------------------------------------------
+    # Payment Method Analytics
+    # ----------------------------------------------------
+
+    payment_methods = (
+        Payment.objects
+        .filter(payment_status="success")
+        .values("payment_method")
+        .annotate(total=Count("id"))
+    )
+
+    payment_labels = [
+        item["payment_method"].upper()
+        for item in payment_methods
+    ]
+
+    payment_data = [
+        item["total"]
+        for item in payment_methods
+    ]
+
+    # ----------------------------------------------------
     # Revenue Forecasting (Weighted Moving Average)
     # ----------------------------------------------------
 
@@ -615,6 +857,117 @@ def booking_trend(request):
             f"Day {i}"
             for i in range(1, 31)
         ]
+    
+    booking_analytics = get_booking_analytics()
+
+    # -------------------------------
+    # Forecast Accuracy Metrics
+    # -------------------------------
+
+    if len(revenue_history) >= 4:
+
+        actual = revenue_history[-1]
+        predicted = forecast_data[0]
+
+        if actual != 0:
+            mape = abs(actual - predicted) / actual * 100
+            accuracy = round(100 - mape, 2)
+        else:
+            accuracy = 0
+
+    else:
+        accuracy = None
+
+    # -----------------------------
+    # Forecast Evaluation
+    # -----------------------------
+
+    mae = 0
+    rmse = 0
+    mape = 0
+
+    if len(revenue_history) >= 5:
+
+        actual = revenue_history[-4:]
+
+        predicted = forecast_data[:4]
+
+        errors = [
+            abs(a - p)
+            for a, p in zip(actual, predicted)
+        ]
+
+        mae = round(sum(errors) / len(errors), 2)
+
+        rmse = round(
+            (
+                sum((a - p) ** 2 for a, p in zip(actual, predicted))
+                / len(actual)
+            ) ** 0.5,
+            2,
+        )
+
+        percentage_errors = []
+
+        for a, p in zip(actual, predicted):
+
+            if a != 0:
+
+                percentage_errors.append(
+                    abs((a - p) / a)
+                )
+
+        if percentage_errors:
+
+            mape = round(
+                sum(percentage_errors)
+                / len(percentage_errors)
+                * 100,
+                2,
+            )
+
+    # ----------------------------------------------------
+    # Cancellation Chart Data
+    # ----------------------------------------------------
+
+    cancel_labels = [
+        "Flights",
+        "Hotels",
+        "Packages",
+    ]
+
+    cancel_data = [
+        flight_cancelled,
+        hotel_cancelled,
+        package_cancelled,
+    ]
+
+    # ----------------------------------------------------
+    # Refund Summary
+    # ----------------------------------------------------
+
+    average_refund = (
+        Booking.objects.filter(
+            booking_status="cancelled"
+        ).aggregate(
+            avg=Avg("refund_amount")
+        )["avg"] or 0
+    )
+
+    largest_refund = (
+        Booking.objects.filter(
+            booking_status="cancelled"
+        ).aggregate(
+            maximum=Max("refund_amount")
+        )["maximum"] or 0
+    )
+
+    cancelled_bookings = Booking.objects.filter(
+        booking_status="cancelled"
+    ).select_related(
+        "user",
+        "flight"
+    ).order_by("-cancelled_at")[:10]
 
     context = {
 
@@ -661,10 +1014,59 @@ def booking_trend(request):
         "forecast_data": forecast_data,
         "forecast_upper": forecast_upper,
         "forecast_lower": forecast_lower,
+        "total_bookings": booking_analytics["total_bookings"],
+        "total_revenue": booking_analytics["total_revenue"],
+        "average_booking": booking_analytics["average_booking"],
+        "forecast_accuracy": accuracy,
+        "mae": mae,
+        "rmse": rmse,
+        "mape": mape,
+        "total_customers": total_customers,
+        "average_booking_value": average_booking_value,
+        "repeat_percentage": repeat_percentage,
+        "top_customers": top_customers,
+        "customer_segments": customer_segments,
+        "flight_revenue": float(flight_revenue),
+        "hotel_revenue": float(hotel_revenue),
+        "package_revenue": float(package_revenue),
+
+        "vip_count": segment_counts["VIP"],
+        "frequent_count": segment_counts["Frequent"],
+        "returning_count": segment_counts["Returning"],
+        "new_count": segment_counts["New"],
+        "status_labels": status_labels,
+        "status_data": status_data,
+
+        "payment_labels": payment_labels,
+        "payment_data": payment_data,
+        "flight_cancelled": flight_cancelled,
+        "hotel_cancelled": hotel_cancelled,
+        "package_cancelled": package_cancelled,
+        "total_cancelled": total_cancelled,
+        "cancellation_rate": cancellation_rate,
+        "refund_total": refund_total,
+        "cancel_labels": cancel_labels,
+        "cancel_data": cancel_data,
+        "average_refund": average_refund,
+        "largest_refund": largest_refund,
+        "cancelled_bookings": cancelled_bookings,
     }
 
     return render(
         request,
         "dashboard/booking_trend.html",
         context
+    )
+
+def revenue_forecast(request):
+    """
+    Revenue Forecast Analytics
+    """
+
+    context = get_revenue_forecast_data()
+
+    return render(
+        request,
+        "dashboard/revenue_forecast.html",
+        context,
     )
