@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load humanize %}
 <style>
 
 .analytics-card{
@@ -125,7 +126,7 @@
                 Total Revenue
                 </h6>
                 <h2 class="fw-bold text-success">
-                    ₹{{ total_revenue|floatformat:0 }}
+                    ₹{{ total_revenue|floatformat:2|intcomma }}
                 </h2>
             </div>
         </div>
@@ -140,7 +141,7 @@
                     Average Booking
                 </h6>
                 <h2 class="fw-bold text-warning">
-                    ₹{{ average_booking|floatformat:0 }}
+                    ₹{{ average_booking|floatformat:2|intcomma }}
                 </h2>
             </div>
         </div>
@@ -158,7 +159,7 @@
 
                 {% if forecast_accuracy %}
                     <h2 class="fw-bold text-info">
-                        {{ forecast_accuracy }}%
+                        {{ forecast_accuracy|floatformat:2 }}%
                     </h2>
                 {% else %}
                     <h2 class="fw-bold text-secondary">
@@ -565,7 +566,7 @@
 
                 <h6>MAE</h6>
 
-                <h3>{{ mae }}</h3>
+                <h3>{{ mae|floatformat:2 }}</h3>
 
                 <small class="text-muted">
                     Mean Absolute Error
@@ -585,7 +586,7 @@
 
                 <h6>RMSE</h6>
 
-                <h3>{{ rmse }}</h3>
+                <h3>{{ rmse|floatformat:2 }}</h3>
 
                 <small class="text-muted">
                     Root Mean Squared Error
@@ -605,7 +606,7 @@
 
                 <h6>MAPE</h6>
 
-                <h3>{{ mape }}%</h3>
+                <h3>{{ mape|floatformat:1 }}%</h3>
 
                 <small class="text-muted">
                     Mean Absolute Percentage Error
@@ -683,7 +684,7 @@
 
                         <h2 class="text-info">
 
-                            ₹{{ average_booking_value }}
+                            ₹{{ average_booking_value|floatformat:2|intcomma }}
 
                         </h2>
 
@@ -703,7 +704,7 @@
 
                         <h2 class="text-warning">
 
-                            {{ repeat_percentage }}%
+                            {{ repeat_percentage|floatformat:1 }}%
 
                         </h2>
 
@@ -795,7 +796,7 @@
 
                         <td>
 
-                            ₹{{ customer.total_spent }}
+                            ₹{{ customer.total_spent|floatformat:2|intcomma }}
 
                         </td>
 
@@ -879,7 +880,7 @@
 
                         <td>{{ customer.bookings }}</td>
 
-                        <td>₹{{ customer.spent }}</td>
+                        <td>₹{{ customer.spent|floatformat:2|intcomma }}</td>
 
                         <td>
 
@@ -1258,6 +1259,55 @@
                 </tbody>
 
             </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ==========================================================
+     MONTHLY BOOKING TREND
+========================================================== -->
+
+<div class="card shadow-sm mt-4">
+
+    <div class="card-header bg-primary text-white">
+
+        <h5 class="mb-0">
+            📅 Monthly Booking Trend
+        </h5>
+
+    </div>
+
+    <div class="card-body">
+
+        <canvas
+            id="monthlyBookingChart"
+            height="90">
+        </canvas>
+
+    </div>
+
+</div>
+
+<div class="row mt-4">
+
+    <div class="col-lg-6">
+
+        <div class="card shadow-sm">
+
+            <div class="card-header bg-success text-white">
+
+                Season-wise Revenue
+
+            </div>
+
+            <div class="card-body">
+
+                <canvas id="seasonRevenueChart" height="180"></canvas>
+
+            </div>
 
         </div>
 
@@ -1780,6 +1830,108 @@ new Chart(document.getElementById("cancelPieChart"), {
     }
 
 });
+
+new Chart(
+    document.getElementById("monthlyBookingChart"),
+    {
+        type: "line",
+
+        data: {
+
+            labels: {{ monthly_labels|safe }},
+
+            datasets: [{
+
+                label: "Bookings",
+
+                data: {{ monthly_data|safe }},
+
+                borderColor: "#0d6efd",
+
+                backgroundColor: "rgba(13,110,253,0.15)",
+
+                fill: true,
+
+                tension: 0.35,
+
+                borderWidth: 3,
+
+                pointRadius: 5
+
+            }]
+        },
+
+        options: {
+
+            responsive: true,
+
+            plugins: {
+
+                legend: {
+
+                    display: true
+
+                }
+
+            },
+
+            scales: {
+
+                y: {
+
+                    beginAtZero: true
+
+                }
+
+            }
+
+        }
+
+    }
+
+);
+
+const seasonLabels =
+    {{ season_labels|safe }};
+
+const seasonData =
+    {{ season_data|safe }};
+    
+new Chart(
+    document.getElementById("seasonRevenueChart"),
+    {
+        type: "bar",
+
+        data: {
+
+            labels: seasonLabels,
+
+            datasets: [{
+                label: "Revenue (₹)",
+
+                data: seasonData,
+
+                backgroundColor: [
+                    "#3498db",
+                    "#f39c12",
+                    "#2ecc71",
+                    "#9b59b6"
+                ]
+            }]
+        },
+
+        options: {
+            responsive: true,
+
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    }
+);
+
 
 </script>
 

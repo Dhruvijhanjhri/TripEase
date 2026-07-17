@@ -21,6 +21,7 @@ from .analytics import get_revenue_forecast_data
 from .analytics import get_booking_analytics
 from django.utils import timezone
 from datetime import timedelta
+from django.db.models.functions import TruncMonth
 
 User = get_user_model()
 
@@ -969,6 +970,68 @@ def booking_trend(request):
         "flight"
     ).order_by("-cancelled_at")[:10]
 
+    # ----------------------------------------------------
+    # Monthly Booking Trend
+    # ----------------------------------------------------
+
+    monthly_bookings = (
+        Booking.objects
+        .annotate(month=TruncMonth("created_at"))
+        .values("month")
+        .annotate(total=Count("id"))
+        .order_by("month")
+    )
+
+    monthly_labels = [
+        item["month"].strftime("%b %Y")
+        for item in monthly_bookings
+    ]
+
+    monthly_data = [
+        item["total"]
+        for item in monthly_bookings
+    ]
+
+    # ----------------------------------------------------
+    # Season-wise Revenue
+    # ----------------------------------------------------
+
+    season_revenue = {
+        "Winter": 0,
+        "Summer": 0,
+        "Monsoon": 0,
+        "Autumn": 0,
+    }
+
+    payments = Payment.objects.filter(payment_status="success")
+
+    for payment in payments:
+
+        if payment.booking:
+            date = payment.booking.created_at
+        elif payment.hotel_booking:
+            date = payment.hotel_booking.created_at
+        elif payment.package_booking:
+            date = payment.package_booking.created_at
+        else:
+            continue
+
+        month = date.month
+
+        if month in [12, 1, 2]:
+            season = "Winter"
+
+        elif month in [3, 4, 5]:
+            season = "Summer"
+
+        elif month in [6, 7, 8, 9]:
+            season = "Monsoon"
+
+        else:
+            season = "Autumn"
+
+        season_revenue[season] += float(payment.amount)
+    
     context = {
 
         "flight_labels": [
@@ -1050,6 +1113,10 @@ def booking_trend(request):
         "average_refund": average_refund,
         "largest_refund": largest_refund,
         "cancelled_bookings": cancelled_bookings,
+        "monthly_labels": monthly_labels,
+        "monthly_data": monthly_data,
+        "season_labels": list(season_revenue.keys()),
+        "season_data": list(season_revenue.values()),
     }
 
     return render(
