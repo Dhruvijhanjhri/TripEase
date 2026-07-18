@@ -299,6 +299,34 @@ Flight Details
         </div>
 
     </div>
+
+    {% if booking_advice %}
+
+    <div class="card mt-4 border-{{ booking_advice.color }}">
+        <div class="card-header bg-{{ booking_advice.color }} text-white">
+            <strong>🤖 AI Booking Recommendation</strong>
+        </div>
+
+        <div class="card-body">
+
+            <h4>
+                {{ booking_advice.icon }}
+                {{ booking_advice.action }}
+            </h4>
+
+            <p class="mb-2">
+                {{ booking_advice.message }}
+            </p>
+
+            <small class="text-muted">
+                Recommendation generated using TripEase Machine Learning fare prediction.
+            </small>
+
+        </div>
+    </div>
+
+    {% endif %}
+    
     {% endif %}
 
             {% if predicted_price %}
@@ -533,5 +561,78 @@ Flight Details
         </div>
     {% endif %}
 </div>
+
+<hr>
+
+<h3>✈️ You May Also Like</h3>
+
+{% if similar_flights %}
+
+    {% for similar in similar_flights %}
+
+        <div style="border:1px solid #ddd; padding:15px; margin-bottom:15px;">
+
+            <h4>
+                {{ similar.airline }}
+                {{ similar.recommendation_badge }}
+            </h4>
+
+            <p><strong>{{ similar.get_display_flight_number }}</strong></p>
+
+            <p>
+                {{ similar.source.code }}
+                →
+                {{ similar.destination.code }}
+            </p>
+
+            <p>
+                Departure:
+                {{ similar.departure_time }}
+            </p>
+
+            <p>
+                Duration:
+                {{ similar.get_duration_display }}
+            </p>
+
+            <p>
+                Cabin Price:
+                ₹ {{ similar.cabin_price }}
+            </p>
+
+            <p>
+                AI Score:
+                {{ similar.similar_score|floatformat:1 }}/100
+            </p>
+
+            <p>
+                <strong>Recommended because:</strong>
+            </p>
+
+            <ul>
+
+            {% for reason in similar.recommendation_reason %}
+
+                <li>{{ reason }}</li>
+
+            {% endfor %}
+
+            </ul>
+
+            <a href="{% url 'flights:flight_detail' similar.id %}?cabin_class={{ cabin_class }}&passengers={{ passengers }}&departure_date={{ departure_date }}">
+                <button type="button">
+                    View Flight
+                </button>
+            </a>
+
+        </div>
+
+    {% endfor %}
+
+{% else %}
+
+    <p>No similar flights found.</p>
+
+{% endif %}
 
 {% endblock %}

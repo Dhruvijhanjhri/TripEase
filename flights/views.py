@@ -8,11 +8,25 @@ from reviews.models import FlightReview
 from bookings.models import Booking
 from ml.fare_service import fare_predictor
 from utils.weather import get_weather
-
+from ml.recommendation import (
+    calculate_recommendation_score,
+    get_confidence,
+)
+from ml.personalization import get_user_preferences
+from ml.similar_flights import get_similar_flights
+from ml.booking_advisor import get_booking_recommendation
+from ml.explainability import explain_recommendation
+from ml.trending import get_trending_flights
 
 def flight_search(request):
 
     form = FlightSearchForm(request.GET or None)
+
+    preferences = None
+
+    if request.user.is_authenticated:
+        preferences = get_user_preferences(request.user)
+        trending = get_trending_flights()
 
     direct_flights = []
     via_flights = []
@@ -74,6 +88,97 @@ def flight_search(request):
                 flight.cabin_price = flight.get_price(cabin_class)
                 flight.price = flight.cabin_price * passengers
 
+                # Average rating
+                average_rating = (
+                    FlightReview.objects
+                    .filter(flight=flight)
+                    .aggregate(Avg("rating"))["rating__avg"]
+                )
+
+                flight.recommendation_score = calculate_recommendation_score(
+                    price=flight.price,
+                    duration=flight.duration_minutes,
+                    rating=average_rating,
+                    stops=0,
+                    available_seats=flight.available_seats,
+                )
+
+                (
+                    flight.confidence_stars,
+                    flight.confidence_level,
+                ) = get_confidence(
+                    flight.recommendation_score
+                )
+
+                # Personalization bonus
+                preferred_airline = False
+
+                if preferences:
+                    if (
+                        preferences["preferred_airline"]
+                        and
+                        flight.airline == preferences["preferred_airline"]
+                    ):
+                        flight.recommendation_score += 5
+                        preferred_airline = True
+
+                # Explain AI recommendation
+                flight.ai_reasons = explain_recommendation(
+                    price=flight.price,
+                    duration=flight.duration_minutes,
+                    rating=average_rating,
+                    stops=0,
+                    available_seats=flight.available_seats,
+                    preferred_airline=preferred_airline,
+                )
+
+                score = flight.recommendation_score
+
+                if score >= 90:
+                    flight.ai_confidence = "Very High"
+                elif score >= 80:
+                    flight.ai_confidence = "High"
+                elif score >= 70:
+                    flight.ai_confidence = "Medium"
+                else:
+                    flight.ai_confidence = "Low"
+
+                if score >= 90:
+                    flight.recommendation_badge = "🏆 AI Recommended"
+
+                elif score >= 80:
+                    flight.recommendation_badge = "⭐ Best Value"
+
+                elif score >= 70:
+                    flight.recommendation_badge = "👍 Good Choice"
+
+                else:
+                    flight.recommendation_badge = "Standard Option"
+                
+                if preferences and flight.airline == preferences["preferred_airline"]:
+                    flight.personalized_reason = (
+                        "Recommended because you frequently fly with this airline."
+                    )
+                else:
+                    flight.personalized_reason = ""
+                
+                booking_count = Booking.objects.filter(
+                    flight=flight,
+                    booking_status="confirmed",
+                ).count()
+
+                if booking_count >= 2:
+                    flight.trending_badge = "🔥 Trending Choice"
+                elif booking_count >= 1:
+                    flight.trending_badge = "📈 Popular Flight"
+                else:
+                    flight.trending_badge = ""
+
+            direct_flights.sort(
+                key=lambda flight: flight.recommendation_score,
+                reverse=True,
+            )
+
             # ==================================
             # VIA FLIGHTS (REALISTIC)
             # ==================================
@@ -126,6 +231,79 @@ def flight_search(request):
                         ).total_seconds() / 60
                     )
 
+                    average_rating = (
+                        FlightReview.objects
+                        .filter(flight=first_leg)
+                        .aggregate(Avg("rating"))["rating__avg"]
+                    )
+
+                    recommendation_score = calculate_recommendation_score(
+                        price=total_price,
+                        duration=total_duration,
+                        rating=average_rating,
+                        stops=1,
+                        available_seats=min(
+                            first_leg.available_seats,
+                            second_leg.available_seats
+                        ),
+                    )
+
+                    route = {
+                        "first_leg": first_leg,
+                        "second_leg": second_leg,
+                        "total_price": total_price,
+                        "total_duration": total_duration,
+                        "total_duration_display": format_duration_minutes(total_duration),
+                        "first_leg_seat_display": first_leg.get_seat_display(),
+                        "second_leg_seat_display": second_leg.get_seat_display(),
+                        "first_leg_price": first_leg_price,
+                        "second_leg_price": second_leg_price,
+                        "recommendation_score": recommendation_score,
+                    }
+
+                    if preferences:
+
+                        if (
+                            preferences["preferred_airline"]
+                            and
+                            first_leg.airline == preferences["preferred_airline"]
+                        ):
+                            recommendation_score += 5
+
+                    score = recommendation_score
+
+                    if recommendation_score >= 90:
+                        ai_confidence = "Very High"
+                    elif recommendation_score >= 80:
+                        ai_confidence = "High"
+                    elif recommendation_score >= 70:
+                        ai_confidence = "Medium"
+                    else:
+                        ai_confidence = "Low"
+
+                    if score >= 90:
+                        route["recommendation_badge"] = "🏆 AI Recommended"
+                    elif score >= 80:
+                        route["recommendation_badge"] = "⭐ Best Value"
+                    elif score >= 70:
+                        route["recommendation_badge"] = "👍 Good Choice"
+                    else:
+                        route["recommendation_badge"] = "Standard Option"
+
+                    booking_count = (
+                        trending.get(first_leg.id, 0)
+                        +
+                        trending.get(second_leg.id, 0)
+                    )
+
+                    if booking_count >= 2:
+                        trending_badge = "🔥 Trending Choice"
+                    elif booking_count >= 1:
+                        trending_badge = "📈 Popular Flight"
+                    else:
+                        trending_badge = ""
+                    
+
                     via_flights.append({
                         "first_leg": first_leg,
                         "second_leg": second_leg,
@@ -137,7 +315,16 @@ def flight_search(request):
                         
                         "first_leg_price": first_leg_price,
                         "second_leg_price": second_leg_price,
+                        "recommendation_score": recommendation_score,
+                        "booking_count": booking_count,
+                        "trending_badge": trending_badge,
+                        "ai_confidence": ai_confidence,
                     })
+
+            via_flights.sort(
+                key=lambda flight: flight["recommendation_score"],
+                reverse=True,
+            )
 
             via_flights = via_flights[:10]
 
@@ -401,11 +588,30 @@ def flight_detail(request, flight_id):
             deal_status = "expensive"
             deal_message = "Expensive. This fare is above the expected market price."
 
+    booking_advice = None
+
+    if predicted_price:
+
+        booking_advice = get_booking_recommendation(
+            current_price=total_price,
+            predicted_price=predicted_price,
+        )
+
     # weather 
     if second_leg:
         weather = get_weather(second_leg.destination.city)
     else:
         weather = get_weather(flight.destination.city)
+    
+    # ==================================
+    # Similar Flights
+    # ==================================
+
+    similar_flights = get_similar_flights(
+        current_flight=flight,
+        cabin_class=cabin_class,
+        passengers=passengers,
+    )
 
     context = {
         'flight': flight,
@@ -434,6 +640,8 @@ def flight_detail(request, flight_id):
         "price_difference": price_difference,
         "price_difference_percent": price_difference_percent,
         "weather": weather,
+        "similar_flights": similar_flights,
+        "booking_advice": booking_advice,
     }
 
     return render(
@@ -441,4 +649,3 @@ def flight_detail(request, flight_id):
         "flights/detail.html",
         context
     )
-

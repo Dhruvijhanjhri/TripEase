@@ -20,9 +20,53 @@
         {% for flight in direct_flights %}
             <div style="border:1px solid #ccc; padding:15px; margin-bottom:15px;">
 
-                <h4>{{ flight.airline }}</h4>
+                <h4>
+                    {{ flight.airline }}
+
+                    {% if flight.recommendation_score >= 90 %}
+                        <span class="badge bg-success">🏆 AI Recommended</span>
+
+                    {% elif flight.recommendation_score >= 80 %}
+                        <span class="badge bg-primary">⭐ Best Value</span>
+
+                    {% elif flight.recommendation_score >= 70 %}
+                        <span class="badge bg-warning text-dark">👍 Good Choice</span>
+
+                    {% else %}
+                        <span class="badge bg-secondary">Standard Option</span>
+                    {% endif %}
+                </h4>
+
+                {% if flight.trending_badge %}
+                    <p>{{ flight.trending_badge }}</p>
+                    <small>
+                        Booked {{ flight.booking_count }} times
+                    </small>
+                {% endif %}
+
+                {% if flight.personalized_reason %}
+                <p><strong>🤖 Personalized:</strong> {{ flight.personalized_reason }}</p>
+                {% endif %}
 
                 <p>{{ flight.get_display_flight_number }}</p>
+                <p>
+                    AI Score: {{ flight.recommendation_score }}/100
+                </p>
+
+                <p>
+                    Confidence:
+                    <strong>{{ flight.ai_confidence }}</strong>
+                </p>
+
+                {% if flight.ai_reasons %}
+                <p><strong>Recommendation Breakdown</strong></p>
+
+                <ul>
+                    {% for reason in flight.ai_reasons %}
+                        <li>✔ {{ reason }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
 
                 <p>
                     {{ flight.source.code }} → {{ flight.destination.code }}
@@ -68,7 +112,54 @@
         {% for route in via_flights %}
             <div style="border:1px solid #ccc; padding:15px; margin-bottom:15px;">
 
-                <h4>1 Stop Journey</h4>
+                <h4>
+                    1 Stop Journey
+
+                    {% if route.recommendation_score >= 90 %}
+                        <span class="badge bg-success">🏆 AI Recommended</span>
+
+                    {% elif route.recommendation_score >= 80 %}
+                        <span class="badge bg-primary">⭐ Best Value</span>
+
+                    {% elif route.recommendation_score >= 70 %}
+                        <span class="badge bg-warning text-dark">👍 Good Choice</span>
+
+                    {% else %}
+                        <span class="badge bg-secondary">Standard Option</span>
+                    {% endif %}
+                </h4>
+
+                {% if route.trending_badge %}
+                    <p>{{ route.trending_badge }}</p>
+                    <small>
+                        Booked {{ route.booking_count }} times
+                    </small>
+                {% endif %}
+
+                {% if route.personalized_reason %}
+                <p><strong>🤖 Personalized:</strong> {{ route.personalized_reason }}</p>
+                {% endif %}
+
+                <p>
+                    <small class="text-muted">
+                        AI Score: {{ route.recommendation_score|floatformat:1 }}/100
+                    </small>
+                </p>
+
+                <p>
+                    Confidence:
+                    <strong>{{ route.ai_confidence }}</strong>
+                </p>
+
+                {% if route.ai_reasons %}
+                <p><strong>Recommendation Breakdown</strong></p>
+
+                <ul>
+                    {% for reason in route.ai_reasons %}
+                        <li>✔ {{ reason }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
 
                 <p>
                     {{ route.first_leg.source.code }}
