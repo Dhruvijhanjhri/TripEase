@@ -1,5 +1,8 @@
 from django.contrib import admin
 from .models import Airport, Flight
+from .models import PriceAlert
+
+admin.site.register(PriceAlert)
 
 
 @admin.register(Airport)

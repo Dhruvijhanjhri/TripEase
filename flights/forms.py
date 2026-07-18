@@ -2,6 +2,7 @@ from django import forms
 from .models import Airport, Flight
 from django.core.exceptions import ValidationError
 from datetime import date
+from .models import PriceAlert
 
 
 class FlightSearchForm(forms.Form):
@@ -70,6 +71,21 @@ class FlightSearchForm(forms.Form):
 
         return cleaned_data
 
+class PriceAlertForm(forms.ModelForm):
+
+    class Meta:
+        model = PriceAlert
+        fields = ["target_price"]
+
+        widgets = {
+            "target_price": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Enter target fare",
+                    "min": "1",
+                }
+            )
+        }
 
 
 

@@ -488,6 +488,48 @@ Flight Details
 
 </div>
 
+{% if user.is_authenticated %}
+
+<hr>
+
+<h3>🔔 Set Price Alert</h3>
+
+<form method="post">
+
+    {% csrf_token %}
+
+    {{ price_alert_form.as_p }}
+
+    <button
+        type="submit"
+        class="btn btn-warning">
+
+        Create Alert
+
+    </button>
+
+</form>
+
+{% endif %}
+
+<hr>
+
+<h3>📈 Price History (Last 7 Days)</h3>
+
+<p><strong>Lowest Fare:</strong> ₹ {{ price_stats.min_price }}</p>
+
+<p><strong>Average Fare:</strong> ₹ {{ price_stats.avg_price }}</p>
+
+<p><strong>Highest Fare:</strong> ₹ {{ price_stats.max_price }}</p>
+
+<p><strong>Current Fare:</strong> ₹ {{ price_stats.current_price }}</p>
+
+<div style="max-width:700px; margin:auto;">
+
+    <canvas id="priceHistoryChart"></canvas>
+
+</div>
+
 <hr class="my-5">
 
 <div class="container mb-5">
@@ -635,4 +677,69 @@ Flight Details
 
 {% endif %}
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+const ctx = document.getElementById('priceHistoryChart');
+
+new Chart(ctx, {
+
+    type: 'line',
+
+    data: {
+
+        labels: [
+            '6 Days Ago',
+            '5 Days Ago',
+            '4 Days Ago',
+            '3 Days Ago',
+            'Today',
+            'Tomorrow',
+            'Prediction'
+        ],
+
+        datasets: [{
+
+            label: 'Flight Fare',
+
+            data: [
+                {{ price_history.0 }},
+                {{ price_history.1 }},
+                {{ price_history.2 }},
+                {{ price_history.3 }},
+                {{ price_history.4 }},
+                {{ price_history.5 }},
+                {{ price_history.6 }}
+            ],
+
+            borderWidth: 3,
+
+            fill: false,
+
+            tension: 0.35
+
+        }]
+
+    },
+
+    options: {
+
+        responsive: true,
+
+        plugins: {
+
+            legend: {
+
+                display: true
+
+            }
+
+        }
+
+    }
+
+});
+
+</script>
 {% endblock %}

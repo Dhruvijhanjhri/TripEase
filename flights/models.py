@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator
 from decimal import Decimal
-
+from django.conf import settings
 from .realism import (
     format_duration_minutes,
     get_display_flight_number,
@@ -105,3 +105,31 @@ class Flight(models.Model):
 
     def get_display_flight_number(self):
         return get_display_flight_number(self.flight_number, self.airline)
+    
+class PriceAlert(models.Model):
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+
+    flight = models.ForeignKey(
+        Flight,
+        on_delete=models.CASCADE,
+    )
+
+    target_price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+    )
+
+    active = models.BooleanField(
+        default=True,
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    def __str__(self):
+        return f"{self.user} - {self.flight} - ₹{self.target_price}"

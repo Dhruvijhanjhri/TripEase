@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from datetime import datetime, timedelta
-from .models import Flight
-from .forms import FlightSearchForm
+from .models import Flight, PriceAlert
+from .forms import FlightSearchForm, PriceAlertForm
 from .realism import format_duration_minutes, get_route_price
 from django.db.models import Avg
 from reviews.models import FlightReview
@@ -17,6 +17,10 @@ from ml.similar_flights import get_similar_flights
 from ml.booking_advisor import get_booking_recommendation
 from ml.explainability import explain_recommendation
 from ml.trending import get_trending_flights
+from ml.price_history import (
+    generate_price_history,
+    get_price_statistics,
+)
 
 def flight_search(request):
 
@@ -173,6 +177,7 @@ def flight_search(request):
                     flight.trending_badge = "📈 Popular Flight"
                 else:
                     flight.trending_badge = ""
+
 
             direct_flights.sort(
                 key=lambda flight: flight.recommendation_score,
@@ -596,6 +601,19 @@ def flight_detail(request, flight_id):
             current_price=total_price,
             predicted_price=predicted_price,
         )
+    
+    # ==================================
+    # Price History Analytics
+    # ==================================
+
+    price_history = generate_price_history(total_price)
+
+    price_stats = {
+        "min_price": min(price_history),
+        "max_price": max(price_history),
+        "avg_price": round(sum(price_history) / len(price_history)),
+        "current_price": price_history[4],
+    }
 
     # weather 
     if second_leg:
@@ -612,6 +630,39 @@ def flight_detail(request, flight_id):
         cabin_class=cabin_class,
         passengers=passengers,
     )
+
+    price_alert_form = None
+
+    if request.user.is_authenticated:
+
+        if request.method == "POST":
+
+            price_alert_form = PriceAlertForm(request.POST)
+
+            if price_alert_form.is_valid():
+
+                alert = price_alert_form.save(commit=False)
+                alert.user = request.user
+                alert.flight = flight
+
+                existing = PriceAlert.objects.filter(
+                    user=request.user,
+                    flight=flight,
+                    active=True,
+                ).first()
+
+                if existing:
+                    existing.target_price = alert.target_price
+                    existing.save()
+                else:
+                    alert.save()
+
+                price_alert_form = PriceAlertForm()
+
+        else:
+            price_alert_form = PriceAlertForm()
+
+        
 
     context = {
         'flight': flight,
@@ -642,6 +693,9 @@ def flight_detail(request, flight_id):
         "weather": weather,
         "similar_flights": similar_flights,
         "booking_advice": booking_advice,
+        "price_history": price_history,
+        "price_stats": price_stats,
+        "price_alert_form": price_alert_form,
     }
 
     return render(
