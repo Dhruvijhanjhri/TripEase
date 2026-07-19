@@ -25,6 +25,7 @@ from ml.fare_calendar import (
     generate_fare_calendar,
     find_cheapest_date,
 )
+from ml.travel_timing import analyze_booking_timing
 
 def flight_search(request):
 
@@ -627,6 +628,17 @@ def flight_detail(request, flight_id):
         )
 
         cheapest_fare_info = find_cheapest_date(fare_calendar)
+
+        travel_timing = None
+
+        if fare_calendar and predicted_price:
+
+            travel_timing = analyze_booking_timing(
+                current_price=float(total_price),
+                predicted_price=float(predicted_price),
+                fare_calendar=fare_calendar,
+            )
+        # {{ travel_timing }}
     
     # ==================================
     # Price History Analytics
@@ -724,6 +736,7 @@ def flight_detail(request, flight_id):
         "price_alert_form": price_alert_form,
         "fare_calendar": fare_calendar,
         "cheapest_fare_info": cheapest_fare_info,
+        "travel_timing": travel_timing,
     }
 
     return render(
