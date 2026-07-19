@@ -9,6 +9,7 @@ from datetime import timedelta
 from bookings.models import Booking
 from hotels.models import HotelBooking
 from packages.models import PackageBooking
+from ml.destination_recommender import recommend_destinations
 
 
 @login_required
@@ -492,10 +493,20 @@ def user_dashboard(request):
     print("\n===== RECENT ACTIVITY =====")
     for a in recent_activity:
         print(a)
+    
+    # ─────────────────────────────────────────────────────────────
+    # 13. AI DESTINATION RECOMMENDATIONS
+    # ─────────────────────────────────────────────────────────────
 
+    recommended_destinations = recommend_destinations(
+        flight_bookings=flight_bookings,
+        hotel_bookings=hotel_bookings,
+        package_bookings=package_bookings,
+        limit=3,
+    )
 
     # ─────────────────────────────────────────────────────────────
-    # 13. CONTEXT — SINGLE DICTIONARY, NO DUPLICATES
+    # 14. CONTEXT — SINGLE DICTIONARY, NO DUPLICATES
     # ─────────────────────────────────────────────────────────────
 
     context = {
@@ -513,6 +524,7 @@ def user_dashboard(request):
         'bookings_needed': bookings_needed,
         'cancelled_count': cancelled_count,
         'favourite_destination': favourite_destination,
+        'recommended_destinations': recommended_destinations,
         
 
         # ── Distribution chart
