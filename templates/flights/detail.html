@@ -530,6 +530,124 @@ Flight Details
 
 </div>
 
+<hr>
+
+<h3 class="mb-3">🗓 Cheapest Nearby Future Dates</h3>
+
+<div class="row g-3 mb-4">
+
+    {% for item in fare_calendar %}
+
+    <div class="col-6 col-md-3 col-lg-2">
+
+        <a href="{% url 'flights:flight_detail' flight.id %}?departure_date={{ item.date|date:'Y-m-d' }}&cabin_class={{ cabin_class }}&passengers={{ passengers }}{% if second_leg %}&is_via=1&second_leg_id={{ second_leg.id }}{% endif %}"
+           class="fare-card-link text-decoration-none text-dark d-block">
+
+            <div class="card h-100 text-center border-2
+                {% if item.is_selected %}
+                    border-primary shadow-sm
+                {% elif item.date == cheapest_fare_info.cheapest_date %}
+                    border-success shadow-sm
+                {% else %}
+                    border-light
+                {% endif %}
+            ">
+
+                <div class="card-body py-3 px-2">
+
+                    <div class="small text-muted fw-semibold">
+                        {{ item.date|date:"D" }}
+                    </div>
+
+                    <div class="small text-muted mb-2">
+                        {{ item.date|date:"d M" }}
+                    </div>
+
+                    <div class="fs-5 fw-bold mb-2">
+                        ₹{{ item.predicted_price }}
+                    </div>
+
+                    {% if item.is_selected %}
+
+                        <span class="badge bg-primary px-3 py-2">
+                            Selected
+                        </span>
+
+                    {% elif item.date == cheapest_fare_info.cheapest_date %}
+
+                        <span class="badge bg-success px-3 py-2">
+                            Cheapest
+                        </span>
+
+                    {% else %}
+                        {% if item.predicted_price == cheapest_fare_info.cheapest_price %}
+                            <span class="badge bg-light text-success border px-3 py-2">
+                                Same fare
+                            </span>
+                        {% else %}
+                            <span class="badge bg-light text-dark border px-3 py-2">
+                                View
+                            </span>
+                        {% endif %}
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </a>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+<div class="alert alert-info border-0 shadow-sm">
+
+    {% if cheapest_fare_info.is_selected_cheapest %}
+
+        🎉 <strong>Your selected date already has the cheapest predicted fare.</strong>
+
+    {% else %}
+
+        💡 Cheapest nearby fare:
+        <strong>
+            {{ cheapest_fare_info.cheapest_date|date:"d M Y" }}
+        </strong>
+        for
+        <strong>
+            ₹{{ cheapest_fare_info.cheapest_price }}
+        </strong>
+        — about
+        <strong>
+            ₹{{ cheapest_fare_info.savings }}
+        </strong>
+        cheaper than the selected date.
+
+    {% endif %}
+
+</div>
+
+<style>
+.fare-card-link .card {
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    border-radius: 14px;
+}
+
+.fare-card-link:hover .card {
+    transform: translateY(-4px);
+    box-shadow: 0 0.75rem 1.5rem rgba(0,0,0,.12) !important;
+}
+
+.fare-card-link .card-body {
+    min-height: 140px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+</style>
+
 <hr class="my-5">
 
 <div class="container mb-5">
@@ -740,6 +858,4 @@ new Chart(ctx, {
     }
 
 });
-
-</script>
 {% endblock %}

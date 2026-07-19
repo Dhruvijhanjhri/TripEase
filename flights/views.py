@@ -21,6 +21,10 @@ from ml.price_history import (
     generate_price_history,
     get_price_statistics,
 )
+from ml.fare_calendar import (
+    generate_fare_calendar,
+    find_cheapest_date,
+)
 
 def flight_search(request):
 
@@ -602,6 +606,28 @@ def flight_detail(request, flight_id):
             predicted_price=predicted_price,
         )
     
+    fare_calendar = []
+    cheapest_fare_info = None
+
+    if selected_departure_date:
+
+        fare_calendar = generate_fare_calendar(
+            predictor=fare_predictor,
+            source=flight.source.city,
+            destination=(
+                second_leg.destination.city
+                if second_leg
+                else flight.destination.city
+            ),
+            stops=1 if second_leg else 0,
+            duration_minutes=total_duration,
+            departure_hour=flight.departure_time.hour,
+            airline=flight.airline,
+            selected_date=selected_departure_date,
+        )
+
+        cheapest_fare_info = find_cheapest_date(fare_calendar)
+    
     # ==================================
     # Price History Analytics
     # ==================================
@@ -696,6 +722,8 @@ def flight_detail(request, flight_id):
         "price_history": price_history,
         "price_stats": price_stats,
         "price_alert_form": price_alert_form,
+        "fare_calendar": fare_calendar,
+        "cheapest_fare_info": cheapest_fare_info,
     }
 
     return render(

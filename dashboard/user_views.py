@@ -486,6 +486,13 @@ def user_dashboard(request):
     recent_activity.sort(key=lambda x: x['date'], reverse=True)
     recent_activity = recent_activity[:10]
 
+    print("\n===== NEXT TRIP =====")
+    print(next_trip)
+
+    print("\n===== RECENT ACTIVITY =====")
+    for a in recent_activity:
+        print(a)
+
 
     # ─────────────────────────────────────────────────────────────
     # 13. CONTEXT — SINGLE DICTIONARY, NO DUPLICATES

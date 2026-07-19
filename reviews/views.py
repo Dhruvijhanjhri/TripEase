@@ -211,7 +211,7 @@ def add_flight_review(request, flight_id):
             request,
             "You can review this flight only after a confirmed/completed booking."
         )
-        return redirect("flights:detail", flight.id)
+        return redirect("flights:flight_detail", flight.id)
 
     already_reviewed = FlightReview.objects.filter(
         user=request.user,
@@ -223,7 +223,7 @@ def add_flight_review(request, flight_id):
             request,
             "You have already reviewed this flight."
         )
-        return redirect("flights:detail", flight.id)
+        return redirect("flights:flight_detail", flight.id)
 
     if request.method == "POST":
         form = FlightReviewForm(request.POST)
@@ -235,8 +235,7 @@ def add_flight_review(request, flight_id):
             review.save()
 
             messages.success(request, "Flight review added successfully.")
-            return redirect("flights:detail", flight.id)
-
+            return redirect("flights:flight_detail", flight.id)
     else:
         form = FlightReviewForm()
 
