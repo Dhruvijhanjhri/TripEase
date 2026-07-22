@@ -133,27 +133,208 @@
 
     </div>
 
+    <!-- Travel Intelligence -->
+    <div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-white border-0 pb-0">
+        <div class="d-flex align-items-center gap-2">
+        <span class="fs-4">🧠</span>
+        <div>
+            <h5 class="mb-0">Travel Intelligence</h5>
+            <small class="text-muted">
+            AI insights for your trip
+            </small>
+        </div>
+        </div>
+    </div>
 
-    <!-- AI Itinerary -->
+    <div class="card-body">
+        <div class="row g-3">
 
-    <div class="card trip-card mt-4">
+        <div class="col-6 col-lg-3">
+            <div class="p-3 border rounded-3 bg-light h-100">
+            <div class="small text-muted fw-semibold mb-1">
+                Best Season
+            </div>
+            <div class="fw-bold">
+                🌤 {{ best_season }}
+            </div>
+            </div>
+        </div>
 
-        <div class="card-body">
+        <div class="col-6 col-lg-3">
+            <div class="p-3 border rounded-3 bg-light h-100">
+            <div class="small text-muted fw-semibold mb-1">
+                Nearest Airport
+            </div>
+            <div class="fw-bold">
+                ✈️ {{ nearest_airport }}
+            </div>
+            </div>
+        </div>
 
-            <h4 class="section-title">
-                🤖 AI Generated Itinerary
-            </h4>
+        <div class="col-6 col-lg-3">
+            <div class="p-3 border rounded-3 bg-light h-100">
+            <div class="small text-muted fw-semibold mb-1">
+                Travel Style
+            </div>
+            <div class="fw-bold">
+                🧳 {{ travel_style }}
+            </div>
+            </div>
+        </div>
 
-            <div class="markdown-body">
+        <div class="col-6 col-lg-3">
+            <div class="p-3 border rounded-3 bg-light h-100">
+            <div class="small text-muted fw-semibold mb-1">
+                Estimated Budget
+            </div>
+            <div class="fw-bold text-success">
+                💰 ₹{{ trip.estimated_cost }}
+            </div>
+            </div>
+        </div>
 
-                {{ trip.generated_plan|safe }}
+        </div>
+
+        <div class="alert alert-light border mt-4 mb-0">
+        <i class="bi bi-info-circle me-2 text-primary"></i>
+        <strong>AI Tip:</strong>
+        The best time to visit <strong>{{ trip.destination }}</strong> is
+        <strong>{{ best_season }}</strong>. Arriving via
+        <strong>{{ nearest_airport }}</strong> usually offers the most convenient access to the destination.
+        </div>
+    </div>
+    </div>
+
+    
+    <!-- Suggested Flight Route -->
+    <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+
+        <div class="d-flex align-items-center gap-2 mb-3">
+        <span class="fs-4">✈️</span>
+        <div>
+            <h5 class="mb-0">Suggested Flight Route</h5>
+            <small class="text-muted">
+            Estimated route and fare range
+            </small>
+        </div>
+        </div>
+
+        <div class="row g-3">
+
+        <div class="col-md-3">
+            <div class="p-3 border rounded-3 bg-light h-100">
+            <div class="small text-muted fw-semibold">From</div>
+            <div class="fw-bold">{{ route_suggestion.origin }}</div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="p-3 border rounded-3 bg-light h-100">
+            <div class="small text-muted fw-semibold">To</div>
+            <div class="fw-bold">{{ route_suggestion.destination_airport }}</div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="p-3 border rounded-3 bg-light h-100">
+            <div class="small text-muted fw-semibold">Flight Time</div>
+            <div class="fw-bold">{{ route_suggestion.duration }}</div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="p-3 border rounded-3 bg-light h-100">
+            <div class="small text-muted fw-semibold">Fare Range</div>
+            <div class="fw-bold text-success">{{ route_suggestion.fare_range }}</div>
+            </div>
+        </div>
+
+        </div>
+
+        <div class="mt-3 d-flex flex-wrap gap-2">
+        <a href="{% url 'flights:search' %}"
+            class="btn btn-outline-primary rounded-pill">
+            Search Flights
+        </a>
+        <span class="badge bg-light text-dark border align-self-center">
+            Estimated route only — live fares may vary.
+        </span>
+        </div>
+
+    </div>
+    </div>
+
+
+    <!-- AI Itinerary Timeline -->
+    <div class="card border-0 shadow-sm mb-4">
+
+    <div class="card-header bg-white border-0 pb-0">
+        <div class="d-flex align-items-center gap-2">
+        <span class="fs-4">🗓</span>
+        <div>
+            <h5 class="mb-0">Day-wise AI Itinerary</h5>
+            <small class="text-muted">
+            Structured timeline generated for your trip
+            </small>
+        </div>
+        </div>
+    </div>
+
+    <div class="card-body">
+
+        {% if timeline_items %}
+
+        {% for item in timeline_items %}
+
+        <div class="timeline-item mb-4">
+
+            <div class="d-flex align-items-start gap-3">
+
+            <div class="timeline-marker bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold">
+                {{ forloop.counter }}
+            </div>
+
+            <div class="timeline-content flex-grow-1">
+
+                <div class="card border-0 bg-light">
+
+                <div class="card-body">
+
+                    <h6 class="fw-bold text-primary mb-3">
+                    {{ item.title }}
+                    </h6>
+
+                    <ul class="mb-0">
+                    {% for detail in item.details %}
+                        <li class="mb-2">{{ detail }}</li>
+                    {% endfor %}
+                    </ul>
+
+                </div>
+
+                </div>
+
+            </div>
 
             </div>
 
         </div>
 
+        {% endfor %}
+
+        {% else %}
+
+        <div class="alert alert-warning mb-0">
+            Itinerary could not be structured. Please generate the trip again.
+        </div>
+
+        {% endif %}
+
     </div>
 
+    </div>
 
     <!-- Hotels -->
 
@@ -193,7 +374,11 @@
 
     <p class="price">
 
-    ₹{{ hotel.price_per_night }}/night
+    {% if hotel.display_price %}
+        ₹{{ hotel.display_price }}/night
+    {% else %}
+        Price on request
+    {% endif %}
 
     </p>
 
@@ -326,6 +511,13 @@
 
         </a>
 
+        <a href="{% url 'ai_planner:export_pdf' trip.id %}"
+            class="btn btn-success btn-lg rounded-pill me-3">
+
+                📄 Download PDF
+
+        </a>
+
         <a href="{% url 'ai_planner:history' %}"
 
            class="btn btn-outline-primary btn-lg rounded-pill">
@@ -337,12 +529,6 @@
     </div>
 
 </div>
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
-<script>
-const container = document.getElementById("itinerary-content");
-container.innerHTML = marked.parse(container.textContent);
-</script>
 <style>
 .markdown-body h1,
 .markdown-body h2,
@@ -405,6 +591,32 @@ container.innerHTML = marked.parse(container.textContent);
 .badge-expensive{
     background:#dc3545;
     color:white;
+}
+
+.timeline-marker{
+    width:42px;
+    height:42px;
+    min-width:42px;
+    font-size:.95rem;
+    box-shadow:0 .5rem 1rem rgba(13,110,253,.25);
+}
+
+.timeline-content .card{
+    border-radius:14px;
+}
+
+.timeline-item{
+    position:relative;
+}
+
+.timeline-item:not(:last-child)::before{
+    content:"";
+    position:absolute;
+    left:20px;
+    top:42px;
+    width:2px;
+    height:calc(100% + 8px);
+    background:#dbe7ff;
 }
 </style>
 

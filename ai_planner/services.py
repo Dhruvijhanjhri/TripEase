@@ -5,7 +5,20 @@ from packages.models import TravelPackage
 
 
 def normalize_text(value):
-    return value.strip().lower() if value else ""
+    text = value.strip().lower() if value else ""
+
+    # common typo corrections
+    corrections = {
+        "udiapur": "udaipur",
+        "udaypur": "udaipur",
+        "manli": "manali",
+        "srinager": "srinagar",
+        "amritser": "amritsar",
+        "kolkatta": "kolkata",
+        "bengalure": "bengaluru",
+    }
+
+    return corrections.get(text, text)
 
 
 def split_interests(interests_text):
@@ -181,15 +194,120 @@ def build_day_wise_plan(destination, days, interests):
     return "\n".join(plan_lines)
 
 
-def estimate_total_cost(hotel_cost, package_cost, budget):
-    total = hotel_cost + package_cost
+def estimate_total_cost(hotel_cost, package_cost, budget, days):
+    # food + local transport + entry tickets
+    base_daily_cost = Decimal("1800")
 
+    total = hotel_cost + package_cost + (base_daily_cost * days)
+
+    # If total exceeds budget, show a realistic optimized estimate
     if total > budget:
-        return Decimal(str(budget))
+        optimized = (budget * Decimal("0.72")).quantize(Decimal("1"))
+        return optimized
 
-    return total
+    return total.quantize(Decimal("1"))
 
-def generate_trip_plan(destination, budget, days, interests):
+def get_best_season(destination):
+    destination = normalize_text(destination)
+
+    season_map = {
+        "goa": "November to February",
+        "manali": "March to June",
+        "srinagar": "April to October",
+        "udaipur": "October to March",
+        "jaipur": "October to March",
+        "leh": "May to September",
+        "andaman": "November to April",
+        "kochi": "October to February",
+    }
+
+    return season_map.get(destination, "October to March")
+
+
+def get_nearest_airport(destination):
+    destination = normalize_text(destination)
+
+    airport_map = {
+        "goa": "GOI (Dabolim Airport)",
+        "manali": "KUU (Kullu–Manali Airport)",
+        "srinagar": "SXR (Srinagar Airport)",
+        "udaipur": "UDR (Maharana Pratap Airport)",
+        "jaipur": "JAI (Jaipur International Airport)",
+        "leh": "IXL (Kushok Bakula Rimpochee Airport)",
+        "andaman": "IXZ (Veer Savarkar Airport)",
+        "kochi": "COK (Cochin International Airport)",
+    }
+
+    return airport_map.get(destination, "Nearest major airport")
+
+def get_route_suggestion(destination, origin=None):
+    origin = origin or "Bengaluru"
+    destination = normalize_text(destination)
+
+    routes = {
+        "udaipur": {
+            "airport": "UDR",
+            "duration": "2h 10m",
+            "fare_range": "₹3,500 – ₹7,500",
+        },
+        "goa": {
+            "airport": "GOI",
+            "duration": "1h 20m",
+            "fare_range": "₹2,500 – ₹6,000",
+        },
+        "manali": {
+            "airport": "KUU",
+            "duration": "3h 00m (via Delhi)",
+            "fare_range": "₹6,000 – ₹12,000",
+        },
+        "srinagar": {
+            "airport": "SXR",
+            "duration": "3h 15m",
+            "fare_range": "₹5,500 – ₹11,000",
+        },
+    }
+
+    route = routes.get(destination)
+
+    if not route:
+        return {
+            "origin": origin,
+            "destination_airport": "Nearest major airport",
+            "duration": "Varies",
+            "fare_range": "Check live fares",
+        }
+
+    return {
+        "origin": origin,
+        "destination_airport": route["airport"],
+        "duration": route["duration"],
+        "fare_range": route["fare_range"],
+    }
+
+def infer_travel_style(interests):
+    interest_list = split_interests(interests)
+
+    if any(i in interest_list for i in ["beach", "relaxation", "honeymoon"]):
+        return "Beach & Leisure"
+
+    if any(i in interest_list for i in ["adventure", "trekking", "camping"]):
+        return "Adventure"
+
+    if any(i in interest_list for i in [
+        "culture", "heritage", "food",
+        "local food", "local market", "lakes", "view"
+    ]):
+        return "Culture & Heritage"
+
+    return "Leisure"
+
+def generate_trip_plan(
+    destination,
+    budget,
+    days,
+    interests,
+    origin_city="Bengaluru"
+):
 
     hotels, hotel_ids, hotel_cost = get_matching_hotels(
         destination,
@@ -214,8 +332,14 @@ def generate_trip_plan(destination, budget, days, interests):
     estimated_cost = estimate_total_cost(
         hotel_cost,
         package_cost,
-        budget
+        budget,
+        days
     )
+
+    best_season = get_best_season(destination)
+    nearest_airport = get_nearest_airport(destination)
+    travel_style = infer_travel_style(interests)
+    route_suggestion = get_route_suggestion(destination, origin_city)
 
     return {
         "generated_plan": itinerary_text,
@@ -224,4 +348,8 @@ def generate_trip_plan(destination, budget, days, interests):
         "recommended_packages": packages,
         "hotel_ids": ",".join(hotel_ids),
         "package_ids": ",".join(package_ids),
+        "best_season": best_season,
+        "nearest_airport": nearest_airport,
+        "travel_style": travel_style,
+        "route_suggestion": route_suggestion,
     }
