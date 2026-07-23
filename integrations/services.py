@@ -11,21 +11,10 @@ class LocationService:
         try:
 
             response = requests.get(
-
                 LocationService.BASE_URL,
-
-                params={
-                    "q": city,
-                    "format": "json",
-                    "limit": 1
-                },
-
-                headers={
-                    "User-Agent": "TripEase"
-                },
-
-                timeout=10
-
+                params={"q": city, "format": "json", "limit": 1},
+                headers={"User-Agent": "TripEase"},
+                timeout=10,
             )
 
             response.raise_for_status()
@@ -38,7 +27,7 @@ class LocationService:
             return {
                 "latitude": float(data[0]["lat"]),
                 "longitude": float(data[0]["lon"]),
-                "display_name": data[0]["display_name"]
+                "display_name": data[0]["display_name"],
             }
 
         except Exception:

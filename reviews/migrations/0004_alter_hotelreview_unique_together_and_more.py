@@ -7,19 +7,19 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('hotels', '0003_alter_hotelbooking_booking_status'),
+        ("hotels", "0003_alter_hotelbooking_booking_status"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('packages', '0002_travelpackage_inclusions_and_more'),
-        ('reviews', '0003_alter_hotelreview_options_and_more'),
+        ("packages", "0002_travelpackage_inclusions_and_more"),
+        ("reviews", "0003_alter_hotelreview_options_and_more"),
     ]
 
     operations = [
         migrations.AlterUniqueTogether(
-            name='hotelreview',
-            unique_together={('user', 'hotel')},
+            name="hotelreview",
+            unique_together={("user", "hotel")},
         ),
         migrations.AlterUniqueTogether(
-            name='packagereview',
-            unique_together={('user', 'package')},
+            name="packagereview",
+            unique_together={("user", "package")},
         ),
     ]

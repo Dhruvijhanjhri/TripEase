@@ -1,5 +1,3 @@
-from collections import Counter
-
 POPULAR_DESTINATIONS = {
     "Goa": {"score": 92, "reason": "Matches your beach travel preference"},
     "Manali": {"score": 86, "reason": "Great for mountain and leisure trips"},
@@ -14,6 +12,7 @@ POPULAR_DESTINATIONS = {
     "Andaman": {"score": 90, "reason": "Premium beach and island experience"},
     "Leh": {"score": 87, "reason": "Ideal for adventure seekers"},
 }
+
 
 def recommend_destinations(flight_bookings, hotel_bookings, package_bookings, limit=3):
     """
@@ -54,22 +53,20 @@ def recommend_destinations(flight_bookings, hotel_bookings, package_bookings, li
 
         # Skip already visited destinations
         already_visited = any(
-            destination_lower in v or v in destination_lower
-            for v in visited_normalized
+            destination_lower in v or v in destination_lower for v in visited_normalized
         )
 
         if already_visited:
             continue
 
-        recommendations.append({
-            "destination": destination,
-            "match_score": info["score"],
-            "reason": info["reason"],
-        })
+        recommendations.append(
+            {
+                "destination": destination,
+                "match_score": info["score"],
+                "reason": info["reason"],
+            }
+        )
 
-    recommendations.sort(
-        key=lambda x: x["match_score"],
-        reverse=True
-    )
+    recommendations.sort(key=lambda x: x["match_score"], reverse=True)
 
     return recommendations[:limit]

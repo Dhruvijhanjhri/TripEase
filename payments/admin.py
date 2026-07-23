@@ -5,15 +5,6 @@ from .models import Payment
 @admin.register(Payment)
 class PaymentAdmin(admin.ModelAdmin):
 
-    list_display = (
-        'id',
-        'payment_method',
-        'amount',
-        'payment_status',
-        'payment_date'
-    )
+    list_display = ("id", "payment_method", "amount", "payment_status", "payment_date")
 
-    list_filter = (
-        'payment_status',
-        'payment_method'
-    )
+    list_filter = ("payment_status", "payment_method")

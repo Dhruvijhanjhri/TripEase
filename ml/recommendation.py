@@ -53,36 +53,22 @@ def calculate_recommendation_score(
 
     return round(min(score, 100), 1)
 
+
 def get_confidence(score):
     """
     Converts recommendation score into AI confidence.
     """
 
     if score >= 90:
-        return (
-            "★★★★★",
-            "Very High"
-        )
+        return ("★★★★★", "Very High")
 
     elif score >= 80:
-        return (
-            "★★★★☆",
-            "High"
-        )
+        return ("★★★★☆", "High")
 
     elif score >= 70:
-        return (
-            "★★★☆☆",
-            "Medium"
-        )
+        return ("★★★☆☆", "Medium")
 
     elif score >= 60:
-        return (
-            "★★☆☆☆",
-            "Low"
-        )
+        return ("★★☆☆☆", "Low")
 
-    return (
-        "★☆☆☆☆",
-        "Very Low"
-    )
+    return ("★☆☆☆☆", "Very Low")

@@ -1,7 +1,6 @@
 import pickle
 from pathlib import Path
 import numpy as np
-from datetime import datetime
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -51,26 +50,16 @@ def predict_fare(
         "departure_day_of_week": departure_day_of_week,
         "departure_month": departure_month,
         "departure_hour": departure_hour,
-
         "is_weekend": is_weekend,
-
         "Source_encoded": encode("Source", source_city),
         "Destination_encoded": encode("Destination", destination_city),
-        "Layover1_encoded": encode(
-            "Layover1",
-            "NoStop" if stops == 0 else "Layover"
-        ),
+        "Layover1_encoded": encode("Layover1", "NoStop" if stops == 0 else "Layover"),
         "Layover2_encoded": encode("Layover2", "NoStop"),
         "Layover3_encoded": encode("Layover3", "NoStop"),
-        "primary_airline_encoded": encode(
-            "primary_airline",
-            airline
-        ),
+        "primary_airline_encoded": encode("primary_airline", airline),
     }
 
-    X = np.array([
-        [features[col] for col in FEATURE_COLUMNS]
-    ])
+    X = np.array([[features[col] for col in FEATURE_COLUMNS]])
 
     if SCALE_FEATURES and SCALER is not None:
         X = SCALER.transform(X)

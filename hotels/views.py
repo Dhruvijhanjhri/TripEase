@@ -1,40 +1,28 @@
 from datetime import datetime
 from django.db.models import Q
-from django.shortcuts import (
-    render,
-    get_object_or_404,
-    redirect
-)
+from django.shortcuts import render, get_object_or_404, redirect
 
-from django.contrib.auth.decorators import (
-    login_required
-)
+from django.contrib.auth.decorators import login_required
 
 from django.contrib import messages
 from .models import Hotel
 from .models import Room
 from .models import HotelBooking
-from .models import HotelGuest
 from payments.models import Payment
 from .forms import HotelSearchForm
-from .forms import HotelGuestFormSet
 from .forms import HotelPaymentForm
 from reviews.models import HotelReview
 from django.db.models import Avg
-from django.contrib.auth.decorators import login_required
-from .models import HotelBooking
 from integrations.services import LocationService
 from utils.weather import (
-    get_weather,
     get_weather_by_coordinates,
 )
 from utils.nearby import get_nearby_places
 
+
 def hotel_search(request):
 
-    form = HotelSearchForm(
-        request.GET or None
-    )
+    form = HotelSearchForm(request.GET or None)
 
     hotels = []
     search_performed = False
@@ -43,57 +31,37 @@ def hotel_search(request):
 
         search_performed = True
 
-        destination = (
-            form.cleaned_data["destination"]
-            .strip()
-            .lower()
-        )
+        destination = form.cleaned_data["destination"].strip().lower()
 
         hotels_queryset = Hotel.objects.filter(
-            Q(city__icontains=destination) |
-            Q(state__icontains=destination) |
-            Q(area__icontains=destination) |
-            Q(search_keywords__icontains=destination)
+            Q(city__icontains=destination)
+            | Q(state__icontains=destination)
+            | Q(area__icontains=destination)
+            | Q(search_keywords__icontains=destination)
         ).prefetch_related("rooms")
 
         filtered_hotels = []
 
         for hotel in hotels_queryset:
 
-            available_room = hotel.rooms.filter(
-                available_rooms__gt=0
-            ).first()
+            available_room = hotel.rooms.filter(available_rooms__gt=0).first()
 
             if available_room:
 
-                hotel.display_room = (
-                    available_room
-                )
+                hotel.display_room = available_room
 
-                filtered_hotels.append(
-                    hotel
-                )
+                filtered_hotels.append(hotel)
 
         hotels = filtered_hotels
 
-    context = {
-        "form": form,
-        "hotels": hotels,
-        "search_performed": search_performed
-    }
+    context = {"form": form, "hotels": hotels, "search_performed": search_performed}
 
-    return render(
-        request,
-        "hotels/search.html",
-        context
-    )
+    return render(request, "hotels/search.html", context)
+
 
 def hotel_detail(request, hotel_id):
 
-    hotel = get_object_or_404(
-        Hotel,
-        id=hotel_id
-    )
+    hotel = get_object_or_404(Hotel, id=hotel_id)
 
     live_location = LocationService.get_coordinates(hotel.city)
 
@@ -101,7 +69,7 @@ def hotel_detail(request, hotel_id):
     if not live_location:
         live_location = {
             "display_name": f"{hotel.city}, {hotel.state}, India",
-            "latitude": 22.7196,   # Indore fallback
+            "latitude": 22.7196,  # Indore fallback
             "longitude": 75.8577,
         }
 
@@ -123,13 +91,9 @@ def hotel_detail(request, hotel_id):
     print("LIVE LOCATION:", live_location)
     print("NEARBY:", nearby)
 
-    rooms = hotel.rooms.filter(
-        available_rooms__gt=0
-    )
+    rooms = hotel.rooms.filter(available_rooms__gt=0)
 
-    average_rating = hotel.reviews.aggregate(
-        Avg("rating")
-    )["rating__avg"]
+    average_rating = hotel.reviews.aggregate(Avg("rating"))["rating__avg"]
 
     review_count = hotel.reviews.count()
 
@@ -141,14 +105,11 @@ def hotel_detail(request, hotel_id):
     if request.user.is_authenticated:
 
         booking_exists = HotelBooking.objects.filter(
-            user=request.user,
-            hotel=hotel,
-            booking_status="confirmed"
+            user=request.user, hotel=hotel, booking_status="confirmed"
         ).exists()
 
         already_reviewed = HotelReview.objects.filter(
-            user=request.user,
-            hotel=hotel
+            user=request.user, hotel=hotel
         ).exists()
 
         if booking_exists and not already_reviewed:
@@ -171,40 +132,21 @@ def hotel_detail(request, hotel_id):
         "nearby": nearby,
     }
 
-    return render(
-        request,
-        "hotels/detail.html",
-        context
-    )
+    return render(request, "hotels/detail.html", context)
 
 
 @login_required
 def hotel_booking(request, room_id):
 
-    room = get_object_or_404(
-        Room,
-        id=room_id
-    )
+    room = get_object_or_404(Room, id=room_id)
 
-    check_in = request.GET.get(
-        "check_in",
-        ""
-    )
+    check_in = request.GET.get("check_in", "")
 
-    check_out = request.GET.get(
-        "check_out",
-        ""
-    )
+    check_out = request.GET.get("check_out", "")
 
-    guests = request.GET.get(
-        "guests",
-        "1"
-    )
+    guests = request.GET.get("guests", "1")
 
-    rooms_count = request.GET.get(
-        "rooms",
-        "1"
-    )
+    rooms_count = request.GET.get("rooms", "1")
 
     try:
         guests = int(guests)
@@ -212,9 +154,7 @@ def hotel_booking(request, room_id):
         guests = 1
 
     try:
-        rooms_count = int(
-            rooms_count
-        )
+        rooms_count = int(rooms_count)
     except:
         rooms_count = 1
 
@@ -226,20 +166,11 @@ def hotel_booking(request, room_id):
 
         try:
 
-            check_in_date = datetime.strptime(
-                check_in,
-                "%Y-%m-%d"
-            ).date()
+            check_in_date = datetime.strptime(check_in, "%Y-%m-%d").date()
 
-            check_out_date = datetime.strptime(
-                check_out,
-                "%Y-%m-%d"
-            ).date()
+            check_out_date = datetime.strptime(check_out, "%Y-%m-%d").date()
 
-            nights = (
-                check_out_date -
-                check_in_date
-            ).days
+            nights = (check_out_date - check_in_date).days
 
             if nights <= 0:
                 nights = 1
@@ -247,60 +178,31 @@ def hotel_booking(request, room_id):
         except:
             nights = 1
 
-    total_price = (
-        room.price_per_night *
-        nights *
-        rooms_count
-    )
+    total_price = room.price_per_night * nights * rooms_count
 
     if request.method == "POST":
 
-        guests = int(
-            request.POST.get(
-                "guests",
-                guests
-            )
-        )
+        guests = int(request.POST.get("guests", guests))
 
-        rooms_count = int(
-            request.POST.get(
-                "rooms_count",
-                rooms_count
-            )
-        )
+        rooms_count = int(request.POST.get("rooms_count", rooms_count))
 
-        if (
-            room.available_rooms
-            < rooms_count
-        ):
+        if room.available_rooms < rooms_count:
 
-            messages.error(
-                request,
-                "Not enough rooms available."
-            )
+            messages.error(request, "Not enough rooms available.")
 
-            return redirect(
-                "hotels:detail",
-                hotel_id=room.hotel.id
-            )
+            return redirect("hotels:detail", hotel_id=room.hotel.id)
 
-        max_allowed_guests = (
-            room.max_guests *
-            rooms_count
-        )
+        max_allowed_guests = room.max_guests * rooms_count
 
         if guests > max_allowed_guests:
 
             messages.error(
                 request,
                 f"Maximum {max_allowed_guests} guests allowed "
-                f"for {rooms_count} room(s)."
+                f"for {rooms_count} room(s).",
             )
 
-            return redirect(
-                "hotels:detail",
-                hotel_id=room.hotel.id
-            )
+            return redirect("hotels:detail", hotel_id=room.hotel.id)
 
         booking = HotelBooking.objects.create(
             user=request.user,
@@ -311,18 +213,13 @@ def hotel_booking(request, room_id):
             guests=guests,
             rooms_count=rooms_count,
             total_price=total_price,
-            booking_status="pending"
+            booking_status="pending",
         )
 
-        room.available_rooms -= (
-            rooms_count
-        )
+        room.available_rooms -= rooms_count
         room.save()
 
-        return redirect(
-            "hotels:payment",
-            booking_id=booking.id
-        )
+        return redirect("hotels:payment", booking_id=booking.id)
 
     context = {
         "room": room,
@@ -334,62 +231,36 @@ def hotel_booking(request, room_id):
         "check_out": check_out,
     }
 
-    return render(
-        request,
-        "hotels/booking.html",
-        context
-    )
+    return render(request, "hotels/booking.html", context)
 
 
 @login_required
 def hotel_booking_detail(request, booking_reference):
 
     booking = get_object_or_404(
-        HotelBooking.objects.select_related(
-            "hotel",
-            "room"
-        ),
+        HotelBooking.objects.select_related("hotel", "room"),
         booking_reference=booking_reference,
-        user=request.user
+        user=request.user,
     )
 
-    return render(
-        request,
-        "hotels/hotel_booking_detail.html",
-        {
-            "booking": booking
-        }
-    )
+    return render(request, "hotels/hotel_booking_detail.html", {"booking": booking})
+
 
 @login_required
-def hotel_payment(
-    request,
-    booking_id
-):
+def hotel_payment(request, booking_id):
 
-    booking = get_object_or_404(
-        HotelBooking,
-        id=booking_id,
-        user=request.user
-    )
+    booking = get_object_or_404(HotelBooking, id=booking_id, user=request.user)
 
-    nights = (
-        booking.check_out_date -
-        booking.check_in_date
-    ).days
+    nights = (booking.check_out_date - booking.check_in_date).days
 
     if nights <= 0:
         nights = 1
 
-    if hasattr(booking, 'payment'):
-        messages.info(
-            request,
-            'Payment already processed.'
-        )
+    if hasattr(booking, "payment"):
+        messages.info(request, "Payment already processed.")
 
         return redirect(
-            'hotels:booking_detail',
-            booking_reference=booking.booking_reference
+            "hotels:booking_detail", booking_reference=booking.booking_reference
         )
 
     if request.method == "POST":
@@ -397,27 +268,23 @@ def hotel_payment(
         form = HotelPaymentForm(request.POST)
 
         if form.is_valid():
-            payment_method = form.cleaned_data['payment_method']
+            payment_method = form.cleaned_data["payment_method"]
 
             payment = Payment.objects.create(
                 hotel_booking=booking,
                 amount=booking.total_price,
                 payment_method=payment_method,
-                payment_status='success',
-                transaction_id=f'HOTEL{booking.id:06d}'
+                payment_status="success",
+                transaction_id=f"HOTEL{booking.id:06d}",
             )
 
             booking.booking_status = "confirmed"
             booking.save()
 
-            messages.success(
-                request,
-                "Payment successful!"
-            )
+            messages.success(request, "Payment successful!")
 
             return redirect(
-                "hotels:booking_detail",
-                booking_reference=booking.booking_reference
+                "hotels:booking_detail", booking_reference=booking.booking_reference
             )
     else:
         form = HotelPaymentForm()
@@ -428,31 +295,22 @@ def hotel_payment(
         "form": form,
     }
 
-    return render(
-        request,
-        "hotels/payment.html",
-        context
-    )
+    return render(request, "hotels/payment.html", context)
+
 
 @login_required
 def cancel_booking(request, booking_reference):
 
     booking = get_object_or_404(
-        HotelBooking,
-        booking_reference=booking_reference,
-        user=request.user
+        HotelBooking, booking_reference=booking_reference, user=request.user
     )
 
     if booking.booking_status == "cancelled":
 
-        messages.warning(
-            request,
-            "Booking already cancelled."
-        )
+        messages.warning(request, "Booking already cancelled.")
 
         return redirect(
-            "hotels:booking_detail",
-            booking_reference=booking.booking_reference
+            "hotels:booking_detail", booking_reference=booking.booking_reference
         )
 
     booking.booking_status = "cancelled"
@@ -463,12 +321,8 @@ def cancel_booking(request, booking_reference):
 
     booking.room.save()
 
-    messages.success(
-        request,
-        "Hotel booking cancelled successfully."
-    )
+    messages.success(request, "Hotel booking cancelled successfully.")
 
     return redirect(
-        "hotels:booking_detail",
-        booking_reference=booking.booking_reference
+        "hotels:booking_detail", booking_reference=booking.booking_reference
     )

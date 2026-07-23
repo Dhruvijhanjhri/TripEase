@@ -7,14 +7,20 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('packages', '0002_travelpackage_inclusions_and_more'),
-        ('payments', '0003_alter_payment_payment_method'),
+        ("packages", "0002_travelpackage_inclusions_and_more"),
+        ("payments", "0003_alter_payment_payment_method"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='payment',
-            name='package_booking',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='payment', to='packages.packagebooking'),
+            model_name="payment",
+            name="package_booking",
+            field=models.OneToOneField(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="payment",
+                to="packages.packagebooking",
+            ),
         ),
     ]

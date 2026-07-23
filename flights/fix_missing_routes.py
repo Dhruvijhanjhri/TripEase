@@ -14,26 +14,32 @@ from flights.realism import (
 
 print("Fixing missing/weak airports...")
 
-hub_codes = ['DEL', 'BLR', 'MAA', 'BOM', 'HYD', 'CCU']
+hub_codes = ["DEL", "BLR", "MAA", "BOM", "HYD", "CCU"]
 
 airlines = [
-    'Air India',
-    'Air India Express',
-    'IndiGo',
-    'Akasa Air',
-    'SpiceJet',
+    "Air India",
+    "Air India Express",
+    "IndiGo",
+    "Akasa Air",
+    "SpiceJet",
 ]
 
 # Airports with poor coverage
 target_airports = [
-    'IXE', 'NAG', 'IXZ', 'IXB', 'SXR',
-    'IXM', 'GOX', 'IMF', 'IXJ', 'IXL', 'IXR'
+    "IXE",
+    "NAG",
+    "IXZ",
+    "IXB",
+    "SXR",
+    "IXM",
+    "GOX",
+    "IMF",
+    "IXJ",
+    "IXL",
+    "IXR",
 ]
 
-airports = {
-    airport.code: airport
-    for airport in Airport.objects.all()
-}
+airports = {airport.code: airport for airport in Airport.objects.all()}
 
 created_count = 0
 
@@ -60,9 +66,7 @@ for airport_code in target_airports:
 
             for _ in range(2):
 
-                chosen_airline = normalize_airline_name(
-                    random.choice(airlines)
-                )
+                chosen_airline = normalize_airline_name(random.choice(airlines))
 
                 departure_hour = random.randint(5, 22)
                 departure_minute = random.choice([0, 15, 30, 45])
@@ -73,16 +77,13 @@ for airport_code in target_airports:
                         date.month,
                         date.day,
                         departure_hour,
-                        departure_minute
+                        departure_minute,
                     )
                 )
 
                 duration = get_route_duration_minutes(airport_code, hub_code)
 
-                arrival_time = (
-                    departure_time +
-                    timedelta(minutes=duration)
-                )
+                arrival_time = departure_time + timedelta(minutes=duration)
 
                 base_price = get_route_base_fare(airport_code, hub_code)
 
@@ -90,8 +91,7 @@ for airport_code in target_airports:
                 unique_id = uuid.uuid4().hex[:6].upper()
 
                 flight_number = (
-                    f"{get_airline_code(chosen_airline)}-"
-                    f"{airport_code}{unique_id}"
+                    f"{get_airline_code(chosen_airline)}-" f"{airport_code}{unique_id}"
                 )
 
                 new_flights.append(
@@ -108,7 +108,7 @@ for airport_code in target_airports:
                         first_class_price=Decimal(base_price * 1.35),
                         total_seats=180,
                         available_seats=random.randint(50, 180),
-                        is_non_stop=True
+                        is_non_stop=True,
                     )
                 )
 

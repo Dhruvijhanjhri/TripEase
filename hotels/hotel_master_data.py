@@ -9,9 +9,8 @@ REAL_HOTELS = {
         "Grand Hyatt Mumbai",
         "Sofitel Mumbai BKC",
         "The Lalit Mumbai",
-        "President Mumbai"
+        "President Mumbai",
     ],
-
     "Delhi": [
         "ITC Maurya",
         "Taj Palace New Delhi",
@@ -22,9 +21,8 @@ REAL_HOTELS = {
         "Shangri-La Eros New Delhi",
         "The Lalit New Delhi",
         "Vivanta New Delhi",
-        "Andaz Delhi"
+        "Andaz Delhi",
     ],
-
     "Bengaluru": [
         "Taj West End",
         "The Oberoi Bengaluru",
@@ -35,9 +33,8 @@ REAL_HOTELS = {
         "Conrad Bengaluru",
         "Radisson Blu Atria",
         "Vivanta MG Road",
-        "Welcomhotel Bengaluru"
+        "Welcomhotel Bengaluru",
     ],
-
     "Hyderabad": [
         "Taj Falaknuma Palace",
         "ITC Kohenur",
@@ -48,9 +45,8 @@ REAL_HOTELS = {
         "Marriott Hyderabad",
         "Trident Hyderabad",
         "Lemon Tree Premier",
-        "Vivanta Hyderabad"
+        "Vivanta Hyderabad",
     ],
-
     "Chennai": [
         "ITC Grand Chola",
         "The Leela Palace Chennai",
@@ -61,9 +57,8 @@ REAL_HOTELS = {
         "Novotel Chennai",
         "Vivanta Chennai",
         "Radisson Blu Chennai",
-        "Taj Connemara"
+        "Taj Connemara",
     ],
-
     "Kolkata": [
         "ITC Royal Bengal",
         "The Oberoi Grand",
@@ -74,9 +69,8 @@ REAL_HOTELS = {
         "The Lalit Great Eastern",
         "Vivanta Kolkata",
         "Peerless Hotel Kolkata",
-        "Kenilworth Kolkata"
+        "Kenilworth Kolkata",
     ],
-
     "Pune": [
         "JW Marriott Pune",
         "Conrad Pune",
@@ -87,9 +81,8 @@ REAL_HOTELS = {
         "Vivanta Pune",
         "Radisson Blu Pune",
         "Marriott Suites Pune",
-        "Sayaji Pune"
+        "Sayaji Pune",
     ],
-
     "Ahmedabad": [
         "Hyatt Regency Ahmedabad",
         "Courtyard Ahmedabad",
@@ -100,9 +93,8 @@ REAL_HOTELS = {
         "Renaissance Ahmedabad",
         "The Fern Ahmedabad",
         "Lemon Tree Ahmedabad",
-        "Pride Plaza Ahmedabad"
+        "Pride Plaza Ahmedabad",
     ],
-
     "Goa": [
         "Taj Exotica Goa",
         "W Goa",
@@ -113,9 +105,8 @@ REAL_HOTELS = {
         "Planet Hollywood Goa",
         "Novotel Goa",
         "Holiday Inn Goa",
-        "Radisson Blu Goa"
+        "Radisson Blu Goa",
     ],
-
     "Jaipur": [
         "Rambagh Palace",
         "ITC Rajputana",
@@ -126,9 +117,8 @@ REAL_HOTELS = {
         "Fairmont Jaipur",
         "The Lalit Jaipur",
         "Le Meridien Jaipur",
-        "Clarks Amer Jaipur"
+        "Clarks Amer Jaipur",
     ],
-
     "Udaipur": [
         "The Oberoi Udaivilas",
         "Taj Fateh Prakash",
@@ -139,6 +129,6 @@ REAL_HOTELS = {
         "Fateh Garh Udaipur",
         "Ramada Udaipur",
         "Parallel Hotel Udaipur",
-        "Jagat Niwas Palace"
-    ]
+        "Jagat Niwas Palace",
+    ],
 }

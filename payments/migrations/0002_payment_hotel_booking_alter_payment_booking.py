@@ -7,20 +7,32 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('bookings', '0002_booking_travel_date'),
-        ('hotels', '0001_initial'),
-        ('payments', '0001_initial'),
+        ("bookings", "0002_booking_travel_date"),
+        ("hotels", "0001_initial"),
+        ("payments", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='payment',
-            name='hotel_booking',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='payment', to='hotels.hotelbooking'),
+            model_name="payment",
+            name="hotel_booking",
+            field=models.OneToOneField(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="payment",
+                to="hotels.hotelbooking",
+            ),
         ),
         migrations.AlterField(
-            model_name='payment',
-            name='booking',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='payment', to='bookings.booking'),
+            model_name="payment",
+            name="booking",
+            field=models.OneToOneField(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="payment",
+                to="bookings.booking",
+            ),
         ),
     ]

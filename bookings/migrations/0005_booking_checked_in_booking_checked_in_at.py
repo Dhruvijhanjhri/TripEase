@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('bookings', '0004_alter_passenger_seat_number'),
+        ("bookings", "0004_alter_passenger_seat_number"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='booking',
-            name='checked_in',
+            model_name="booking",
+            name="checked_in",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='booking',
-            name='checked_in_at',
+            model_name="booking",
+            name="checked_in_at",
             field=models.DateTimeField(blank=True, null=True),
         ),
     ]

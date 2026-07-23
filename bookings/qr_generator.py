@@ -6,12 +6,7 @@ from django.conf import settings
 
 def generate_qr_code(booking):
 
-    seat_numbers = ", ".join(
-        booking.passengers.values_list(
-            "seat_number",
-            flat=True
-        )
-    )
+    seat_numbers = ", ".join(booking.passengers.values_list("seat_number", flat=True))
 
     qr_data = f"""
 TripEase Boarding Pass
@@ -35,41 +30,22 @@ Seat(s):
 {seat_numbers}
 """
 
-    qr = qrcode.QRCode(
-        version=1,
-        box_size=10,
-        border=4
-    )
+    qr = qrcode.QRCode(version=1, box_size=10, border=4)
 
     qr.add_data(qr_data)
 
     qr.make(fit=True)
 
-    image = qr.make_image(
-        fill_color="black",
-        back_color="white"
-    )
+    image = qr.make_image(fill_color="black", back_color="white")
 
-    folder = os.path.join(
-        settings.MEDIA_ROOT,
-        "qr_codes"
-    )
+    folder = os.path.join(settings.MEDIA_ROOT, "qr_codes")
 
-    os.makedirs(
-        folder,
-        exist_ok=True
-    )
+    os.makedirs(folder, exist_ok=True)
 
     filename = f"{booking.booking_reference}.png"
 
-    filepath = os.path.join(
-        folder,
-        filename
-    )
+    filepath = os.path.join(folder, filename)
 
     image.save(filepath)
 
-    return os.path.join(
-        "qr_codes",
-        filename
-    )
+    return os.path.join("qr_codes", filename)

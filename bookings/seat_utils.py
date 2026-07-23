@@ -17,10 +17,12 @@ def generate_seat_map(booked_seats=None):
 
             seat = f"{row}{letter}"
 
-            row_seats.append({
-                "seat_number": seat,
-                "booked": seat in booked_seats,
-            })
+            row_seats.append(
+                {
+                    "seat_number": seat,
+                    "booked": seat in booked_seats,
+                }
+            )
 
         seat_map.append(row_seats)
 

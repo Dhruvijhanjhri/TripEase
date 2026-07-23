@@ -13,32 +13,20 @@ from packages.models import PackageBooking
 @login_required
 def payment_view(request, booking_id):
 
-    booking = get_object_or_404(
-        Booking,
-        id=booking_id,
-        user=request.user
-    )
+    booking = get_object_or_404(Booking, id=booking_id, user=request.user)
 
-    if hasattr(booking, 'payment'):
-        messages.info(
-            request,
-            'Payment already processed.'
-        )
+    if hasattr(booking, "payment"):
+        messages.info(request, "Payment already processed.")
 
-        return redirect(
-            'bookings:detail',
-            booking_reference=booking.booking_reference
-        )
+        return redirect("bookings:detail", booking_reference=booking.booking_reference)
 
-    if request.method == 'POST':
+    if request.method == "POST":
 
         form = PaymentForm(request.POST)
 
         if form.is_valid():
 
-            payment_method = form.cleaned_data[
-                'payment_method'
-            ]
+            payment_method = form.cleaned_data["payment_method"]
 
             try:
 
@@ -50,170 +38,103 @@ def payment_view(request, booking_id):
                         booking=booking,
                         amount=booking.total_price,
                         payment_method=payment_method,
-                        payment_status='success',
-                        transaction_id=transaction_id
+                        payment_status="success",
+                        transaction_id=transaction_id,
                     )
 
-                    booking.booking_status = 'confirmed'
+                    booking.booking_status = "confirmed"
                     booking.save()
 
                     messages.success(
                         request,
-                        f'Payment successful! '
-                        f'Transaction ID: '
-                        f'{transaction_id}'
+                        f"Payment successful! " f"Transaction ID: " f"{transaction_id}",
                     )
 
-                    return redirect(
-                        'payments:success',
-                        booking_id=booking_id
-                    )
+                    return redirect("payments:success", booking_id=booking_id)
 
             except Exception as e:
 
-                messages.error(
-                    request,
-                    f'Payment error: {str(e)}'
-                )
+                messages.error(request, f"Payment error: {str(e)}")
 
     else:
         form = PaymentForm()
 
     context = {
-        'booking': booking,
-        'form': form,
+        "booking": booking,
+        "form": form,
     }
 
-    return render(
-        request,
-        'payments/payment.html',
-        context
-    )
+    return render(request, "payments/payment.html", context)
+
 
 @login_required
-def payment_success(
-    request,
-    booking_id
-):
+def payment_success(request, booking_id):
 
-    booking = get_object_or_404(
-        Booking,
-        id=booking_id,
-        user=request.user
-    )
+    booking = get_object_or_404(Booking, id=booking_id, user=request.user)
 
-    payment = get_object_or_404(
-        Payment,
-        booking=booking
-    )
+    payment = get_object_or_404(Payment, booking=booking)
 
     context = {
-        'booking': booking,
-        'payment': payment,
+        "booking": booking,
+        "payment": payment,
     }
 
-    return render(
-        request,
-        'payments/success.html',
-        context
-    )
+    return render(request, "payments/success.html", context)
+
 
 @login_required
-def package_payment_view(
-    request,
-    booking_id
-):
+def package_payment_view(request, booking_id):
 
-    booking = get_object_or_404(
-        PackageBooking,
-        id=booking_id,
-        user=request.user
-    )
+    booking = get_object_or_404(PackageBooking, id=booking_id, user=request.user)
 
-    if hasattr(booking, 'payment'):
+    if hasattr(booking, "payment"):
 
-        messages.info(
-            request,
-            'Payment already processed.'
-        )
+        messages.info(request, "Payment already processed.")
 
-        return redirect(
-            'packages:booking_success',
-            booking_id=booking.id
-        )
+        return redirect("packages:booking_success", booking_id=booking.id)
 
-    if request.method == 'POST':
+    if request.method == "POST":
 
-        form = PaymentForm(
-            request.POST
-        )
+        form = PaymentForm(request.POST)
 
         if form.is_valid():
 
-            payment_method = form.cleaned_data[
-                'payment_method'
-            ]
+            payment_method = form.cleaned_data["payment_method"]
 
-            transaction_id = (
-                uuid.uuid4()
-                .hex[:12]
-                .upper()
-            )
+            transaction_id = uuid.uuid4().hex[:12].upper()
 
             Payment.objects.create(
                 package_booking=booking,
                 amount=booking.total_price,
                 payment_method=payment_method,
-                payment_status='success',
-                transaction_id=transaction_id
+                payment_status="success",
+                transaction_id=transaction_id,
             )
 
-            booking.booking_status = (
-                'confirmed'
-            )
+            booking.booking_status = "confirmed"
 
             booking.save()
 
-            return redirect(
-                'payments:package_success',
-                booking_id=booking.id
-            )
+            return redirect("payments:package_success", booking_id=booking.id)
 
     else:
 
         form = PaymentForm()
 
     return render(
-        request,
-        'payments/package_payment.html',
-        {
-            'booking': booking,
-            'form': form
-        }
+        request, "payments/package_payment.html", {"booking": booking, "form": form}
     )
+
 
 @login_required
-def package_payment_success(
-    request,
-    booking_id
-):
+def package_payment_success(request, booking_id):
 
-    booking = get_object_or_404(
-        PackageBooking,
-        id=booking_id,
-        user=request.user
-    )
+    booking = get_object_or_404(PackageBooking, id=booking_id, user=request.user)
 
-    payment = get_object_or_404(
-        Payment,
-        package_booking=booking
-    )
+    payment = get_object_or_404(Payment, package_booking=booking)
 
     return render(
         request,
-        'payments/package_success.html',
-        {
-            'booking': booking,
-            'payment': payment
-        }
+        "payments/package_success.html",
+        {"booking": booking, "payment": payment},
     )

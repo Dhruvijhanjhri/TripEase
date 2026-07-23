@@ -31,22 +31,11 @@ def track_booking_flight(request, booking_reference):
 
         for flight in response["data"]:
 
-            departure = (
-                flight.get("departure", {})
-                .get("iata", "")
-                .upper()
-            )
+            departure = flight.get("departure", {}).get("iata", "").upper()
 
-            arrival = (
-                flight.get("arrival", {})
-                .get("iata", "")
-                .upper()
-            )
+            arrival = flight.get("arrival", {}).get("iata", "").upper()
 
-            airline = (
-                flight.get("airline", {})
-                .get("name", "")
-            )
+            airline = flight.get("airline", {}).get("name", "")
 
             if (
                 departure == booking_source

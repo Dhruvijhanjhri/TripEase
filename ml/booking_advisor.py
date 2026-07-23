@@ -8,9 +8,7 @@ def get_booking_recommendation(
 
     difference = float(predicted_price) - float(current_price)
 
-    percentage = (
-        difference / float(predicted_price)
-    ) * 100
+    percentage = (difference / float(predicted_price)) * 100
 
     if percentage >= 15:
 
@@ -19,9 +17,8 @@ def get_booking_recommendation(
             "color": "success",
             "icon": "🟢",
             "message": (
-                "Prices are expected to increase."
-                " Booking now can save money."
-            )
+                "Prices are expected to increase." " Booking now can save money."
+            ),
         }
 
     elif percentage >= 5:
@@ -30,10 +27,7 @@ def get_booking_recommendation(
             "action": "LIKELY BOOK NOW",
             "color": "primary",
             "icon": "🔵",
-            "message": (
-                "Current fare looks good."
-                " Prices may rise soon."
-            )
+            "message": ("Current fare looks good." " Prices may rise soon."),
         }
 
     elif percentage > -5:
@@ -45,7 +39,7 @@ def get_booking_recommendation(
             "message": (
                 "Prices appear stable."
                 " You may wait if your travel dates are flexible."
-            )
+            ),
         }
 
     else:
@@ -55,7 +49,6 @@ def get_booking_recommendation(
             "color": "danger",
             "icon": "🔴",
             "message": (
-                "The fare appears expensive."
-                " Waiting may result in a lower price."
-            )
+                "The fare appears expensive." " Waiting may result in a lower price."
+            ),
         }

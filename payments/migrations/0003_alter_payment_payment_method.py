@@ -6,13 +6,21 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('payments', '0002_payment_hotel_booking_alter_payment_booking'),
+        ("payments", "0002_payment_hotel_booking_alter_payment_booking"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='payment',
-            name='payment_method',
-            field=models.CharField(choices=[('upi', 'UPI'), ('card', 'Credit/Debit Card'), ('netbanking', 'Net Banking'), ('wallet', 'Wallet')], max_length=20),
+            model_name="payment",
+            name="payment_method",
+            field=models.CharField(
+                choices=[
+                    ("upi", "UPI"),
+                    ("card", "Credit/Debit Card"),
+                    ("netbanking", "Net Banking"),
+                    ("wallet", "Wallet"),
+                ],
+                max_length=20,
+            ),
         ),
     ]

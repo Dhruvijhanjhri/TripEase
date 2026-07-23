@@ -24,11 +24,7 @@ class RevenueForecaster:
 
         self.weights = [0.4, 0.3, 0.2, 0.1]
 
-    def forecast(
-        self,
-        revenue_history: List[float],
-        future_days: int = 30
-    ):
+    def forecast(self, revenue_history: List[float], future_days: int = 30):
 
         history = revenue_history.copy()
 
@@ -39,10 +35,10 @@ class RevenueForecaster:
             if len(history) >= 4:
 
                 next_value = (
-                    history[-1] * self.weights[0] +
-                    history[-2] * self.weights[1] +
-                    history[-3] * self.weights[2] +
-                    history[-4] * self.weights[3]
+                    history[-1] * self.weights[0]
+                    + history[-2] * self.weights[1]
+                    + history[-3] * self.weights[2]
+                    + history[-4] * self.weights[3]
                 )
 
             elif history:
@@ -57,14 +53,8 @@ class RevenueForecaster:
 
             history.append(next_value)
 
-        upper = [
-            round(x * 1.10, 2)
-            for x in predictions
-        ]
+        upper = [round(x * 1.10, 2) for x in predictions]
 
-        lower = [
-            round(x * 0.90, 2)
-            for x in predictions
-        ]
+        lower = [round(x * 0.90, 2) for x in predictions]
 
         return predictions, upper, lower

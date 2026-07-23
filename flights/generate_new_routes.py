@@ -6,7 +6,6 @@ import random
 import uuid
 
 from flights.realism import (
-    ACTIVE_AIRLINES,
     get_airline_code,
     get_route_base_fare,
     get_route_duration_minutes,
@@ -18,7 +17,7 @@ print("Generating realistic flight schedules...")
 # Clear old flights
 Flight.objects.all().delete()
 
-HUBS = ['DEL', 'BOM', 'BLR', 'HYD', 'MAA', 'CCU']
+HUBS = ["DEL", "BOM", "BLR", "HYD", "MAA", "CCU"]
 
 AIRLINES = [
     ("6E", "IndiGo"),
@@ -28,10 +27,7 @@ AIRLINES = [
     ("IX", "Air India Express"),
 ]
 
-airports = {
-    airport.code: airport
-    for airport in Airport.objects.all()
-}
+airports = {airport.code: airport for airport in Airport.objects.all()}
 
 today = timezone.now()
 
@@ -42,10 +38,7 @@ for source_code, source_airport in airports.items():
 
     # Hub logic
     if source_code in HUBS:
-        destinations = [
-            code for code in airports.keys()
-            if code != source_code
-        ]
+        destinations = [code for code in airports.keys() if code != source_code]
     else:
         destinations = HUBS.copy()
 
@@ -67,9 +60,7 @@ for source_code, source_airport in airports.items():
             for _ in range(flights_per_day):
 
                 departure_hour = random.randint(5, 22)
-                departure_minute = random.choice(
-                    [0, 15, 30, 45]
-                )
+                departure_minute = random.choice([0, 15, 30, 45])
 
                 departure_time = timezone.make_aware(
                     timezone.datetime(
@@ -77,22 +68,17 @@ for source_code, source_airport in airports.items():
                         travel_date.month,
                         travel_date.day,
                         departure_hour,
-                        departure_minute
+                        departure_minute,
                     )
                 )
 
                 duration = get_route_duration_minutes(source_code, destination_code)
 
-                arrival_time = (
-                    departure_time +
-                    timedelta(minutes=duration)
-                )
+                arrival_time = departure_time + timedelta(minutes=duration)
 
                 base_price = get_route_base_fare(source_code, destination_code)
 
-                code_prefix, airline = random.choice(
-                    AIRLINES
-                )
+                code_prefix, airline = random.choice(AIRLINES)
                 airline = normalize_airline_name(airline)
                 code_prefix = get_airline_code(airline)
 
@@ -116,18 +102,11 @@ for source_code, source_airport in airports.items():
                         arrival_time=arrival_time,
                         duration_minutes=duration,
                         economy_price=Decimal(base_price),
-                        business_price=Decimal(
-                            base_price * 1.8
-                        ),
-                        first_class_price=Decimal(
-                            base_price * 1.35
-                        ),
+                        business_price=Decimal(base_price * 1.8),
+                        first_class_price=Decimal(base_price * 1.35),
                         total_seats=180,
-                        available_seats=random.randint(
-                            40,
-                            180
-                        ),
-                        is_non_stop=True
+                        available_seats=random.randint(40, 180),
+                        is_non_stop=True,
                     )
                 )
 
@@ -135,25 +114,14 @@ for source_code, source_airport in airports.items():
 
                 # Batch insert for speed
                 if len(new_flights) >= 1000:
-                    Flight.objects.bulk_create(
-                        new_flights,
-                        batch_size=1000
-                    )
-                    print(
-                        f"Created {created_count} flights..."
-                    )
+                    Flight.objects.bulk_create(new_flights, batch_size=1000)
+                    print(f"Created {created_count} flights...")
                     new_flights = []
 
 # Insert remaining
 if new_flights:
-    Flight.objects.bulk_create(
-        new_flights,
-        batch_size=1000
-    )
+    Flight.objects.bulk_create(new_flights, batch_size=1000)
 
 print("Done!")
 print("Created:", created_count)
-print(
-    "Total Flights:",
-    Flight.objects.count()
-)
+print("Total Flights:", Flight.objects.count())

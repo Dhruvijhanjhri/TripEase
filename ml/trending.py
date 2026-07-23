@@ -6,9 +6,7 @@ from bookings.models import Booking
 def get_trending_flights():
 
     bookings = (
-        Booking.objects.filter(
-            booking_status="confirmed"
-        )
+        Booking.objects.filter(booking_status="confirmed")
         .values("flight")
         .annotate(total=Count("flight"))
     )

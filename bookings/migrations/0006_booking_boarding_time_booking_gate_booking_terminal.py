@@ -6,23 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('bookings', '0005_booking_checked_in_booking_checked_in_at'),
+        ("bookings", "0005_booking_checked_in_booking_checked_in_at"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='booking',
-            name='boarding_time',
+            model_name="booking",
+            name="boarding_time",
             field=models.DateTimeField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='booking',
-            name='gate',
+            model_name="booking",
+            name="gate",
             field=models.CharField(blank=True, max_length=10, null=True),
         ),
         migrations.AddField(
-            model_name='booking',
-            name='terminal',
+            model_name="booking",
+            name="terminal",
             field=models.CharField(blank=True, max_length=10, null=True),
         ),
     ]

@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('bookings', '0003_booking_cancellation_reason_booking_cancelled_at_and_more'),
+        ("bookings", "0003_booking_cancellation_reason_booking_cancelled_at_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='passenger',
-            name='seat_number',
+            model_name="passenger",
+            name="seat_number",
             field=models.CharField(blank=True, max_length=4, null=True),
         ),
     ]

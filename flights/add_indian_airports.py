@@ -38,12 +38,7 @@ airports = [
 
 for code, name, city in airports:
     Airport.objects.get_or_create(
-        code=code,
-        defaults={
-            "name": name,
-            "city": city,
-            "country": "India"
-        }
+        code=code, defaults={"name": name, "city": city, "country": "India"}
     )
 
 print("Indian airports added successfully")

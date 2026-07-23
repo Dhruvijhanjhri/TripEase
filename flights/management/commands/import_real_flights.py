@@ -8,6 +8,7 @@ from datetime import timedelta
 from flights.models import Flight, Airport
 from flights.realism import normalize_airline_name
 
+
 class Command(BaseCommand):
 
     help = "Import real flight data"
@@ -16,7 +17,7 @@ class Command(BaseCommand):
 
         file_path = "data/Clean_Dataset.csv"
 
-        with open(file_path, newline='', encoding='utf-8') as file:
+        with open(file_path, newline="", encoding="utf-8") as file:
 
             reader = csv.DictReader(file)
 
@@ -26,26 +27,26 @@ class Command(BaseCommand):
 
                 # Create / get source airport
                 source_airport, _ = Airport.objects.get_or_create(
-                    code=row['source_city'][:3].upper(),
+                    code=row["source_city"][:3].upper(),
                     defaults={
-                        "name": row['source_city'] + " Airport",
-                        "city": row['source_city'],
+                        "name": row["source_city"] + " Airport",
+                        "city": row["source_city"],
                         "country": "India",
-                    }
+                    },
                 )
 
                 # Create / get destination airport
                 destination_airport, _ = Airport.objects.get_or_create(
-                    code=row['destination_city'][:3].upper(),
+                    code=row["destination_city"][:3].upper(),
                     defaults={
-                        "name": row['destination_city'] + " Airport",
-                        "city": row['destination_city'],
+                        "name": row["destination_city"] + " Airport",
+                        "city": row["destination_city"],
                         "country": "India",
-                    }
+                    },
                 )
 
                 # Convert duration like "2h 30m" to minutes
-                duration_text = row['duration']
+                duration_text = row["duration"]
 
                 hours = 0
                 minutes = 0
@@ -61,15 +62,13 @@ class Command(BaseCommand):
                 # Create departure & arrival times
                 departure_time = timezone.now()
 
-                arrival_time = departure_time + timedelta(
-                    minutes=duration_minutes
-                )
+                arrival_time = departure_time + timedelta(minutes=duration_minutes)
 
                 # Convert stops to boolean
-                is_non_stop = row['stops'].lower() == "non-stop"
+                is_non_stop = row["stops"].lower() == "non-stop"
 
                 # Base price
-                base_price = float(row['price'])
+                base_price = float(row["price"])
 
                 # Prices for classes
                 economy_price = base_price
@@ -84,38 +83,25 @@ class Command(BaseCommand):
                 available_seats = random.randint(20, 180)
 
                 # Use dataset flight number
-                flight_number = row['flight']
+                flight_number = row["flight"]
 
                 # Create or update flight
                 Flight.objects.update_or_create(
-
                     flight_number=flight_number,
-
                     defaults={
-                        'airline': normalize_airline_name(row['airline']),
-
-                        'source': source_airport,
-
-                        'destination': destination_airport,
-
-                        'departure_time': departure_time,
-
-                        'arrival_time': arrival_time,
-
-                        'duration_minutes': duration_minutes,
-
-                        'economy_price': economy_price,
-
-                        'business_price': business_price,
-
-                        'first_class_price': first_class_price,
-
-                        'total_seats': total_seats,
-
-                        'available_seats': available_seats,
-
-                        'is_non_stop': is_non_stop,
-                    }
+                        "airline": normalize_airline_name(row["airline"]),
+                        "source": source_airport,
+                        "destination": destination_airport,
+                        "departure_time": departure_time,
+                        "arrival_time": arrival_time,
+                        "duration_minutes": duration_minutes,
+                        "economy_price": economy_price,
+                        "business_price": business_price,
+                        "first_class_price": first_class_price,
+                        "total_seats": total_seats,
+                        "available_seats": available_seats,
+                        "is_non_stop": is_non_stop,
+                    },
                 )
 
                 count += 1
@@ -124,8 +110,4 @@ class Command(BaseCommand):
 
                     print(count, "records imported")
 
-        self.stdout.write(
-            self.style.SUCCESS(
-                f"{count} flights imported successfully"
-            )
-        )
+        self.stdout.write(self.style.SUCCESS(f"{count} flights imported successfully"))

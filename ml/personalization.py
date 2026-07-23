@@ -8,8 +8,7 @@ def get_user_preferences(user):
     """
 
     bookings = Booking.objects.filter(
-        user=user,
-        booking_status__in=["confirmed", "completed"]
+        user=user, booking_status__in=["confirmed", "completed"]
     )
 
     if not bookings.exists():
@@ -24,8 +23,6 @@ def get_user_preferences(user):
 
     return {
         "preferred_airline": (
-            preferred_airline["flight__airline"]
-            if preferred_airline
-            else None
+            preferred_airline["flight__airline"] if preferred_airline else None
         )
     }

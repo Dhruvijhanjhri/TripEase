@@ -10,14 +10,12 @@ from django.db.models import Avg
 from django.contrib import messages
 from utils.weather import (
     get_weather,
-    get_weather_by_coordinates,
 )
+
 
 def package_search(request):
 
-    form = PackageSearchForm(
-        request.GET or None
-    )
+    form = PackageSearchForm(request.GET or None)
 
     packages = []
     search_performed = False
@@ -26,42 +24,26 @@ def package_search(request):
 
         search_performed = True
 
-        destination = (
-            form.cleaned_data["destination"]
-            .strip()
-        )
+        destination = form.cleaned_data["destination"].strip()
 
         packages = TravelPackage.objects.filter(
-            destination__icontains=destination,
-            is_active=True
+            destination__icontains=destination, is_active=True
         )
 
     return render(
         request,
         "packages/search.html",
-        {
-            "form": form,
-            "packages": packages,
-            "search_performed": search_performed
-        }
+        {"form": form, "packages": packages, "search_performed": search_performed},
     )
 
 
-def package_detail(
-    request,
-    package_id
-):
+def package_detail(request, package_id):
 
-    package = get_object_or_404(
-        TravelPackage,
-        id=package_id
-    )
+    package = get_object_or_404(TravelPackage, id=package_id)
 
     weather = get_weather(package.destination)
 
-    average_rating = package.reviews.aggregate(
-        Avg("rating")
-    )["rating__avg"]
+    average_rating = package.reviews.aggregate(Avg("rating"))["rating__avg"]
 
     review_count = package.reviews.count()
 
@@ -73,14 +55,11 @@ def package_detail(
     if request.user.is_authenticated:
 
         booking_exists = PackageBooking.objects.filter(
-            user=request.user,
-            package=package,
-            booking_status="confirmed"
+            user=request.user, package=package, booking_status="confirmed"
         ).exists()
 
         already_reviewed = PackageReview.objects.filter(
-            user=request.user,
-            package=package
+            user=request.user, package=package
         ).exists()
 
         if booking_exists and not already_reviewed:
@@ -97,81 +76,50 @@ def package_detail(
             "can_review": can_review,
             "already_reviewed": already_reviewed,
             "weather": weather,
-        }
+        },
     )
+
 
 @login_required
 def package_booking(request, package_id):
 
-    package = get_object_or_404(
-        TravelPackage,
-        id=package_id
-    )
+    package = get_object_or_404(TravelPackage, id=package_id)
 
     if request.method == "POST":
 
-        form = PackageBookingForm(
-            request.POST
-        )
+        form = PackageBookingForm(request.POST)
 
         if form.is_valid():
 
-            travellers = form.cleaned_data[
-                "travellers_count"
-            ]
+            travellers = form.cleaned_data["travellers_count"]
 
-            total_price = (
-                package.price * travellers
-            )
+            total_price = package.price * travellers
 
             booking = PackageBooking.objects.create(
                 user=request.user,
                 package=package,
-                travel_date=form.cleaned_data[
-                    "travel_date"
-                ],
+                travel_date=form.cleaned_data["travel_date"],
                 travellers_count=travellers,
                 total_price=total_price,
-                booking_status="pending"
+                booking_status="pending",
             )
 
-            return redirect(
-                "payments:package_payment",
-                booking.id
-            )
+            return redirect("payments:package_payment", booking.id)
 
     else:
 
         form = PackageBookingForm()
 
-    return render(
-        request,
-        "packages/booking.html",
-        {
-            "package": package,
-            "form": form
-        }
-    )
+    return render(request, "packages/booking.html", {"package": package, "form": form})
+
 
 @login_required
-def booking_success(
-    request,
-    booking_id
-):
+def booking_success(request, booking_id):
 
-    booking = get_object_or_404(
-        PackageBooking,
-        id=booking_id,
-        user=request.user
-    )
+    booking = get_object_or_404(PackageBooking, id=booking_id, user=request.user)
 
-    return render(
-        request,
-        "packages/booking_success.html",
-        {
-            "booking": booking
-        }
-    )
+    return render(request, "packages/booking_success.html", {"booking": booking})
+
 
 @login_required
 def package_booking_detail(request, booking_reference):
@@ -179,24 +127,17 @@ def package_booking_detail(request, booking_reference):
     booking = get_object_or_404(
         PackageBooking.objects.select_related("package"),
         booking_reference=booking_reference,
-        user=request.user
+        user=request.user,
     )
 
-    return render(
-        request,
-        "packages/package_booking_detail.html",
-        {
-            "booking": booking
-        }
-    )
+    return render(request, "packages/package_booking_detail.html", {"booking": booking})
+
 
 @login_required
 def cancel_booking(request, booking_reference):
 
     booking = get_object_or_404(
-        PackageBooking,
-        booking_reference=booking_reference,
-        user=request.user
+        PackageBooking, booking_reference=booking_reference, user=request.user
     )
 
     if request.method == "POST":
@@ -206,12 +147,8 @@ def cancel_booking(request, booking_reference):
             booking.booking_status = "cancelled"
             booking.save()
 
-            messages.success(
-                request,
-                "Package booking cancelled successfully."
-            )
+            messages.success(request, "Package booking cancelled successfully.")
 
     return redirect(
-        "packages:booking_detail",
-        booking_reference=booking.booking_reference
+        "packages:booking_detail", booking_reference=booking.booking_reference
     )

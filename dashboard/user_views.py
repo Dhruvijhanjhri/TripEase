@@ -1,6 +1,5 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.urls import reverse
 from django.utils import timezone
 from collections import defaultdict, Counter
 from decimal import Decimal, ROUND_HALF_UP
@@ -22,40 +21,38 @@ def user_dashboard(request):
     # ─────────────────────────────────────────────────────────────
 
     flight_bookings = list(
-        Booking.objects
-        .filter(user=user)
-        .select_related('flight', 'flight__source', 'flight__destination')
+        Booking.objects.filter(user=user).select_related(
+            "flight", "flight__source", "flight__destination"
+        )
     )
 
     hotel_bookings = list(
-        HotelBooking.objects
-        .filter(user=user)
-        .select_related('hotel', 'room')
+        HotelBooking.objects.filter(user=user).select_related("hotel", "room")
     )
 
     package_bookings = list(
-        PackageBooking.objects
-        .filter(user=user)
-        .select_related('package')
+        PackageBooking.objects.filter(user=user).select_related("package")
     )
 
     # ─────────────────────────────────────────────────────────────
     # 1. TRAVEL SNAPSHOT — COUNTS
     # ─────────────────────────────────────────────────────────────
 
-    total_flight_bookings  = len(flight_bookings)
-    total_hotel_bookings   = len(hotel_bookings)
+    total_flight_bookings = len(flight_bookings)
+    total_hotel_bookings = len(hotel_bookings)
     total_package_bookings = len(package_bookings)
-    total_bookings         = total_flight_bookings + total_hotel_bookings + total_package_bookings
+    total_bookings = (
+        total_flight_bookings + total_hotel_bookings + total_package_bookings
+    )
 
     # ─────────────────────────────────────────────────────────────
     # 2. SPENDING TOTALS
     # ─────────────────────────────────────────────────────────────
 
-    flight_spending  = sum((b.total_price for b in flight_bookings),  Decimal('0.00'))
-    hotel_spending   = sum((b.total_price for b in hotel_bookings),   Decimal('0.00'))
-    package_spending = sum((b.total_price for b in package_bookings), Decimal('0.00'))
-    total_spending   = flight_spending + hotel_spending + package_spending
+    flight_spending = sum((b.total_price for b in flight_bookings), Decimal("0.00"))
+    hotel_spending = sum((b.total_price for b in hotel_bookings), Decimal("0.00"))
+    package_spending = sum((b.total_price for b in package_bookings), Decimal("0.00"))
+    total_spending = flight_spending + hotel_spending + package_spending
 
     # ─────────────────────────────────────────────────────────────
     # 3. UPCOMING TRIPS
@@ -64,21 +61,27 @@ def user_dashboard(request):
     today = now.date()
 
     upcoming_flights = sum(
-        1 for b in flight_bookings
-        if b.travel_date and b.travel_date >= today
-        and b.booking_status in ('pending', 'confirmed')
+        1
+        for b in flight_bookings
+        if b.travel_date
+        and b.travel_date >= today
+        and b.booking_status in ("pending", "confirmed")
     )
 
     upcoming_hotels = sum(
-        1 for b in hotel_bookings
-        if b.check_in_date and b.check_in_date >= today
-        and b.booking_status in ('pending', 'confirmed')
+        1
+        for b in hotel_bookings
+        if b.check_in_date
+        and b.check_in_date >= today
+        and b.booking_status in ("pending", "confirmed")
     )
 
     upcoming_packages = sum(
-        1 for b in package_bookings
-        if b.travel_date and b.travel_date >= today
-        and b.booking_status in ('pending', 'confirmed')
+        1
+        for b in package_bookings
+        if b.travel_date
+        and b.travel_date >= today
+        and b.booking_status in ("pending", "confirmed")
     )
 
     upcoming_trips = upcoming_flights + upcoming_hotels + upcoming_packages
@@ -100,11 +103,13 @@ def user_dashboard(request):
             and booking.booking_status in ("pending", "confirmed")
         ):
 
-            upcoming_items.append({
-                "type": "Flight",
-                "date": booking.travel_date,
-                "booking": booking,
-            })
+            upcoming_items.append(
+                {
+                    "type": "Flight",
+                    "date": booking.travel_date,
+                    "booking": booking,
+                }
+            )
 
     # Hotels
     for booking in hotel_bookings:
@@ -115,11 +120,13 @@ def user_dashboard(request):
             and booking.booking_status in ("pending", "confirmed")
         ):
 
-            upcoming_items.append({
-                "type": "Hotel",
-                "date": booking.check_in_date,
-                "booking": booking,
-            })
+            upcoming_items.append(
+                {
+                    "type": "Hotel",
+                    "date": booking.check_in_date,
+                    "booking": booking,
+                }
+            )
 
     # Packages
     for booking in package_bookings:
@@ -130,11 +137,13 @@ def user_dashboard(request):
             and booking.booking_status in ("pending", "confirmed")
         ):
 
-            upcoming_items.append({
-                "type": "Package",
-                "date": booking.travel_date,
-                "booking": booking,
-            })
+            upcoming_items.append(
+                {
+                    "type": "Package",
+                    "date": booking.travel_date,
+                    "booking": booking,
+                }
+            )
 
     if upcoming_items:
 
@@ -146,20 +155,21 @@ def user_dashboard(request):
     # ─────────────────────────────────────────────────────────────
 
     completed_flights = sum(
-        1 for b in flight_bookings
-        if b.booking_status == 'completed'
+        1 for b in flight_bookings if b.booking_status == "completed"
     )
 
     completed_hotels = sum(
-        1 for b in hotel_bookings
-        if b.check_out_date and b.check_out_date < today
-        and b.booking_status == 'confirmed'
+        1
+        for b in hotel_bookings
+        if b.check_out_date
+        and b.check_out_date < today
+        and b.booking_status == "confirmed"
     )
 
     completed_packages = sum(
-        1 for b in package_bookings
-        if b.travel_date and b.travel_date < today
-        and b.booking_status == 'confirmed'
+        1
+        for b in package_bookings
+        if b.travel_date and b.travel_date < today and b.booking_status == "confirmed"
     )
 
     completed_trips = completed_flights + completed_hotels + completed_packages
@@ -168,7 +178,7 @@ def user_dashboard(request):
     # 5. BOOKING DISTRIBUTION
     # ─────────────────────────────────────────────────────────────
 
-    booking_distribution_labels = ['Flights', 'Hotels', 'Packages']
+    booking_distribution_labels = ["Flights", "Hotels", "Packages"]
     booking_distribution_values = [
         total_flight_bookings,
         total_hotel_bookings,
@@ -190,53 +200,52 @@ def user_dashboard(request):
     for b in package_bookings:
         status_counter[b.booking_status] += 1
 
-    all_statuses         = ['pending', 'confirmed', 'cancelled', 'completed']
+    all_statuses = ["pending", "confirmed", "cancelled", "completed"]
     booking_status_labels = [s.capitalize() for s in all_statuses]
     booking_status_values = [status_counter.get(s, 0) for s in all_statuses]
 
-    confirmed_count   = status_counter.get('confirmed', 0)
-    cancelled_count   = status_counter.get('cancelled', 0)
-    pending_count     = status_counter.get('pending', 0)
-    completed_count   = status_counter.get('completed', 0)
+    confirmed_count = status_counter.get("confirmed", 0)
+    cancelled_count = status_counter.get("cancelled", 0)
+    pending_count = status_counter.get("pending", 0)
+    completed_count = status_counter.get("completed", 0)
 
     # ─────────────────────────────────────────────────────────────
     # 7. MONTHLY SPENDING — LAST 12 MONTHS
     # ─────────────────────────────────────────────────────────────
 
-    monthly_spending   = defaultdict(Decimal)
-    twelve_months_ago  = now - timedelta(days=365)
+    monthly_spending = defaultdict(Decimal)
+    twelve_months_ago = now - timedelta(days=365)
 
     for b in flight_bookings:
         if b.created_at >= twelve_months_ago:
-            monthly_spending[b.created_at.strftime('%b %Y')] += b.total_price
+            monthly_spending[b.created_at.strftime("%b %Y")] += b.total_price
 
     for b in hotel_bookings:
         if b.created_at >= twelve_months_ago:
-            monthly_spending[b.created_at.strftime('%b %Y')] += b.total_price
+            monthly_spending[b.created_at.strftime("%b %Y")] += b.total_price
 
     for b in package_bookings:
         if b.created_at >= twelve_months_ago:
-            monthly_spending[b.created_at.strftime('%b %Y')] += b.total_price
+            monthly_spending[b.created_at.strftime("%b %Y")] += b.total_price
 
     # Build ordered deduplicated list of last 12 months
-    seen                 = set()
+    seen = set()
     unique_ordered_months = []
     for i in range(11, -1, -1):
-        month_key = (now - timedelta(days=i * 30)).strftime('%b %Y')
+        month_key = (now - timedelta(days=i * 30)).strftime("%b %Y")
         if month_key not in seen:
             seen.add(month_key)
             unique_ordered_months.append(month_key)
 
     monthly_labels = unique_ordered_months
     monthly_values = [
-        float(monthly_spending.get(m, Decimal('0.00')))
-        for m in monthly_labels
+        float(monthly_spending.get(m, Decimal("0.00"))) for m in monthly_labels
     ]
 
     # Determine busiest month (highest spend)
     favourite_month = None
     if any(v > 0 for v in monthly_values):
-        max_idx         = monthly_values.index(max(monthly_values))
+        max_idx = monthly_values.index(max(monthly_values))
         favourite_month = monthly_labels[max_idx]
 
     # ─────────────────────────────────────────────────────────────
@@ -260,7 +269,7 @@ def user_dashboard(request):
         if dest:
             destination_counter[dest] += 1
 
-    top_destinations   = destination_counter.most_common(5)
+    top_destinations = destination_counter.most_common(5)
     destination_labels = [d[0] for d in top_destinations]
     destination_values = [d[1] for d in top_destinations]
 
@@ -275,10 +284,9 @@ def user_dashboard(request):
         if b.hotel.name:
             hotel_counter[b.hotel.name] += 1
 
-    top_hotels     = hotel_counter.most_common(5)
+    top_hotels = hotel_counter.most_common(5)
     favorite_hotels = [
-        {'hotel_name': name, 'booking_count': count}
-        for name, count in top_hotels
+        {"hotel_name": name, "booking_count": count} for name, count in top_hotels
     ]
 
     # ─────────────────────────────────────────────────────────────
@@ -287,28 +295,36 @@ def user_dashboard(request):
 
     # Average booking value (all bookings combined)
     avg_booking_value = (
-        (total_spending / total_bookings).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+        (total_spending / total_bookings).quantize(
+            Decimal("0.01"), rounding=ROUND_HALF_UP
+        )
         if total_bookings > 0
         else None
     )
 
     # Average flight cost
     avg_flight_cost = (
-        (flight_spending / total_flight_bookings).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+        (flight_spending / total_flight_bookings).quantize(
+            Decimal("0.01"), rounding=ROUND_HALF_UP
+        )
         if total_flight_bookings > 0
         else None
     )
 
     # Average hotel cost
     avg_hotel_cost = (
-        (hotel_spending / total_hotel_bookings).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+        (hotel_spending / total_hotel_bookings).quantize(
+            Decimal("0.01"), rounding=ROUND_HALF_UP
+        )
         if total_hotel_bookings > 0
         else None
     )
 
     # Average package cost
     avg_package_cost = (
-        (package_spending / total_package_bookings).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+        (package_spending / total_package_bookings).quantize(
+            Decimal("0.01"), rounding=ROUND_HALF_UP
+        )
         if total_package_bookings > 0
         else None
     )
@@ -323,9 +339,7 @@ def user_dashboard(request):
     # Cancellation rate
     cancellation_rate = None
     if total_bookings > 0:
-        cancellation_rate = round(
-            (cancelled_count / total_bookings) * 100, 1
-        )
+        cancellation_rate = round((cancelled_count / total_bookings) * 100, 1)
 
     # Travel frequency — bookings per month over active period
     travel_frequency = None
@@ -382,12 +396,12 @@ def user_dashboard(request):
     # Insight: dominant booking type
     if total_bookings > 0:
         type_map = {
-            'Flights':  total_flight_bookings,
-            'Hotels':   total_hotel_bookings,
-            'Packages': total_package_bookings,
+            "Flights": total_flight_bookings,
+            "Hotels": total_hotel_bookings,
+            "Packages": total_package_bookings,
         }
-        dominant_type  = max(type_map, key=type_map.get)
-        dominant_pct   = round((type_map[dominant_type] / total_bookings) * 100, 1)
+        dominant_type = max(type_map, key=type_map.get)
+        dominant_pct = round((type_map[dominant_type] / total_bookings) * 100, 1)
         if dominant_pct > 0:
             insights.append(
                 f"{dominant_type} account for {dominant_pct}% of your total travel bookings."
@@ -403,15 +417,11 @@ def user_dashboard(request):
 
     # Insight: average booking value
     if avg_booking_value:
-        insights.append(
-            f"Your average booking value is ₹{avg_booking_value:,.2f}."
-        )
+        insights.append(f"Your average booking value is ₹{avg_booking_value:,.2f}.")
 
     # Insight: busiest month
     if favourite_month:
-        insights.append(
-            f"{favourite_month} is your highest-spending month."
-        )
+        insights.append(f"{favourite_month} is your highest-spending month.")
 
     # Insight: cancellation behaviour
     if cancellation_rate is not None:
@@ -452,39 +462,45 @@ def user_dashboard(request):
     recent_activity = []
 
     for b in flight_bookings:
-        recent_activity.append({
-            'type': 'Flight',
-            'title': (
-                f"{b.flight.source.city} → {b.flight.destination.city}"
-                f" ({b.flight.airline})"
-            ),
-            'date': b.created_at,
-            'status': b.booking_status.capitalize(),
-            'amount': b.total_price,
-            'reference': b.booking_reference,
-        })
-    
+        recent_activity.append(
+            {
+                "type": "Flight",
+                "title": (
+                    f"{b.flight.source.city} → {b.flight.destination.city}"
+                    f" ({b.flight.airline})"
+                ),
+                "date": b.created_at,
+                "status": b.booking_status.capitalize(),
+                "amount": b.total_price,
+                "reference": b.booking_reference,
+            }
+        )
+
     for b in hotel_bookings:
-        recent_activity.append({
-            'type': 'Hotel',
-            'title': f"{b.hotel.name}, {b.hotel.city}",
-            'date': b.created_at,
-            'status': b.booking_status.capitalize(),
-            'amount': b.total_price,
-            'reference': b.booking_reference,
-        })
+        recent_activity.append(
+            {
+                "type": "Hotel",
+                "title": f"{b.hotel.name}, {b.hotel.city}",
+                "date": b.created_at,
+                "status": b.booking_status.capitalize(),
+                "amount": b.total_price,
+                "reference": b.booking_reference,
+            }
+        )
 
     for b in package_bookings:
-       recent_activity.append({
-            'type': 'Package',
-            'title': f"{b.package.name} — {b.package.destination}",
-            'date': b.created_at,
-            'status': b.booking_status.capitalize(),
-            'amount': b.total_price,
-            'reference': b.booking_reference,
-        })
+        recent_activity.append(
+            {
+                "type": "Package",
+                "title": f"{b.package.name} — {b.package.destination}",
+                "date": b.created_at,
+                "status": b.booking_status.capitalize(),
+                "amount": b.total_price,
+                "reference": b.booking_reference,
+            }
+        )
 
-    recent_activity.sort(key=lambda x: x['date'], reverse=True)
+    recent_activity.sort(key=lambda x: x["date"], reverse=True)
     recent_activity = recent_activity[:10]
 
     print("\n===== NEXT TRIP =====")
@@ -493,7 +509,7 @@ def user_dashboard(request):
     print("\n===== RECENT ACTIVITY =====")
     for a in recent_activity:
         print(a)
-    
+
     # ─────────────────────────────────────────────────────────────
     # 13. AI DESTINATION RECOMMENDATIONS
     # ─────────────────────────────────────────────────────────────
@@ -511,60 +527,50 @@ def user_dashboard(request):
 
     context = {
         # ── Snapshot
-        'total_bookings':          total_bookings,
-        'total_flight_bookings':   total_flight_bookings,
-        'total_hotel_bookings':    total_hotel_bookings,
-        'total_package_bookings':  total_package_bookings,
-        'total_spending':          total_spending,
-        'upcoming_trips':          upcoming_trips,
-        'completed_trips':         completed_trips,
-        'next_trip': next_trip,
-        'travel_level': travel_level,
-        'next_level': next_level,
-        'bookings_needed': bookings_needed,
-        'cancelled_count': cancelled_count,
-        'favourite_destination': favourite_destination,
-        'recommended_destinations': recommended_destinations,
-        
-
+        "total_bookings": total_bookings,
+        "total_flight_bookings": total_flight_bookings,
+        "total_hotel_bookings": total_hotel_bookings,
+        "total_package_bookings": total_package_bookings,
+        "total_spending": total_spending,
+        "upcoming_trips": upcoming_trips,
+        "completed_trips": completed_trips,
+        "next_trip": next_trip,
+        "travel_level": travel_level,
+        "next_level": next_level,
+        "bookings_needed": bookings_needed,
+        "cancelled_count": cancelled_count,
+        "favourite_destination": favourite_destination,
+        "recommended_destinations": recommended_destinations,
         # ── Distribution chart
-        'booking_distribution_labels': booking_distribution_labels,
-        'booking_distribution_values': booking_distribution_values,
-
+        "booking_distribution_labels": booking_distribution_labels,
+        "booking_distribution_values": booking_distribution_values,
         # ── Status chart
-        'booking_status_labels': booking_status_labels,
-        'booking_status_values': booking_status_values,
-
+        "booking_status_labels": booking_status_labels,
+        "booking_status_values": booking_status_values,
         # ── Monthly spending chart
-        'monthly_labels': monthly_labels,
-        'monthly_values': monthly_values,
-
+        "monthly_labels": monthly_labels,
+        "monthly_values": monthly_values,
         # ── Destinations chart
-        'destination_labels': destination_labels,
-        'destination_values': destination_values,
-
+        "destination_labels": destination_labels,
+        "destination_values": destination_values,
         # ── Hotels table
-        'favorite_hotels': favorite_hotels,
-
+        "favorite_hotels": favorite_hotels,
         # ── Recent activity
-        'recent_activity': recent_activity,
-
+        "recent_activity": recent_activity,
         # ── Analytics metrics
-        'avg_booking_value':  avg_booking_value,
-        'avg_flight_cost':    avg_flight_cost,
-        'avg_hotel_cost':     avg_hotel_cost,
-        'avg_package_cost':   avg_package_cost,
-        'success_rate':       success_rate,
-        'cancellation_rate':  cancellation_rate,
-        'travel_frequency':   travel_frequency,
-        'favourite_month':    favourite_month,
-
+        "avg_booking_value": avg_booking_value,
+        "avg_flight_cost": avg_flight_cost,
+        "avg_hotel_cost": avg_hotel_cost,
+        "avg_package_cost": avg_package_cost,
+        "success_rate": success_rate,
+        "cancellation_rate": cancellation_rate,
+        "travel_frequency": travel_frequency,
+        "favourite_month": favourite_month,
         # ── Travel insights
-        'insights': insights,
-
+        "insights": insights,
         # ── Helper for template guards
-        'has_spending': total_spending > Decimal('0.00'),
-        'has_destinations': bool(destination_labels),
+        "has_spending": total_spending > Decimal("0.00"),
+        "has_destinations": bool(destination_labels),
     }
 
-    return render(request, 'dashboard/user_dashboard.html', context)
+    return render(request, "dashboard/user_dashboard.html", context)

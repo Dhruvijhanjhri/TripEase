@@ -8,29 +8,17 @@ from flights.models import Flight
 
 
 class HotelReview(models.Model):
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE
-    )
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
-    hotel = models.ForeignKey(
-        Hotel,
-        on_delete=models.CASCADE,
-        related_name="reviews"
-    )
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name="reviews")
 
     rating = models.IntegerField(
-        validators=[
-            MinValueValidator(1),
-            MaxValueValidator(5)
-        ]
+        validators=[MinValueValidator(1), MaxValueValidator(5)]
     )
 
     review_text = models.TextField()
 
-    created_at = models.DateTimeField(
-        auto_now_add=True
-    )
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ["-created_at"]
@@ -41,29 +29,19 @@ class HotelReview(models.Model):
 
 
 class PackageReview(models.Model):
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE
-    )
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     package = models.ForeignKey(
-        TravelPackage,
-        on_delete=models.CASCADE,
-        related_name="reviews"
+        TravelPackage, on_delete=models.CASCADE, related_name="reviews"
     )
 
     rating = models.IntegerField(
-        validators=[
-            MinValueValidator(1),
-            MaxValueValidator(5)
-        ]
+        validators=[MinValueValidator(1), MaxValueValidator(5)]
     )
 
     review_text = models.TextField()
 
-    created_at = models.DateTimeField(
-        auto_now_add=True
-    )
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ["-created_at"]
@@ -74,29 +52,17 @@ class PackageReview(models.Model):
 
 
 class FlightReview(models.Model):
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE
-    )
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
-    flight = models.ForeignKey(
-        Flight,
-        on_delete=models.CASCADE,
-        related_name="reviews"
-    )
+    flight = models.ForeignKey(Flight, on_delete=models.CASCADE, related_name="reviews")
 
     rating = models.IntegerField(
-        validators=[
-            MinValueValidator(1),
-            MaxValueValidator(5)
-        ]
+        validators=[MinValueValidator(1), MaxValueValidator(5)]
     )
 
     review_text = models.TextField()
 
-    created_at = models.DateTimeField(
-        auto_now_add=True
-    )
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ["-created_at"]

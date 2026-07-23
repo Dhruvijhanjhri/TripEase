@@ -4,7 +4,6 @@ from django.core.management.base import BaseCommand
 
 from flights.models import Flight
 
-
 TRACKING_NUMBERS = {
     "IndiGo": [
         "6E203",
@@ -41,9 +40,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
 
-        flights = Flight.objects.filter(
-            tracking_flight_number__isnull=True
-        )
+        flights = Flight.objects.filter(tracking_flight_number__isnull=True)
 
         batch = []
 
@@ -55,10 +52,7 @@ class Command(BaseCommand):
                 flight.tripease_flight_id = f"TP{100000 + flight.id}"
 
             flight.tracking_flight_number = random.choice(
-                TRACKING_NUMBERS.get(
-                    flight.airline,
-                    ["AI101"]
-                )
+                TRACKING_NUMBERS.get(flight.airline, ["AI101"])
             )
 
             batch.append(flight)
@@ -70,16 +64,12 @@ class Command(BaseCommand):
                     [
                         "tripease_flight_id",
                         "tracking_flight_number",
-                    ]
+                    ],
                 )
 
                 updated += len(batch)
 
-                self.stdout.write(
-                    self.style.SUCCESS(
-                        f"{updated} flights updated..."
-                    )
-                )
+                self.stdout.write(self.style.SUCCESS(f"{updated} flights updated..."))
 
                 batch = []
 
@@ -90,13 +80,11 @@ class Command(BaseCommand):
                 [
                     "tripease_flight_id",
                     "tracking_flight_number",
-                ]
+                ],
             )
 
             updated += len(batch)
 
         self.stdout.write(
-            self.style.SUCCESS(
-                f"{updated} flights updated successfully."
-            )
+            self.style.SUCCESS(f"{updated} flights updated successfully.")
         )

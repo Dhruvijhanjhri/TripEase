@@ -1,6 +1,5 @@
 from datetime import timedelta
 
-from django.db.models import Q
 
 from flights.models import Flight
 from reviews.models import FlightReview
@@ -22,9 +21,7 @@ def get_similar_flights(current_flight, cabin_class, passengers=1):
         destination=current_flight.destination,
         available_seats__gte=passengers,
         departure_time__range=(start_time, end_time),
-    ).exclude(
-        id=current_flight.id
-    )
+    ).exclude(id=current_flight.id)
 
     results = []
 
@@ -32,11 +29,9 @@ def get_similar_flights(current_flight, cabin_class, passengers=1):
 
     for flight in flights:
 
-        average_rating = (
-            FlightReview.objects
-            .filter(flight=flight)
-            .aggregate(Avg("rating"))["rating__avg"]
-        )
+        average_rating = FlightReview.objects.filter(flight=flight).aggregate(
+            Avg("rating")
+        )["rating__avg"]
 
         cabin_price = flight.get_price(cabin_class)
         flight.cabin_price = cabin_price
@@ -60,7 +55,7 @@ def get_similar_flights(current_flight, cabin_class, passengers=1):
             flight.recommendation_badge = "👍 Good Choice"
         else:
             flight.recommendation_badge = "Standard Option"
-        
+
         reasons = []
 
         reasons.append("Same route")

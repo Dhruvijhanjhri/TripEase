@@ -7,16 +7,16 @@ class HotelReviewForm(forms.ModelForm):
         model = HotelReview
         fields = ["rating", "review_text"]
         widgets = {
-            "rating": forms.NumberInput(attrs={
-                "class": "form-control",
-                "min": 1,
-                "max": 5
-            }),
-            "review_text": forms.Textarea(attrs={
-                "class": "form-control",
-                "rows": 4,
-                "placeholder": "Write your review..."
-            }),
+            "rating": forms.NumberInput(
+                attrs={"class": "form-control", "min": 1, "max": 5}
+            ),
+            "review_text": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 4,
+                    "placeholder": "Write your review...",
+                }
+            ),
         }
 
 
@@ -25,16 +25,16 @@ class PackageReviewForm(forms.ModelForm):
         model = PackageReview
         fields = ["rating", "review_text"]
         widgets = {
-            "rating": forms.NumberInput(attrs={
-                "class": "form-control",
-                "min": 1,
-                "max": 5
-            }),
-            "review_text": forms.Textarea(attrs={
-                "class": "form-control",
-                "rows": 4,
-                "placeholder": "Write your review..."
-            }),
+            "rating": forms.NumberInput(
+                attrs={"class": "form-control", "min": 1, "max": 5}
+            ),
+            "review_text": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 4,
+                    "placeholder": "Write your review...",
+                }
+            ),
         }
 
 
@@ -43,14 +43,14 @@ class FlightReviewForm(forms.ModelForm):
         model = FlightReview
         fields = ["rating", "review_text"]
         widgets = {
-            "rating": forms.NumberInput(attrs={
-                "class": "form-control",
-                "min": 1,
-                "max": 5
-            }),
-            "review_text": forms.Textarea(attrs={
-                "class": "form-control",
-                "rows": 4,
-                "placeholder": "Write your review..."
-            }),
+            "rating": forms.NumberInput(
+                attrs={"class": "form-control", "min": 1, "max": 5}
+            ),
+            "review_text": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 4,
+                    "placeholder": "Write your review...",
+                }
+            ),
         }

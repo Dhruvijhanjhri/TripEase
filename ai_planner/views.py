@@ -18,7 +18,7 @@ def planner_home(request):
             budget = form.cleaned_data["budget"]
             days = form.cleaned_data["days"]
             interests = form.cleaned_data["interests"]
-            
+
             planner_output = generate_trip_plan(
                 destination=destination,
                 budget=budget,
@@ -49,21 +49,19 @@ def planner_home(request):
 
 @login_required
 def planner_result(request, trip_id):
-    trip = get_object_or_404(
-        TripPlan,
-        id=trip_id,
-        user=request.user
+    trip = get_object_or_404(TripPlan, id=trip_id, user=request.user)
+
+    hotel_ids = (
+        [int(x) for x in trip.recommended_hotels.split(",") if x.strip()]
+        if trip.recommended_hotels
+        else []
     )
 
-    hotel_ids = [
-        int(x) for x in trip.recommended_hotels.split(",")
-        if x.strip()
-    ] if trip.recommended_hotels else []
-
-    package_ids = [
-        int(x) for x in trip.recommended_packages.split(",")
-        if x.strip()
-    ] if trip.recommended_packages else []
+    package_ids = (
+        [int(x) for x in trip.recommended_packages.split(",") if x.strip()]
+        if trip.recommended_packages
+        else []
+    )
 
     from hotels.models import Hotel
     from packages.models import TravelPackage
@@ -98,27 +96,27 @@ def planner_result(request, trip_id):
 
         if line.startswith("## Day"):
             if current_day:
-                timeline_items.append({
-                    "title": current_day.replace("## ", ""),
-                    "details": current_details,
-                })
+                timeline_items.append(
+                    {
+                        "title": current_day.replace("## ", ""),
+                        "details": current_details,
+                    }
+                )
 
             current_day = line
             current_details = []
 
-        elif (
-            line
-            and not line.startswith("#")
-            and line.strip() != "---"
-        ):
+        elif line and not line.startswith("#") and line.strip() != "---":
             current_details.append(line.replace("**", ""))
 
     # add last day
     if current_day:
-        timeline_items.append({
-            "title": current_day.replace("## ", ""),
-            "details": current_details,
-        })
+        timeline_items.append(
+            {
+                "title": current_day.replace("## ", ""),
+                "details": current_details,
+            }
+        )
 
     return render(
         request,
@@ -132,31 +130,21 @@ def planner_result(request, trip_id):
             "travel_style": planner_output["travel_style"],
             "timeline_items": timeline_items,
             "route_suggestion": planner_output["route_suggestion"],
-        }
+        },
     )
+
 
 @login_required
 def planner_history(request):
-    trips = TripPlan.objects.filter(
-        user=request.user
-    ).order_by("-created_at")
+    trips = TripPlan.objects.filter(user=request.user).order_by("-created_at")
 
-    return render(
-        request,
-        "ai_planner/history.html",
-        {
-            "trips": trips
-        }
-    )
+    return render(request, "ai_planner/history.html", {"trips": trips})
+
 
 @login_required
 def export_trip_pdf(request, trip_id):
 
-    trip = get_object_or_404(
-        TripPlan,
-        id=trip_id,
-        user=request.user
-    )
+    trip = get_object_or_404(TripPlan, id=trip_id, user=request.user)
 
     from .services import (
         get_best_season,
@@ -168,17 +156,10 @@ def export_trip_pdf(request, trip_id):
     trip.best_season = get_best_season(trip.destination)
     trip.nearest_airport = get_nearest_airport(trip.destination)
     trip.travel_style = infer_travel_style(trip.interests)
-    trip.suggested_route = get_route_suggestion(
-        trip.destination,
-        "Bengaluru"
-    )
+    trip.suggested_route = get_route_suggestion(trip.destination, "Bengaluru")
 
     pdf = generate_trip_pdf(trip)
 
     filename = f"TripEase_{trip.destination}.pdf"
 
-    return FileResponse(
-        pdf,
-        as_attachment=True,
-        filename=filename
-    )
+    return FileResponse(pdf, as_attachment=True, filename=filename)

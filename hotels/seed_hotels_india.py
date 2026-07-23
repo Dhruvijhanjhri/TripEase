@@ -10,67 +10,56 @@ city_hotels = {
         ("The Leela Palace New Delhi", "Chanakyapuri"),
         ("ITC Maurya", "Chanakyapuri"),
     ],
-
     "Mumbai": [
         ("The Taj Mahal Palace", "Colaba"),
         ("The Oberoi Mumbai", "Nariman Point"),
         ("Trident Nariman Point", "Marine Drive"),
     ],
-
     "Bengaluru": [
         ("Taj West End Bengaluru", "Race Course Road"),
         ("The Oberoi Bengaluru", "MG Road"),
         ("ITC Gardenia", "Residency Road"),
     ],
-
     "Hyderabad": [
         ("Taj Falaknuma Palace", "Falaknuma"),
         ("ITC Kohenur", "Hitech City"),
         ("Park Hyatt Hyderabad", "Banjara Hills"),
     ],
-
     "Chennai": [
         ("ITC Grand Chola", "Guindy"),
         ("Taj Club House", "Anna Salai"),
         ("The Leela Palace Chennai", "MRC Nagar"),
     ],
-
     "Kolkata": [
         ("ITC Royal Bengal", "EM Bypass"),
         ("The Oberoi Grand", "New Market"),
         ("Taj Bengal", "Alipore"),
     ],
-
     "Pune": [
         ("JW Marriott Pune", "Senapati Bapat Road"),
         ("Conrad Pune", "Bund Garden"),
         ("The Westin Pune", "Koregaon Park"),
     ],
-
     "Indore": [
         ("Radisson Blu Indore", "Ring Road"),
         ("Sayaji Indore", "Vijay Nagar"),
         ("Marriott Indore", "MR10 Road"),
     ],
-
     "Mysore": [
         ("Royal Orchid Metropole", "Jhansi Lakshmibai Road"),
         ("Fortune JP Palace", "Nazarbad"),
         ("Radisson Blu Mysore", "MG Road"),
     ],
-
     "Goa": [
         ("Taj Exotica Goa", "Benaulim"),
         ("W Goa", "Vagator"),
         ("Grand Hyatt Goa", "Bambolim"),
     ],
-
     "Jaipur": [
         ("Rambagh Palace", "Bhawani Singh Road"),
         ("ITC Rajputana", "Palace Road"),
         ("Holiday Inn Jaipur", "Tonk Road"),
     ],
-
     "Udaipur": [
         ("The Oberoi Udaivilas", "Lake Pichola"),
         ("Taj Fateh Prakash", "City Palace"),
@@ -135,4 +124,3 @@ for city, hotels in city_hotels.items():
             )
 
 print("Hotels Added Successfully")
-

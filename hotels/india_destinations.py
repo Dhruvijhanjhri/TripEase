@@ -1,5 +1,4 @@
 INDIA_DESTINATIONS = {
-
     # Metro Cities
     "Ahmedabad": "Gujarat",
     "Bengaluru": "Karnataka",
@@ -9,7 +8,6 @@ INDIA_DESTINATIONS = {
     "Hyderabad": "Telangana",
     "Chennai": "Tamil Nadu",
     "Kolkata": "West Bengal",
-
     # Major Cities
     "Indore": "Madhya Pradesh",
     "Bhopal": "Madhya Pradesh",
@@ -34,7 +32,6 @@ INDIA_DESTINATIONS = {
     "Udaipur": "Rajasthan",
     "Ajmer": "Rajasthan",
     "Kota": "Rajasthan",
-
     # Karnataka
     "Mysore": "Karnataka",
     "Mangalore": "Karnataka",
@@ -43,7 +40,6 @@ INDIA_DESTINATIONS = {
     "Coorg": "Karnataka",
     "Hampi": "Karnataka",
     "Gokarna": "Karnataka",
-
     # Kerala
     "Kochi": "Kerala",
     "Munnar": "Kerala",
@@ -53,7 +49,6 @@ INDIA_DESTINATIONS = {
     "Thekkady": "Kerala",
     "Thrissur": "Kerala",
     "Kozhikode": "Kerala",
-
     # Tamil Nadu
     "Madurai": "Tamil Nadu",
     "Coimbatore": "Tamil Nadu",
@@ -61,13 +56,11 @@ INDIA_DESTINATIONS = {
     "Kodaikanal": "Tamil Nadu",
     "Rameswaram": "Tamil Nadu",
     "Mahabalipuram": "Tamil Nadu",
-
     # Telangana / Andhra
     "Vijayawada": "Andhra Pradesh",
     "Visakhapatnam": "Andhra Pradesh",
     "Tirupati": "Andhra Pradesh",
     "Warangal": "Telangana",
-
     # Hill Stations
     "Shimla": "Himachal Pradesh",
     "Manali": "Himachal Pradesh",
@@ -78,7 +71,6 @@ INDIA_DESTINATIONS = {
     "Rishikesh": "Uttarakhand",
     "Haridwar": "Uttarakhand",
     "Dehradun": "Uttarakhand",
-
     # Religious
     "Varanasi": "Uttar Pradesh",
     "Ayodhya": "Uttar Pradesh",
@@ -86,7 +78,6 @@ INDIA_DESTINATIONS = {
     "Vrindavan": "Uttar Pradesh",
     "Shirdi": "Maharashtra",
     "Nashik": "Maharashtra",
-
     # Tourism
     "Goa": "Goa",
     "Darjeeling": "West Bengal",
@@ -96,12 +87,10 @@ INDIA_DESTINATIONS = {
     "Leh": "Ladakh",
     "Srinagar": "Jammu & Kashmir",
     "Jammu": "Jammu & Kashmir",
-
     # Islands
     "Port Blair": "Andaman & Nicobar",
     "Havelock Island": "Andaman & Nicobar",
     "Lakshadweep": "Lakshadweep",
-
     # Heritage
     "Agra": "Uttar Pradesh",
     "Khajuraho": "Madhya Pradesh",
@@ -109,5 +98,5 @@ INDIA_DESTINATIONS = {
     "Ellora": "Maharashtra",
     "Bhubaneswar": "Odisha",
     "Puri": "Odisha",
-    "Konark": "Odisha"
+    "Konark": "Odisha",
 }

@@ -2,5 +2,5 @@ from django.apps import AppConfig
 
 
 class AiPlannerConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'ai_planner'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "ai_planner"

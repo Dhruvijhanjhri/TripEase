@@ -6,13 +6,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0003_remove_user_supabase_user_id'),
+        ("accounts", "0003_remove_user_supabase_user_id"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='user_id',
-            field=models.UUIDField(blank=True, editable=False, help_text='Supabase Auth user ID (UUID)', null=True, unique=True),
+            model_name="user",
+            name="user_id",
+            field=models.UUIDField(
+                blank=True,
+                editable=False,
+                help_text="Supabase Auth user ID (UUID)",
+                null=True,
+                unique=True,
+            ),
         ),
     ]

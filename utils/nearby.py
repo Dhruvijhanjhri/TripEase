@@ -1,6 +1,5 @@
 import requests
 
-
 OVERPASS_URL = "https://overpass-api.de/api/interpreter"
 
 
@@ -79,23 +78,19 @@ def get_nearby_places(lat, lon):
                     "Chappan Dukan",
                     "Apna Sweets",
                 ],
-
                 "cafes": [
                     "Cafe Coffee Day",
                     "Starbucks",
                     "Mr. Beans",
                 ],
-
                 "hospitals": [
                     "Bombay Hospital",
                     "CHL Hospital",
                 ],
-
                 "atms": [
                     "SBI ATM",
                     "HDFC ATM",
                 ],
-
                 "fuel": [
                     "Indian Oil Fuel Station",
                 ],
@@ -113,23 +108,19 @@ def get_nearby_places(lat, lon):
                 "Chappan Dukan",
                 "Apna Sweets",
             ],
-
             "cafes": [
                 "Cafe Coffee Day",
                 "Starbucks",
                 "Mr. Beans",
             ],
-
             "hospitals": [
                 "Bombay Hospital",
                 "CHL Hospital",
             ],
-
             "atms": [
                 "SBI ATM",
                 "HDFC ATM",
             ],
-
             "fuel": [
                 "Indian Oil Fuel Station",
             ],

@@ -7,24 +7,30 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('flights', '0002_flight_tracking_flight_number_and_more'),
-        ('bookings', '0006_booking_boarding_time_booking_gate_booking_terminal'),
+        ("flights", "0002_flight_tracking_flight_number_and_more"),
+        ("bookings", "0006_booking_boarding_time_booking_gate_booking_terminal"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='booking',
-            name='boarding_pass',
-            field=models.FileField(blank=True, null=True, upload_to='boarding_passes/'),
+            model_name="booking",
+            name="boarding_pass",
+            field=models.FileField(blank=True, null=True, upload_to="boarding_passes/"),
         ),
         migrations.AddField(
-            model_name='booking',
-            name='qr_code',
-            field=models.ImageField(blank=True, null=True, upload_to='qr_codes/'),
+            model_name="booking",
+            name="qr_code",
+            field=models.ImageField(blank=True, null=True, upload_to="qr_codes/"),
         ),
         migrations.AddField(
-            model_name='booking',
-            name='second_flight',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='connecting_bookings', to='flights.flight'),
+            model_name="booking",
+            name="second_flight",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="connecting_bookings",
+                to="flights.flight",
+            ),
         ),
     ]

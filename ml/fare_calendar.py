@@ -64,13 +64,16 @@ def generate_fare_calendar(
             airline=airline,
         )
 
-        fare_calendar.append({
-            "date": travel_date,
-            "predicted_price": int(round(predicted_price)),
-            "is_selected": travel_date == selected_date,
-        })
+        fare_calendar.append(
+            {
+                "date": travel_date,
+                "predicted_price": int(round(predicted_price)),
+                "is_selected": travel_date == selected_date,
+            }
+        )
 
     return fare_calendar
+
 
 def find_cheapest_date(fare_calendar):
     """
@@ -78,15 +81,9 @@ def find_cheapest_date(fare_calendar):
     Returns a dictionary with cheapest date and savings info.
     """
 
-    cheapest = min(
-        fare_calendar,
-        key=lambda x: x["predicted_price"]
-    )
+    cheapest = min(fare_calendar, key=lambda x: x["predicted_price"])
 
-    selected = next(
-        item for item in fare_calendar
-        if item["is_selected"]
-    )
+    selected = next(item for item in fare_calendar if item["is_selected"])
 
     savings = selected["predicted_price"] - cheapest["predicted_price"]
 

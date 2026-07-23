@@ -5,15 +5,9 @@ import pandas as pd
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODEL_DIR = os.path.join(BASE_DIR, "ml_models")
 
-MODEL_PATH = os.path.join(
-    MODEL_DIR,
-    "fare_model_final.pkl"
-)
+MODEL_PATH = os.path.join(MODEL_DIR, "fare_model_final.pkl")
 
-PREPROCESSOR_PATH = os.path.join(
-    MODEL_DIR,
-    "fare_preprocessing.pkl"
-)
+PREPROCESSOR_PATH = os.path.join(MODEL_DIR, "fare_preprocessing.pkl")
 
 
 class FarePredictionService:
@@ -53,9 +47,7 @@ class FarePredictionService:
 
         departure_month = departure_date.month
 
-        is_weekend = (
-            1 if departure_day >= 5 else 0
-        )
+        is_weekend = 1 if departure_day >= 5 else 0
 
         row = {
             "Number Of Stops": stops,
@@ -64,42 +56,14 @@ class FarePredictionService:
             "departure_month": departure_month,
             "departure_hour": departure_hour,
             "is_weekend": is_weekend,
-
-            "Source_encoded":
-                self._encode(
-                    "Source",
-                    source
-                ),
-
-            "Destination_encoded":
-                self._encode(
-                    "Destination",
-                    destination
-                ),
-
-            "Layover1_encoded":
-                self._encode(
-                    "Layover1",
-                    "NoStop" if stops == 0 else "Unknown"
-                ),
-
-            "Layover2_encoded":
-                self._encode(
-                    "Layover2",
-                    "NoStop"
-                ),
-
-            "Layover3_encoded":
-                self._encode(
-                    "Layover3",
-                    "NoStop"
-                ),
-
-            "primary_airline_encoded":
-                self._encode(
-                    "primary_airline",
-                    airline
-                ),
+            "Source_encoded": self._encode("Source", source),
+            "Destination_encoded": self._encode("Destination", destination),
+            "Layover1_encoded": self._encode(
+                "Layover1", "NoStop" if stops == 0 else "Unknown"
+            ),
+            "Layover2_encoded": self._encode("Layover2", "NoStop"),
+            "Layover3_encoded": self._encode("Layover3", "NoStop"),
+            "primary_airline_encoded": self._encode("primary_airline", airline),
         }
 
         df = pd.DataFrame([row])

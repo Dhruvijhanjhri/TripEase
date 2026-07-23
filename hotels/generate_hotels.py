@@ -72,7 +72,7 @@ for city, state in india_locations.items():
         "Chennai",
         "Kolkata",
         "Pune",
-        "Ahmedabad"
+        "Ahmedabad",
     ]:
         hotel_count = 15
 
@@ -88,7 +88,7 @@ for city, state in india_locations.items():
         "Leh",
         "Srinagar",
         "Rishikesh",
-        "Varanasi"
+        "Varanasi",
     ]:
         hotel_count = 10
 
@@ -99,20 +99,13 @@ for city, state in india_locations.items():
 
         if city in REAL_HOTELS:
 
-            available_hotels = [
-                h for h in REAL_HOTELS[city]
-                if h not in used_hotels
-            ]
+            available_hotels = [h for h in REAL_HOTELS[city] if h not in used_hotels]
 
             if available_hotels:
-                hotel_name = random.choice(
-                    available_hotels
-                )
+                hotel_name = random.choice(available_hotels)
                 used_hotels.add(hotel_name)
             else:
-                hotel_name = random.choice(
-                    REAL_HOTELS[city]
-                )
+                hotel_name = random.choice(REAL_HOTELS[city])
 
         else:
             hotel_name = (
@@ -147,39 +140,14 @@ for city, state in india_locations.items():
             search_keywords=search_terms,
             address=f"{random.randint(1,200)} Main Road, {city}",
             description=f"Comfortable stay in {city}",
-            hotel_type=random.choice([
-                'luxury',
-                'budget',
-                'business',
-                'resort'
-            ]),
-            property_type=random.choice([
-                'hotel',
-                'resort',
-                'villa',
-                'apartment'
-            ]),
-            star_rating=random.choice([
-                3.0,
-                3.5,
-                4.0,
-                4.5,
-                5.0
-            ]),
-            user_rating=round(
-                random.uniform(3.5, 4.9),
-                1
-            ),
-            total_reviews=random.randint(
-                100,
-                15000
-            ),
-            image_url=random.choice(
-                hotel_images
-            ),
+            hotel_type=random.choice(["luxury", "budget", "business", "resort"]),
+            property_type=random.choice(["hotel", "resort", "villa", "apartment"]),
+            star_rating=random.choice([3.0, 3.5, 4.0, 4.5, 5.0]),
+            user_rating=round(random.uniform(3.5, 4.9), 1),
+            total_reviews=random.randint(100, 15000),
+            image_url=random.choice(hotel_images),
             check_in_time=time(12, 0),
             check_out_time=time(11, 0),
-
             free_wifi=True,
             swimming_pool=random.choice([True, False]),
             spa=random.choice([True, False]),
@@ -230,7 +198,7 @@ for city, state in india_locations.items():
                 free_cancellation=random.choice([True, False]),
                 room_image=random.choice(room_images),
             )
-            
+
         created += 1
 
         if created % 100 == 0:

@@ -37,7 +37,14 @@ DATA_FILE = os.path.join(DATA_DIR, "easemytrip.csv")
 DROP_COLUMNS = ["Uniq Id", "Crawl Timestamp"]
 
 # Categorical columns to target-encode (Source, Destination, Layovers, primary airline)
-CAT_COLUMNS = ["Source", "Destination", "Layover1", "Layover2", "Layover3", "primary_airline"]
+CAT_COLUMNS = [
+    "Source",
+    "Destination",
+    "Layover1",
+    "Layover2",
+    "Layover3",
+    "primary_airline",
+]
 
 # Numerical feature columns used for modeling (after encoding and engineering)
 NUMERIC_FEATURE_COLUMNS = [
@@ -122,10 +129,14 @@ def engineer_temporal_features(df: pd.DataFrame) -> pd.DataFrame:
     df["is_weekend"] = (df["departure_day_of_week"] >= 5).astype(int)
 
     df["departure_hour"] = df["Departure Time"].astype(str).map(parse_time_to_hour)
-    df["total_duration_minutes"] = df["Total Time"].astype(str).map(parse_total_time_minutes)
+    df["total_duration_minutes"] = (
+        df["Total Time"].astype(str).map(parse_total_time_minutes)
+    )
 
     df = df.drop(columns=["_dep_dt"])
-    print("Engineered temporal features: departure_day_of_week, departure_month, departure_hour, total_duration_minutes, is_weekend")
+    print(
+        "Engineered temporal features: departure_day_of_week, departure_month, departure_hour, total_duration_minutes, is_weekend"
+    )
     return df
 
 
@@ -145,8 +156,12 @@ def derive_primary_airline(df: pd.DataFrame) -> pd.DataFrame:
     if "Flight Operator" not in df.columns:
         df["primary_airline"] = "Unknown"
         return df
-    df["primary_airline"] = df["Flight Operator"].astype(str).str.split("|").str[0].str.strip()
-    df["primary_airline"] = df["primary_airline"].replace("", "Unknown").fillna("Unknown")
+    df["primary_airline"] = (
+        df["Flight Operator"].astype(str).str.split("|").str[0].str.strip()
+    )
+    df["primary_airline"] = (
+        df["primary_airline"].replace("", "Unknown").fillna("Unknown")
+    )
     print("Derived primary_airline from Flight Operator")
     return df
 
@@ -218,7 +233,9 @@ def time_based_split(
         train_df = train_df.drop(columns=["_dep_dt"])
         val_df = val_df.drop(columns=["_dep_dt"])
         test_df = test_df.drop(columns=["_dep_dt"])
-    print(f"Time-based split: train={len(train_df)}, val={len(val_df)}, test={len(test_df)}")
+    print(
+        f"Time-based split: train={len(train_df)}, val={len(val_df)}, test={len(test_df)}"
+    )
     return train_df, val_df, test_df
 
 
@@ -251,16 +268,24 @@ def main() -> None:
         val_df, CAT_COLUMNS, TARGET_COLUMN, encodings=encodings, global_mean=global_mean
     )
     test_df, encodings, _ = target_encode_fit_transform(
-        test_df, CAT_COLUMNS, TARGET_COLUMN, encodings=encodings, global_mean=global_mean
+        test_df,
+        CAT_COLUMNS,
+        TARGET_COLUMN,
+        encodings=encodings,
+        global_mean=global_mean,
     )
-    print("Categorical encoding: target encoding (mean Fare per category) fitted on train only; unseen categories use global mean. Reason: single encoding for both linear and tree models, avoids high-dimensional one-hot for many cities/airlines.")
+    print(
+        "Categorical encoding: target encoding (mean Fare per category) fitted on train only; unseen categories use global mean. Reason: single encoding for both linear and tree models, avoids high-dimensional one-hot for many cities/airlines."
+    )
 
     # 3. Build feature matrices
     feats = [c for c in NUMERIC_FEATURE_COLUMNS if c in train_df.columns]
     X_train, y_train = build_feature_matrix(train_df, feats, TARGET_COLUMN)
     X_val, y_val = build_feature_matrix(val_df, feats, TARGET_COLUMN)
     X_test, y_test = build_feature_matrix(test_df, feats, TARGET_COLUMN)
-    print(f"Feature matrix shape: train {X_train.shape}, val {X_val.shape}, test {X_test.shape}")
+    print(
+        f"Feature matrix shape: train {X_train.shape}, val {X_val.shape}, test {X_test.shape}"
+    )
 
     # 4. Scale for Linear Regression only (tree model uses unscaled)
     scaler = StandardScaler()
@@ -293,23 +318,39 @@ def main() -> None:
     print("\n" + "=" * 60)
     print("Model comparison (Validation / Test)")
     print("=" * 60)
-    print(f"{'Model':<25} {'MAE (val)':<12} {'MAE (test)':<12} {'RMSE (val)':<12} {'RMSE (test)':<12} {'R² (val)':<10} {'R² (test)':<10}")
+    print(
+        f"{'Model':<25} {'MAE (val)':<12} {'MAE (test)':<12} {'RMSE (val)':<12} {'RMSE (test)':<12} {'R² (val)':<10} {'R² (test)':<10}"
+    )
     print("-" * 95)
-    print(f"{'Linear Regression':<25} {lr_val['MAE']:<12.2f} {lr_test['MAE']:<12.2f} {lr_val['RMSE']:<12.2f} {lr_test['RMSE']:<12.2f} {lr_val['R2']:<10.4f} {lr_test['R2']:<10.4f}")
-    print(f"{'Random Forest':<25} {rf_val['MAE']:<12.2f} {rf_test['MAE']:<12.2f} {rf_val['RMSE']:<12.2f} {rf_test['RMSE']:<12.2f} {rf_val['R2']:<10.4f} {rf_test['R2']:<10.4f}")
+    print(
+        f"{'Linear Regression':<25} {lr_val['MAE']:<12.2f} {lr_test['MAE']:<12.2f} {lr_val['RMSE']:<12.2f} {lr_test['RMSE']:<12.2f} {lr_val['R2']:<10.4f} {lr_test['R2']:<10.4f}"
+    )
+    print(
+        f"{'Random Forest':<25} {rf_val['MAE']:<12.2f} {rf_test['MAE']:<12.2f} {rf_val['RMSE']:<12.2f} {rf_test['RMSE']:<12.2f} {rf_val['R2']:<10.4f} {rf_test['R2']:<10.4f}"
+    )
     print("=" * 95)
 
     # 8. Short interpretation (plain English)
     print("\nInterpretation:")
-    print("- MAE: average absolute error in fare units (e.g. currency). Lower is better.")
+    print(
+        "- MAE: average absolute error in fare units (e.g. currency). Lower is better."
+    )
     print("- RMSE: penalizes large errors more; useful for cost-sensitive decisions.")
-    print("- R²: share of fare variance explained by the model (0–1); higher is better.")
+    print(
+        "- R²: share of fare variance explained by the model (0–1); higher is better."
+    )
     best_val_mae = min(lr_val["MAE"], rf_val["MAE"])
     if rf_val["MAE"] <= lr_val["MAE"]:
-        print("- Random Forest achieves better (or equal) validation MAE than Linear Regression, which is typical for non-linear fare patterns.")
+        print(
+            "- Random Forest achieves better (or equal) validation MAE than Linear Regression, which is typical for non-linear fare patterns."
+        )
     else:
-        print("- Linear Regression achieves better validation MAE here; Random Forest may benefit from more data or different hyperparameters later.")
-    print("- Test metrics show how well the model generalizes to unseen time periods; use them for final reporting.")
+        print(
+            "- Linear Regression achieves better validation MAE here; Random Forest may benefit from more data or different hyperparameters later."
+        )
+    print(
+        "- Test metrics show how well the model generalizes to unseen time periods; use them for final reporting."
+    )
 
     # 9. Save best model (by validation MAE) and preprocessing to ml_models/
     os.makedirs(MODELS_DIR, exist_ok=True)

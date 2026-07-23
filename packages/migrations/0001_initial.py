@@ -15,57 +15,135 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='PackageBooking',
+            name="PackageBooking",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('booking_reference', models.CharField(editable=False, max_length=12, unique=True)),
-                ('travel_date', models.DateField()),
-                ('travellers_count', models.IntegerField(default=1)),
-                ('total_price', models.DecimalField(decimal_places=2, max_digits=12)),
-                ('booking_status', models.CharField(choices=[('pending', 'Pending'), ('confirmed', 'Confirmed'), ('cancelled', 'Cancelled')], default='pending', max_length=20)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "booking_reference",
+                    models.CharField(editable=False, max_length=12, unique=True),
+                ),
+                ("travel_date", models.DateField()),
+                ("travellers_count", models.IntegerField(default=1)),
+                ("total_price", models.DecimalField(decimal_places=2, max_digits=12)),
+                (
+                    "booking_status",
+                    models.CharField(
+                        choices=[
+                            ("pending", "Pending"),
+                            ("confirmed", "Confirmed"),
+                            ("cancelled", "Cancelled"),
+                        ],
+                        default="pending",
+                        max_length=20,
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
             ],
         ),
         migrations.CreateModel(
-            name='TravelPackage',
+            name="TravelPackage",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
-                ('destination', models.CharField(max_length=100)),
-                ('state', models.CharField(max_length=100)),
-                ('package_type', models.CharField(choices=[('beach', 'Beach'), ('hill_station', 'Hill Station'), ('adventure', 'Adventure'), ('honeymoon', 'Honeymoon'), ('family', 'Family'), ('wildlife', 'Wildlife'), ('pilgrimage', 'Pilgrimage'), ('heritage', 'Heritage'), ('luxury', 'Luxury')], max_length=30)),
-                ('duration_days', models.IntegerField()),
-                ('duration_nights', models.IntegerField()),
-                ('price', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('rating', models.DecimalField(decimal_places=1, default=4.0, max_digits=2)),
-                ('description', models.TextField()),
-                ('itinerary', models.TextField()),
-                ('image_url', models.URLField(blank=True)),
-                ('is_active', models.BooleanField(default=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+                ("destination", models.CharField(max_length=100)),
+                ("state", models.CharField(max_length=100)),
+                (
+                    "package_type",
+                    models.CharField(
+                        choices=[
+                            ("beach", "Beach"),
+                            ("hill_station", "Hill Station"),
+                            ("adventure", "Adventure"),
+                            ("honeymoon", "Honeymoon"),
+                            ("family", "Family"),
+                            ("wildlife", "Wildlife"),
+                            ("pilgrimage", "Pilgrimage"),
+                            ("heritage", "Heritage"),
+                            ("luxury", "Luxury"),
+                        ],
+                        max_length=30,
+                    ),
+                ),
+                ("duration_days", models.IntegerField()),
+                ("duration_nights", models.IntegerField()),
+                ("price", models.DecimalField(decimal_places=2, max_digits=10)),
+                (
+                    "rating",
+                    models.DecimalField(decimal_places=1, default=4.0, max_digits=2),
+                ),
+                ("description", models.TextField()),
+                ("itinerary", models.TextField()),
+                ("image_url", models.URLField(blank=True)),
+                ("is_active", models.BooleanField(default=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
             ],
             options={
-                'ordering': ['destination', 'name'],
+                "ordering": ["destination", "name"],
             },
         ),
         migrations.CreateModel(
-            name='PackageTraveller',
+            name="PackageTraveller",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('full_name', models.CharField(max_length=100)),
-                ('age', models.IntegerField()),
-                ('gender', models.CharField(choices=[('male', 'Male'), ('female', 'Female'), ('other', 'Other')], max_length=10)),
-                ('booking', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='travellers', to='packages.packagebooking')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("full_name", models.CharField(max_length=100)),
+                ("age", models.IntegerField()),
+                (
+                    "gender",
+                    models.CharField(
+                        choices=[
+                            ("male", "Male"),
+                            ("female", "Female"),
+                            ("other", "Other"),
+                        ],
+                        max_length=10,
+                    ),
+                ),
+                (
+                    "booking",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="travellers",
+                        to="packages.packagebooking",
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='packagebooking',
-            name='package',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='packages.travelpackage'),
+            model_name="packagebooking",
+            name="package",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="packages.travelpackage"
+            ),
         ),
         migrations.AddField(
-            model_name='packagebooking',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            model_name="packagebooking",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
+            ),
         ),
     ]

@@ -15,5 +15,5 @@ def markdownify(text):
             "extra",
             "nl2br",
             "sane_lists",
-        ]
+        ],
     )

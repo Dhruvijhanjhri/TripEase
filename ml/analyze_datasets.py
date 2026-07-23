@@ -34,7 +34,9 @@ TARGET_FILES = [
 ]
 
 
-def infer_column_types(header: List[str], rows: List[List[str]], max_samples: int = 500) -> Dict[str, str]:
+def infer_column_types(
+    header: List[str], rows: List[List[str]], max_samples: int = 500
+) -> Dict[str, str]:
     """
     Very lightweight type inference based on sampled non-empty values.
     Types reported are descriptive only (no casting is done).
@@ -126,7 +128,9 @@ def analyze_csv(filename: str) -> None:
             continue
         ratio = miss / max(len(data_rows), 1)
         if ratio > 0.9:
-            print(f"  - {h}: ~{ratio:.0%} values missing; likely optional/structural field.")
+            print(
+                f"  - {h}: ~{ratio:.0%} values missing; likely optional/structural field."
+            )
         elif ratio > 0.3:
             print(f"  - {h}: ~{ratio:.0%} values missing; consider careful handling.")
 
@@ -141,6 +145,5 @@ def main() -> None:
         analyze_csv(fname)
 
 
-if __name__ == \"__main__\":
+if __name__ == "__main__":
     main()
-

@@ -12,6 +12,7 @@ from reportlab.platypus import (
 )
 import re
 
+
 def clean_markdown(text):
 
     if not text:
@@ -131,18 +132,11 @@ def generate_trip_pdf(trip):
     # ITINERARY
     # -----------------------------------------------------------------
 
-    story.append(
-        Paragraph("Day-wise Travel Plan", heading)
-    )
+    story.append(Paragraph("Day-wise Travel Plan", heading))
 
     story.append(Spacer(1, 10))
 
-    story.append(
-        Paragraph(
-            clean_markdown(trip.generated_plan),
-            body
-        )
-    )
+    story.append(Paragraph(clean_markdown(trip.generated_plan), body))
 
     story.append(Spacer(1, 25))
 
@@ -150,9 +144,7 @@ def generate_trip_pdf(trip):
     # AI INSIGHTS
     # -----------------------------------------------------------------
 
-    story.append(
-        Paragraph("Travel Intelligence", heading)
-    )
+    story.append(Paragraph("Travel Intelligence", heading))
 
     story.append(
         Paragraph(

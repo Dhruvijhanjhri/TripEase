@@ -1,7 +1,6 @@
 from decimal import Decimal
 import hashlib
 
-
 ACTIVE_AIRLINES = [
     "Air India",
     "Air India Express",

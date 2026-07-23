@@ -6,28 +6,28 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('ai_planner', '0001_initial'),
+        ("ai_planner", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='tripplan',
-            name='estimated_cost',
+            model_name="tripplan",
+            name="estimated_cost",
             field=models.DecimalField(decimal_places=2, default=0, max_digits=10),
         ),
         migrations.AddField(
-            model_name='tripplan',
-            name='recommended_hotels',
-            field=models.TextField(blank=True, help_text='Comma separated hotel IDs'),
+            model_name="tripplan",
+            name="recommended_hotels",
+            field=models.TextField(blank=True, help_text="Comma separated hotel IDs"),
         ),
         migrations.AddField(
-            model_name='tripplan',
-            name='recommended_packages',
-            field=models.TextField(blank=True, help_text='Comma separated package IDs'),
+            model_name="tripplan",
+            name="recommended_packages",
+            field=models.TextField(blank=True, help_text="Comma separated package IDs"),
         ),
         migrations.AlterField(
-            model_name='tripplan',
-            name='generated_plan',
+            model_name="tripplan",
+            name="generated_plan",
             field=models.TextField(blank=True),
         ),
     ]

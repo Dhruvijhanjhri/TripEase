@@ -8,97 +8,68 @@ class Payment(models.Model):
     """Universal Payment Model"""
 
     PAYMENT_METHOD_CHOICES = [
-        ('upi', 'UPI'),
-        ('card', 'Credit/Debit Card'),
-        ('netbanking', 'Net Banking'),
-        ('wallet', 'Wallet'),
+        ("upi", "UPI"),
+        ("card", "Credit/Debit Card"),
+        ("netbanking", "Net Banking"),
+        ("wallet", "Wallet"),
     ]
 
     STATUS_CHOICES = [
-        ('pending', 'Pending'),
-        ('success', 'Success'),
-        ('failed', 'Failed'),
-        ('refunded', 'Refunded'),
+        ("pending", "Pending"),
+        ("success", "Success"),
+        ("failed", "Failed"),
+        ("refunded", "Refunded"),
     ]
 
     # Flight Booking
     booking = models.OneToOneField(
-        Booking,
-        on_delete=models.CASCADE,
-        related_name='payment',
-        null=True,
-        blank=True
+        Booking, on_delete=models.CASCADE, related_name="payment", null=True, blank=True
     )
 
     # Hotel Booking
     hotel_booking = models.OneToOneField(
         HotelBooking,
         on_delete=models.CASCADE,
-        related_name='payment',
+        related_name="payment",
         null=True,
-        blank=True
+        blank=True,
     )
 
-    #Package Booking
+    # Package Booking
     package_booking = models.OneToOneField(
         PackageBooking,
         on_delete=models.CASCADE,
-        related_name='payment',
+        related_name="payment",
         null=True,
-        blank=True
+        blank=True,
     )
 
-    amount = models.DecimalField(
-        max_digits=10,
-        decimal_places=2
-    )
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
 
-    payment_method = models.CharField(
-        max_length=20,
-        choices=PAYMENT_METHOD_CHOICES
-    )
+    payment_method = models.CharField(max_length=20, choices=PAYMENT_METHOD_CHOICES)
 
     payment_status = models.CharField(
-        max_length=20,
-        choices=STATUS_CHOICES,
-        default='pending'
+        max_length=20, choices=STATUS_CHOICES, default="pending"
     )
 
-    transaction_id = models.CharField(
-        max_length=100,
-        blank=True,
-        null=True
-    )
+    transaction_id = models.CharField(max_length=100, blank=True, null=True)
 
-    payment_date = models.DateTimeField(
-        auto_now_add=True
-    )
+    payment_date = models.DateTimeField(auto_now_add=True)
 
-    updated_at = models.DateTimeField(
-        auto_now=True
-    )
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['-payment_date']
+        ordering = ["-payment_date"]
 
     def __str__(self):
 
         if self.booking:
-            return (
-                f"Flight Payment - "
-                f"{self.booking.booking_reference}"
-            )
+            return f"Flight Payment - " f"{self.booking.booking_reference}"
 
         elif self.hotel_booking:
-            return (
-                f"Hotel Payment - "
-                f"{self.hotel_booking.booking_reference}"
-            )
+            return f"Hotel Payment - " f"{self.hotel_booking.booking_reference}"
 
         elif self.package_booking:
-            return (
-                f"Package Payment - "
-                f"{self.package_booking.booking_reference}"
-            )
+            return f"Package Payment - " f"{self.package_booking.booking_reference}"
 
         return "Payment"
