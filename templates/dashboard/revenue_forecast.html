@@ -12,7 +12,9 @@
                 Revenue Forecast
             </h2>
 
-            <canvas id="forecastChart" height="120"></canvas>
+            <div style="position: relative; width: 100%; height: 320px;">
+                <canvas id="forecastChart"></canvas>
+            </div>
 
         </div>
 
@@ -116,6 +118,7 @@ new Chart(
         options: {
 
             responsive: true,
+            maintainAspectRatio: false,
 
             interaction: {
                 mode: "index",

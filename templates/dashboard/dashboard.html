@@ -1105,13 +1105,13 @@ body { background: var(--surface); }
       <a href="#" class="te-btn te-btn-primary" onclick="window.print();return false;">
         <i class="fa-solid fa-print"></i> Print
       </a>
-      <a href="/dashboard/export/pdf/" class="te-btn" style="background:#e74c3c;color:#fff">
+      <a href="{% url 'dashboard:export_pdf' %}" class="te-btn" style="background:#e74c3c;color:#fff">
         <i class="fa-solid fa-file-pdf"></i> PDF
       </a>
-      <a href="/dashboard/export/excel/" class="te-btn te-btn-green">
+      <a href="{% url 'dashboard:export_excel' %}" class="te-btn te-btn-green">
         <i class="fa-solid fa-file-excel"></i> Excel
       </a>
-      <a href="/dashboard/export/csv/" class="te-btn te-btn-amber">
+      <a href="{% url 'dashboard:export_csv' %}" class="te-btn te-btn-amber">
         <i class="fa-solid fa-file-csv"></i> CSV
       </a>
     </div>

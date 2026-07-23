@@ -1989,15 +1989,15 @@
               const label = labels[index];
 
               if (label === "Flights") {
-                  window.location.href = "/bookings/";
+                  window.location.href = "{% url 'bookings:list' %}";
               }
 
               else if (label === "Hotels") {
-                  window.location.href = "/hotels/";
+                  window.location.href = "{% url 'hotels:search' %}";
               }
 
               else if (label === "Packages") {
-                  window.location.href = "/packages/";
+                  window.location.href = "{% url 'packages:search' %}";
               }
 
           },
@@ -2079,19 +2079,19 @@
               const label = filteredLabels[index];
 
               if (label === "Pending") {
-                  window.location.href = "/bookings/?status=pending";
+                  window.location.href = "{% url 'bookings:list' %}?status=pending";
               }
 
               else if (label === "Confirmed") {
-                  window.location.href = "/bookings/?status=confirmed";
+                  window.location.href = "{% url 'bookings:list' %}?status=confirmed";
               }
 
               else if (label === "Cancelled") {
-                  window.location.href = "/bookings/?status=cancelled";
+                  window.location.href = "{% url 'bookings:list' %}?status=cancelled";
               }
 
               else if (label === "Completed") {
-                  window.location.href = "/bookings/?status=completed";
+                  window.location.href = "{% url 'bookings:list' %}?status=completed";
               }
 
           },
@@ -2163,7 +2163,7 @@
               const month = labels[index];
 
               window.location.href =
-                  "/bookings/?month=" + encodeURIComponent(month);
+                  "{% url 'bookings:list' %}?month=" + encodeURIComponent(month);
 
           },
 
