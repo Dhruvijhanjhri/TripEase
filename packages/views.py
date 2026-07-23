@@ -8,6 +8,10 @@ from .models import PackageBooking
 from reviews.models import PackageReview
 from django.db.models import Avg
 from django.contrib import messages
+from utils.weather import (
+    get_weather,
+    get_weather_by_coordinates,
+)
 
 def package_search(request):
 
@@ -53,6 +57,8 @@ def package_detail(
         id=package_id
     )
 
+    weather = get_weather(package.destination)
+
     average_rating = package.reviews.aggregate(
         Avg("rating")
     )["rating__avg"]
@@ -90,6 +96,7 @@ def package_detail(
             "reviews": reviews,
             "can_review": can_review,
             "already_reviewed": already_reviewed,
+            "weather": weather,
         }
     )
 

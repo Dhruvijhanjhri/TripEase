@@ -24,6 +24,11 @@ from django.db.models import Avg
 from django.contrib.auth.decorators import login_required
 from .models import HotelBooking
 from integrations.services import LocationService
+from utils.weather import (
+    get_weather,
+    get_weather_by_coordinates,
+)
+from utils.nearby import get_nearby_places
 
 def hotel_search(request):
 
@@ -90,9 +95,33 @@ def hotel_detail(request, hotel_id):
         id=hotel_id
     )
 
-    live_location = LocationService.get_coordinates(
-        hotel.city
-    )
+    live_location = LocationService.get_coordinates(hotel.city)
+
+    # fallback if geocoding fails
+    if not live_location:
+        live_location = {
+            "display_name": f"{hotel.city}, {hotel.state}, India",
+            "latitude": 22.7196,   # Indore fallback
+            "longitude": 75.8577,
+        }
+
+    weather = None
+    nearby = None
+
+    if live_location:
+
+        weather = get_weather_by_coordinates(
+            live_location["latitude"],
+            live_location["longitude"],
+        )
+
+        nearby = get_nearby_places(
+            live_location["latitude"],
+            live_location["longitude"],
+        )
+
+    print("LIVE LOCATION:", live_location)
+    print("NEARBY:", nearby)
 
     rooms = hotel.rooms.filter(
         available_rooms__gt=0
@@ -138,6 +167,8 @@ def hotel_detail(request, hotel_id):
         "can_review": can_review,
         "already_reviewed": already_reviewed,
         "live_location": live_location,
+        "weather": weather,
+        "nearby": nearby,
     }
 
     return render(

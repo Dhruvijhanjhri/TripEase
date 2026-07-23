@@ -55,12 +55,12 @@
 
             <hr class="my-4">
 
+            {% if live_location %}
+
             <div class="card border-0 shadow-sm mt-4">
                 <div class="card-body">
 
-                    <h5 class="fw-bold mb-3">
-                        📍 Location
-                    </h5>
+                    <h5 class="fw-bold mb-3">📍 Location</h5>
 
                     <p class="mb-2">
                         <strong>Address:</strong><br>
@@ -69,20 +69,102 @@
 
                     <p class="mb-2">
                         <strong>Coordinates:</strong><br>
-                        {{ live_location.latitude }},
-                        {{ live_location.longitude }}
+                        {{ live_location.latitude }}, {{ live_location.longitude }}
                     </p>
 
-                    <a
-                        href="https://www.google.com/maps?q={{ live_location.latitude }},{{ live_location.longitude }}"
-                        target="_blank"
-                        class="btn btn-outline-primary btn-sm"
-                    >
+                    <a href="https://www.google.com/maps?q={{ live_location.latitude }},{{ live_location.longitude }}"
+                    target="_blank"
+                    class="btn btn-outline-primary btn-sm">
                         Open in Google Maps
                     </a>
 
+                    <hr>
+
+                    <h6 class="fw-bold mb-3">
+                        🗺 Interactive Map
+                    </h6>
+
+                    <div class="ratio ratio-16x9">
+
+                    <iframe
+                        src="https://maps.google.com/maps?q={{ live_location.latitude }},{{ live_location.longitude }}&z=15&output=embed"
+                        style="border:0;border-radius:12px;"
+                        loading="lazy"
+                        allowfullscreen>
+                    </iframe>
+
+                    </div>
+
                 </div>
             </div>
+
+            {% else %}
+
+            <div class="alert alert-warning mt-4">
+                Location information is temporarily unavailable.
+            </div>
+
+            {% endif %}
+
+            {% if weather %}
+
+            <div class="card border-0 shadow-sm mt-4">
+
+                <div class="card-body">
+
+                    <h5 class="fw-bold mb-3">
+                        🌤 Destination Weather
+                    </h5>
+
+                    <h6 class="mb-3">
+                        {{ hotel.city }}
+                    </h6>
+
+                    <p class="mb-2">
+                        <img
+                            src="https://openweathermap.org/img/wn/{{ weather.icon }}@2x.png"
+                            width="50"
+                            alt="{{ weather.description }}"
+                        >
+
+                        {{ weather.description }}
+                    </p>
+
+                    <div class="row">
+
+                        <div class="col-6">
+                            🌡 <strong>{{ weather.temperature }}°C</strong><br>
+                            <small class="text-muted">Temperature</small>
+                        </div>
+
+                        <div class="col-6">
+                            🤗 <strong>{{ weather.feels_like }}°C</strong><br>
+                            <small class="text-muted">Feels Like</small>
+                        </div>
+
+                    </div>
+
+                    <hr>
+
+                    <div class="row">
+
+                        <div class="col-6">
+                            💧 <strong>{{ weather.humidity }}%</strong><br>
+                            <small class="text-muted">Humidity</small>
+                        </div>
+
+                        <div class="col-6">
+                            💨 <strong>{{ weather.wind_speed }} km/h</strong><br>
+                            <small class="text-muted">Wind</small>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endif %}
 
         </div>
 

@@ -51,6 +51,81 @@
 
             <hr>
 
+            {% if weather %}
+
+                <div class="card border-0 shadow-sm mt-4">
+
+                    <div class="card-body">
+
+                        <h5 class="fw-bold mb-3">
+                            🌤 Destination Weather
+                        </h5>
+
+                        <h6>{{ package.destination }}</h6>
+
+                        <p>☁️ {{ weather.description }}</p>
+
+                        <div class="row">
+
+                            <div class="col-6">
+                                🌡 <strong>{{ weather.temperature }}°C</strong><br>
+                                <small>Temperature</small>
+                            </div>
+
+                            <div class="col-6">
+                                🤗 <strong>{{ weather.feels_like }}°C</strong><br>
+                                <small>Feels Like</small>
+                            </div>
+
+                        </div>
+
+                        <hr>
+
+                        <div class="row">
+
+                            <div class="col-6">
+                                💧 <strong>{{ weather.humidity }}%</strong><br>
+                                <small>Humidity</small>
+                            </div>
+
+                            <div class="col-6">
+                                💨 <strong>{{ weather.wind_speed }} km/h</strong><br>
+                                <small>Wind</small>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            {% endif %}
+
+            <div class="card border-0 shadow-sm mt-4">
+
+            <div class="card-body">
+
+            <h5 class="fw-bold mb-3">
+            🗺 Destination Map
+            </h5>
+
+            <div class="ratio ratio-16x9">
+
+            <iframe
+            src="https://maps.google.com/maps?q={{ package.destination }}&z=13&output=embed"
+            style="border:0;border-radius:12px;"
+            loading="lazy"
+            allowfullscreen>
+            </iframe>
+
+            </div>
+
+            </div>
+
+            </div>
+            
+            <hr>
+
             <h5>Package Includes</h5>
 
             <pre style="white-space: pre-wrap;">{{ package.inclusions }}</pre>
