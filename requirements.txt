@@ -22,6 +22,8 @@ joblib>=1.2
 
 # PDF generation
 reportlab>=4.0
+fpdf2>=2.8.2
+qrcode>=8.2
 
 # SSL certificates
 certifi>=2024.7.4
