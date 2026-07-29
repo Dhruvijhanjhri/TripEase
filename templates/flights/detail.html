@@ -7,12 +7,15 @@ Flight Details
 
 {% block content %}
 
-<div class="container" style="padding:40px;">
+<div class="page-shell">
+    <div class="container py-5">
+        <div class="detail-heading">
+            <div class="travel-pill"><i class="bi bi-airplane"></i> Premium flight overview</div>
+            <h2 class="section-title mb-0">Flight Details</h2>
+        </div>
 
-    <h2>Flight Details</h2>
-
-    <!-- ROUTE -->
-    <h3>
+        <div class="glass-card p-4 p-lg-5 mb-4">
+            <h3 class="fw-bold mb-3">
 
         {% if second_leg %}
             {{ flight.source.code }}
@@ -28,7 +31,7 @@ Flight Details
 
     </h3>
 
-    <div style="margin: 10px 0 20px; color: #475569;">
+    <div class="detail-meta">
         Travel Date: <strong>{{ selected_departure_date|date:"D, M d, Y" }}</strong> |
         Seats: <strong>{{ seat_display }}</strong> |
         Duration: <strong>{{ total_duration_display }}</strong> |
@@ -127,14 +130,7 @@ Flight Details
     <!-- SECOND FLIGHT -->
     {% if second_leg %}
 
-    <div
-        style="
-        border:1px solid #ddd;
-        padding:25px;
-        margin-top:20px;
-        border-radius:10px;
-        "
-    >
+    <div class="detail-panel p-4 mt-4">
 
         <h3>
             {{ second_leg.airline }}
@@ -213,9 +209,9 @@ Flight Details
     {% endif %}
 
     <!-- PRICE -->
-    <div style="margin-top:30px;">
+    <div class="glass-card p-4 mt-4">
 
-        <h3>Price Breakdown</h3>
+        <h3 class="fw-bold mb-3">Price Breakdown</h3>
 
         <p>
             Cabin:
@@ -245,9 +241,9 @@ Flight Details
     </div>
 
     {% if weather %}
-    <div class="card shadow-sm border-0 mt-4">
+    <div class="glass-card mt-4">
 
-        <div class="card-header bg-primary text-white">
+        <div class="card-header bg-primary text-white rounded-top-4">
             🌤 Destination Weather
         </div>
 
@@ -302,7 +298,7 @@ Flight Details
 
     {% if booking_advice %}
 
-    <div class="card mt-4 border-{{ booking_advice.color }}">
+    <div class="glass-card mt-4 border-{{ booking_advice.color }}">
         <div class="card-header bg-{{ booking_advice.color }} text-white">
             <strong>🤖 AI Booking Recommendation</strong>
         </div>
@@ -331,7 +327,7 @@ Flight Details
 
             {% if predicted_price %}
 
-                <div class="card shadow-sm border-0 mt-4">
+                <div class="glass-card mt-4">
 
                     <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
 

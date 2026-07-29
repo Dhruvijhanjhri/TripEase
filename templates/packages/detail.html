@@ -2,6 +2,7 @@
 
 {% block content %}
 
+<div class="page-shell">
 <div class="container mt-4 mb-5">
 
     <div class="row">
@@ -10,36 +11,25 @@
 
             <img
                 src="{{ package.image_url }}"
-                class="img-fluid rounded shadow"
+                class="detail-media"
             >
 
         </div>
 
         <div class="col-md-6">
 
-            <h2>
-                {{ package.name }}
-            </h2>
+            <div class="detail-heading">
+                <div class="travel-pill"><i class="bi bi-briefcase"></i> Curated travel experience</div>
+                <h2 class="section-title mb-0">{{ package.name }}</h2>
+                <p class="section-copy mb-0">{{ package.destination }}, {{ package.state }}</p>
+            </div>
 
-            <p>
-                {{ package.destination }},
-                {{ package.state }}
-            </p>
+            <div class="detail-meta">
+                <span class="detail-badge">⭐ {{ package.rating }}</span>
+                <span class="detail-badge">{{ package.duration_days }} Days / {{ package.duration_nights }} Nights</span>
+            </div>
 
-            <p>
-                ⭐ {{ package.rating }}
-            </p>
-
-            <p>
-                {{ package.duration_days }}
-                Days /
-                {{ package.duration_nights }}
-                Nights
-            </p>
-
-            <h3>
-                ₹{{ package.price }}
-            </h3>
+            <h3 class="text-primary fw-bold">₹{{ package.price }}</h3>
 
             <hr>
 
@@ -53,7 +43,7 @@
 
             {% if weather %}
 
-                <div class="card border-0 shadow-sm mt-4">
+                <div class="glass-card mt-4">
 
                     <div class="card-body">
 
@@ -101,7 +91,7 @@
 
             {% endif %}
 
-            <div class="card border-0 shadow-sm mt-4">
+            <div class="glass-card mt-4">
 
             <div class="card-body">
 
@@ -210,7 +200,7 @@
 
             <div class="col-md-6 mb-4">
 
-                <div class="card shadow-sm border-0 h-100">
+                <div class="glass-card h-100">
 
                     <div class="card-body">
 

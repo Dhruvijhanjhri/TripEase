@@ -48,7 +48,7 @@
     *::after { box-sizing: border-box; }
 
     body {
-      background  : var(--body-bg);
+      background  : linear-gradient(180deg, #f8fbff 0%, var(--body-bg) 100%);
       font-family : 'Segoe UI', system-ui, -apple-system, sans-serif;
       color       : var(--brand-dark);
       font-size   : 0.9375rem;
@@ -151,9 +151,10 @@
        KPI CARDS (Snapshot)
     ═══════════════════════════════════════════════ */
     .kpi-card {
-      border        : none;
+      border        : 1px solid rgba(226,232,240,0.95);
       border-radius : var(--card-radius);
       box-shadow    : var(--shadow-sm);
+      backdrop-filter: blur(8px);
       transition    : transform var(--transition-fast), box-shadow var(--transition-fast);
       overflow      : hidden;
       position      : relative;

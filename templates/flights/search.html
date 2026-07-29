@@ -1,230 +1,123 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<div class="page-shell">
+    <div class="container">
+        <div class="section-heading">
+            <div class="travel-pill"><i class="bi bi-airplane"></i> AI-ranked fares and flexible routes</div>
+            <h2 class="section-title">Search flights</h2>
+            <p class="section-copy">Compare route options with a calmer, more polished experience.</p>
+        </div>
 
-<h2>Search Flights</h2>
+        <div class="search-panel mb-4">
+            <form method="GET" class="auth-form">
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+        </div>
 
-<form method="GET">
-    {{ form.as_p }}
-    <button type="submit">Search</button>
-</form>
-
-<hr>
-
-{% if search_performed %}
-
-    <!-- DIRECT FLIGHTS -->
-    {% if direct_flights %}
-        <h3>Direct Flights ({{ direct_flights|length }})</h3>
-
-        {% for flight in direct_flights %}
-            <div style="border:1px solid #ccc; padding:15px; margin-bottom:15px;">
-
-                <h4>
-                    {{ flight.airline }}
-
-                    {% if flight.recommendation_score >= 90 %}
-                        <span class="badge bg-success">🏆 AI Recommended</span>
-
-                    {% elif flight.recommendation_score >= 80 %}
-                        <span class="badge bg-primary">⭐ Best Value</span>
-
-                    {% elif flight.recommendation_score >= 70 %}
-                        <span class="badge bg-warning text-dark">👍 Good Choice</span>
-
-                    {% else %}
-                        <span class="badge bg-secondary">Standard Option</span>
-                    {% endif %}
-                </h4>
-
-                {% if flight.trending_badge %}
-                    <p>{{ flight.trending_badge }}</p>
-                    <small>
-                        Booked {{ flight.booking_count }} times
-                    </small>
-                {% endif %}
-
-                {% if flight.personalized_reason %}
-                <p><strong>🤖 Personalized:</strong> {{ flight.personalized_reason }}</p>
-                {% endif %}
-
-                <p>{{ flight.get_display_flight_number }}</p>
-                <p>
-                    AI Score: {{ flight.recommendation_score }}/100
-                </p>
-
-                <p>
-                    Confidence:
-                    <strong>{{ flight.ai_confidence }}</strong>
-                </p>
-
-                {% if flight.ai_reasons %}
-                <p><strong>Recommendation Breakdown</strong></p>
-
-                <ul>
-                    {% for reason in flight.ai_reasons %}
-                        <li>✔ {{ reason }}</li>
+        {% if search_performed %}
+            {% if direct_flights %}
+                <h3 class="mb-3">Direct flights ({{ direct_flights|length }})</h3>
+                <div class="results-stack">
+                    {% for flight in direct_flights %}
+                        <div class="travel-card result-card">
+                            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                                <h4 class="mb-2">{{ flight.airline }}</h4>
+                                {% if flight.recommendation_score >= 90 %}
+                                    <span class="chip">🏆 AI Recommended</span>
+                                {% elif flight.recommendation_score >= 80 %}
+                                    <span class="chip">⭐ Best Value</span>
+                                {% elif flight.recommendation_score >= 70 %}
+                                    <span class="chip">👍 Good Choice</span>
+                                {% else %}
+                                    <span class="chip">Standard Option</span>
+                                {% endif %}
+                            </div>
+                            {% if flight.trending_badge %}
+                                <p class="mb-2">{{ flight.trending_badge }}</p>
+                                <small class="text-muted">Booked {{ flight.booking_count }} times</small>
+                            {% endif %}
+                            {% if flight.personalized_reason %}
+                            <p class="mt-3"><strong>🤖 Personalized:</strong> {{ flight.personalized_reason }}</p>
+                            {% endif %}
+                            <p class="mb-1">{{ flight.get_display_flight_number }}</p>
+                            <p class="mb-1">AI Score: {{ flight.recommendation_score }}/100</p>
+                            <p class="mb-1">Confidence: <strong>{{ flight.ai_confidence }}</strong></p>
+                            {% if flight.ai_reasons %}
+                            <p class="mt-3"><strong>Recommendation breakdown</strong></p>
+                            <ul>
+                                {% for reason in flight.ai_reasons %}
+                                    <li>✔ {{ reason }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                            <p class="mb-1">{{ flight.source.code }} → {{ flight.destination.code }}</p>
+                            <p class="mb-1">Seats: {{ flight.seat_display }}</p>
+                            <p class="mb-1">Departure: {{ flight.display_departure }}</p>
+                            <p class="mb-1">Arrival: {{ flight.display_arrival }}</p>
+                            <p class="mb-1">Duration: {{ flight.get_duration_display }}</p>
+                            <p class="mb-1">Cabin Price: ₹ {{ flight.cabin_price }}</p>
+                            <p class="mb-1">Total Price: ₹ {{ flight.price }}</p>
+                            <a href="{% url 'flights:flight_detail' flight.id %}?cabin_class={{ cabin_class }}&passengers={{ passengers }}&departure_date={{ request.GET.departure_date }}" class="btn btn-primary mt-3">View Details & Book</a>
+                        </div>
                     {% endfor %}
-                </ul>
-                {% endif %}
+                </div>
+            {% endif %}
 
-                <p>
-                    {{ flight.source.code }} → {{ flight.destination.code }}
-                </p>
-
-                <p>
-                    Seats: {{ flight.seat_display }}
-                </p>
-
-                <p>
-                    Departure: {{ flight.display_departure }}
-                </p>
-
-                <p>
-                    Arrival: {{ flight.display_arrival }}
-                </p>
-
-                <p>
-                    Duration: {{ flight.get_duration_display }}
-                </p>
-
-                <p>
-                    Cabin Price: ₹ {{ flight.cabin_price }}
-                </p>
-
-                <p>
-                    Total Price: ₹ {{ flight.price }}
-                </p>
-
-                <a href="{% url 'flights:flight_detail' flight.id %}?cabin_class={{ cabin_class }}&passengers={{ passengers }}&departure_date={{ request.GET.departure_date }}">
-                    <button type="button">View Details & Book</button>
-                </a>
-
-            </div>
-        {% endfor %}
-    {% endif %}
-
-
-    <!-- VIA FLIGHTS -->
-    {% if via_flights %}
-        <h3>Via Flights ({{ via_flights|length }})</h3>
-
-        {% for route in via_flights %}
-            <div style="border:1px solid #ccc; padding:15px; margin-bottom:15px;">
-
-                <h4>
-                    1 Stop Journey
-
-                    {% if route.recommendation_score >= 90 %}
-                        <span class="badge bg-success">🏆 AI Recommended</span>
-
-                    {% elif route.recommendation_score >= 80 %}
-                        <span class="badge bg-primary">⭐ Best Value</span>
-
-                    {% elif route.recommendation_score >= 70 %}
-                        <span class="badge bg-warning text-dark">👍 Good Choice</span>
-
-                    {% else %}
-                        <span class="badge bg-secondary">Standard Option</span>
-                    {% endif %}
-                </h4>
-
-                {% if route.trending_badge %}
-                    <p>{{ route.trending_badge }}</p>
-                    <small>
-                        Booked {{ route.booking_count }} times
-                    </small>
-                {% endif %}
-
-                {% if route.personalized_reason %}
-                <p><strong>🤖 Personalized:</strong> {{ route.personalized_reason }}</p>
-                {% endif %}
-
-                <p>
-                    <small class="text-muted">
-                        AI Score: {{ route.recommendation_score|floatformat:1 }}/100
-                    </small>
-                </p>
-
-                <p>
-                    Confidence:
-                    <strong>{{ route.ai_confidence }}</strong>
-                </p>
-
-                {% if route.ai_reasons %}
-                <p><strong>Recommendation Breakdown</strong></p>
-
-                <ul>
-                    {% for reason in route.ai_reasons %}
-                        <li>✔ {{ reason }}</li>
+            {% if via_flights %}
+                <h3 class="mt-4 mb-3">Via flights ({{ via_flights|length }})</h3>
+                <div class="results-stack">
+                    {% for route in via_flights %}
+                        <div class="travel-card result-card">
+                            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                                <h4 class="mb-2">1 Stop Journey</h4>
+                                {% if route.recommendation_score >= 90 %}
+                                    <span class="chip">🏆 AI Recommended</span>
+                                {% elif route.recommendation_score >= 80 %}
+                                    <span class="chip">⭐ Best Value</span>
+                                {% elif route.recommendation_score >= 70 %}
+                                    <span class="chip">👍 Good Choice</span>
+                                {% else %}
+                                    <span class="chip">Standard Option</span>
+                                {% endif %}
+                            </div>
+                            {% if route.trending_badge %}
+                                <p class="mb-2">{{ route.trending_badge }}</p>
+                                <small class="text-muted">Booked {{ route.booking_count }} times</small>
+                            {% endif %}
+                            {% if route.personalized_reason %}
+                            <p class="mt-3"><strong>🤖 Personalized:</strong> {{ route.personalized_reason }}</p>
+                            {% endif %}
+                            <p class="mb-1"><small class="text-muted">AI Score: {{ route.recommendation_score|floatformat:1 }}/100</small></p>
+                            <p class="mb-1">Confidence: <strong>{{ route.ai_confidence }}</strong></p>
+                            {% if route.ai_reasons %}
+                            <p class="mt-3"><strong>Recommendation breakdown</strong></p>
+                            <ul>
+                                {% for reason in route.ai_reasons %}
+                                    <li>✔ {{ reason }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                            <p class="mb-1">{{ route.first_leg.source.code }} → {{ route.first_leg.destination.code }} → {{ route.second_leg.destination.code }}</p>
+                            <p class="mb-1">Seats: {{ route.first_leg_seat_display }} + {{ route.second_leg_seat_display }}</p>
+                            <p class="mb-1"><strong>First Flight:</strong> {{ route.first_leg.airline }} ({{ route.first_leg.get_display_flight_number }})</p>
+                            <p class="mb-1">Departure: {{ request.GET.departure_date }} {{ route.first_leg.departure_time|time:"H:i" }}</p>
+                            <p class="mb-1"><strong>Second Flight:</strong> {{ route.second_leg.airline }} ({{ route.second_leg.get_display_flight_number }})</p>
+                            <p class="mb-1">Departure: {{ request.GET.departure_date }} {{ route.second_leg.departure_time|time:"H:i" }}</p>
+                            <p class="mb-1">Total Price: ₹ {{ route.total_price }}</p>
+                            <p class="mb-1">Cabin Price: ₹ {{ route.first_leg_price }} + ₹ {{ route.second_leg_price }}</p>
+                            <p class="mb-1">Total Journey Time: {{ route.total_duration_display }}</p>
+                            <a href="{% url 'flights:flight_detail' route.first_leg.id %}?cabin_class={{ cabin_class }}&passengers={{ passengers }}&departure_date={{ request.GET.departure_date }}&is_via=1&second_leg_id={{ route.second_leg.id }}" class="btn btn-primary mt-3">View Details & Book</a>
+                        </div>
                     {% endfor %}
-                </ul>
-                {% endif %}
+                </div>
+            {% endif %}
 
-                <p>
-                    {{ route.first_leg.source.code }}
-                    →
-                    {{ route.first_leg.destination.code }}
-                    →
-                    {{ route.second_leg.destination.code }}
-                </p>
-
-                <p>
-                    Seats:
-                    {{ route.first_leg_seat_display }} + {{ route.second_leg_seat_display }}
-                </p>
-
-                <p>
-                    <strong>First Flight:</strong>
-                    {{ route.first_leg.airline }}
-                    ({{ route.first_leg.get_display_flight_number }})
-                </p>
-
-                <p>
-                    Departure:
-                    {{ request.GET.departure_date }}
-                    {{ route.first_leg.departure_time|time:"H:i" }}
-                </p>
-
-                <p>
-                    <strong>Second Flight:</strong>
-                    {{ route.second_leg.airline }}
-                    ({{ route.second_leg.get_display_flight_number }})
-                </p>
-
-                <p>
-                    Departure:
-                    {{ request.GET.departure_date }}
-                    {{ route.second_leg.departure_time|time:"H:i" }}
-                </p>
-
-                <p>
-                    Total Price: ₹ {{ route.total_price }}
-                </p>
-
-                <p>
-                    Cabin Price:
-                    ₹ {{ route.first_leg_price }} + ₹ {{ route.second_leg_price }}
-                </p>
-
-                <p>
-                    Total Journey Time: {{ route.total_duration_display }}
-                </p>
-
-                <a href="{% url 'flights:flight_detail' route.first_leg.id %}?cabin_class={{ cabin_class }}&passengers={{ passengers }}&departure_date={{ request.GET.departure_date }}&is_via=1&second_leg_id={{ route.second_leg.id }}">
-                    <button type="button">View Details & Book</button>
-                </a>
-
-            </div>
-        {% endfor %}
-    {% endif %}
-
-
-    <!-- NOTHING FOUND -->
-    {% if not direct_flights and not via_flights %}
-        <p>No flights found matching your criteria.</p>
-    {% endif %}
-
-{% endif %}
-
+            {% if not direct_flights and not via_flights %}
+                <div class="support-card mt-3">No flights found matching your criteria.</div>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

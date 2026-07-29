@@ -44,26 +44,17 @@
 
 </style>
 
+<div class="page-shell">
 <div class="container-fluid py-5 px-lg-5">
 
     <!-- Header -->
 
     <div class="card shadow-lg border-0 rounded-4 mb-4">
 
-        <div class="text-center mb-5">
-
-            <h1 class="fw-bold text-primary">
-
-            ✈️ Your AI Trip is Ready
-
-            </h1>
-
-            <p class="text-muted">
-
-            Generated using Google Gemini AI
-
-            </p>
-
+        <div class="section-heading text-center mb-5">
+            <div class="travel-pill"><i class="bi bi-stars"></i> Trip ready for your next adventure</div>
+            <h1 class="section-title mb-2">✈️ Your AI Trip is Ready</h1>
+            <p class="section-copy">Generated using Google Gemini AI with a polished, easy-to-scan itinerary.</p>
         </div>
 
         <div class="row text-center mb-4">
@@ -206,9 +197,9 @@
     </div>
     </div>
 
-    <div class="card border-0 shadow-sm mb-4">
+    <div class="glass-card mb-4">
 
-    <div class="card-header bg-white">
+    <div class="card-header bg-white border-0">
 
     <h5 class="mb-0">
 
@@ -296,7 +287,7 @@
 
 
     <!-- AI Itinerary Timeline -->
-    <div class="card border-0 shadow-sm mb-4">
+    <div class="glass-card mb-4">
 
     <div class="card-header bg-white border-0 pb-0">
         <div class="d-flex align-items-center gap-2">
@@ -376,11 +367,11 @@
 
     <div class="col-md-4 mb-4">
 
-    <div class="card recommend-card">
+    <div class="recommendation-card card">
 
     <div class="card-body text-center">
 
-    <div class="recommend-icon">
+    <div class="recommendation-icon">
     🏨
     </div>
 
@@ -394,13 +385,13 @@
 
     </p>
 
-    <p class="rating">
+    <p class="recommendation-rating">
 
     ⭐ {{ hotel.user_rating }}
 
     </p>
 
-    <p class="price">
+    <p class="recommendation-price">
 
     {% if hotel.display_price %}
         ₹{{ hotel.display_price }}/night
@@ -529,31 +520,10 @@
 
     <!-- Buttons -->
 
-    <div class="text-center mt-5">
-
-        <a href="{% url 'ai_planner:planner' %}"
-
-           class="btn btn-primary btn-lg rounded-pill me-3">
-
-            ✨ Plan Another Trip
-
-        </a>
-
-        <a href="{% url 'ai_planner:export_pdf' trip.id %}"
-            class="btn btn-success btn-lg rounded-pill me-3">
-
-                📄 Download PDF
-
-        </a>
-
-        <a href="{% url 'ai_planner:history' %}"
-
-           class="btn btn-outline-primary btn-lg rounded-pill">
-
-            📋 View My Plans
-
-        </a>
-
+    <div class="export-actions mt-5">
+        <a href="{% url 'ai_planner:planner' %}" class="btn btn-primary btn-lg rounded-pill">✨ Plan Another Trip</a>
+        <a href="{% url 'ai_planner:export_pdf' trip.id %}" class="btn btn-success btn-lg rounded-pill">📄 Download PDF</a>
+        <a href="{% url 'ai_planner:history' %}" class="btn btn-outline btn-lg rounded-pill">📋 View My Plans</a>
     </div>
 
 </div>

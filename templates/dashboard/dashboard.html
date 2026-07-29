@@ -36,7 +36,7 @@
 /* ================================================================
    Layout
    ================================================================ */
-body { background: var(--surface); }
+body { background: linear-gradient(180deg, #f8fbff 0%, var(--surface) 100%); }
 
 .te-wrap {
   max-width: 1400px;
@@ -231,6 +231,10 @@ body { background: var(--surface); }
   position: relative;
   width: 100%;
   min-height: 280px;
+  padding: 12px;
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(248,250,252,0.95), rgba(255,255,255,0.98));
+  border: 1px solid rgba(226,232,240,0.95);
 }
 .te-chart-box canvas { width: 100% !important; }
 
