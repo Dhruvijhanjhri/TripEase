@@ -19,11 +19,9 @@ services:
       - key: ALLOWED_HOSTS
         value: "tripease-y0yf.onrender.com,localhost,127.0.0.1"
       # Use your Supabase Postgres connection string here (not the anon key)
-      - key: DATABASE_URL
-        value: "set-your-supabase-postgres-connection-string"
+      
       # Optional: if you prefer SUPABASE_DB_URL env name
-      - key: SUPABASE_DB_URL
-        value: "set-your-supabase-postgres-connection-string"
+      
       - key: SUPABASE_URL
         value: "https://cakngwyybeqlxdolbdqh.supabase.co"
       - key: SUPABASE_ANON_KEY
