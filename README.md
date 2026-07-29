@@ -1,235 +1,311 @@
-# TripEase - Full-Stack Flight Booking Platform
+# ✈️ TripEase – AI Powered Travel Booking Platform
 
-TripEase is a comprehensive flight booking platform built with Django, featuring secure authentication, flight search, booking management, and payment processing.
+![Django](https://img.shields.io/badge/Django-4.2-green)
+![Python](https://img.shields.io/badge/Python-3.x-blue)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-5-purple)
+![SQLite](https://img.shields.io/badge/Database-SQLite-blue)
+![Supabase](https://img.shields.io/badge/Auth-Supabase-green)
+![Gemini AI](https://img.shields.io/badge/AI-Google_Gemini-orange)
+![Render](https://img.shields.io/badge/Deployment-Render-black)
 
-## Features
+---
 
-✅ **User Authentication**
-- Sign up with email, phone, and password
-- Secure login/logout
-- Password reset functionality
-- User profiles with photo and ID document upload
+## 🌍 Overview
 
-✅ **Flight Search & Booking**
-- Search flights by source, destination, and date
-- Filter by cabin class (Economy, Business, First Class)
-- Real-time seat availability
-- Transparent pricing breakdown
-- Booking management
+TripEase is a full-stack AI-powered travel booking platform developed using **Django**. It provides a complete travel booking experience where users can search and book flights, hotels, and holiday packages, generate AI-powered travel itineraries, manage bookings, make secure payments, and access a personalized dashboard.
 
-✅ **Payment Processing**
-- Multiple payment methods (UPI, Card, Net Banking)
-- Simulated payment gateway
-- Payment history tracking
+The project is designed to simulate a real-world travel booking platform with modern features and scalable architecture.
 
-✅ **Contact System**
-- Contact form with file attachment support
-- Admin panel for managing inquiries
+---
 
-✅ **Admin Panel**
-- Manage airports, flights, bookings
-- View and respond to contact messages
-- User management
+## 🚀 Features
 
-## Tech Stack
+### 🔐 Authentication
+- Secure User Registration & Login
+- Profile Management
+- Password Reset
+- Supabase Authentication Integration
 
-- **Backend**: Django 4.2+
-- **Database**: SQLite (development) / PostgreSQL (production)
-- **Frontend**: HTML5, CSS3, JavaScript (minimal, UI only)
-- **Authentication**: Django Authentication System
+---
 
-## Project Structure
+### ✈️ Flight Booking
+- Smart Flight Search
+- Airport Search
+- Dynamic Flight Pricing
+- Flight Tracking
+- Seat Availability
+- Booking Management
+- QR Boarding Pass Generation
 
-```
+---
+
+### 🏨 Hotel Booking
+- Hotel Search
+- Hotel Details
+- Room Booking
+- Hotel Reviews
+- Booking History
+
+---
+
+### 🎒 Travel Packages
+- Holiday Package Listings
+- Package Booking
+- Destination Information
+
+---
+
+### 🤖 AI Trip Planner
+- Google Gemini AI Integration
+- Personalized Travel Itinerary
+- Budget Suggestions
+- Travel Recommendations
+
+---
+
+### 💳 Payment System
+- Secure Payment Workflow
+- Payment History
+- Booking Confirmation
+- Invoice Generation
+
+---
+
+### 📊 User Dashboard
+- Upcoming Trips
+- Booking History
+- Travel Statistics
+- Profile Summary
+- Quick Actions
+
+---
+
+### ⭐ Reviews & Ratings
+- Flight Reviews
+- Hotel Reviews
+- Ratings System
+
+---
+
+### 🛠 Admin Panel
+- Manage Flights
+- Manage Hotels
+- Manage Packages
+- Manage Users
+- Manage Payments
+- Manage Reviews
+- Analytics Dashboard
+
+---
+
+## 🛠 Tech Stack
+
+### Backend
+- Python
+- Django 4.2
+
+### Frontend
+- HTML5
+- CSS3
+- Bootstrap 5
+- JavaScript
+
+### Database
+- SQLite
+- PostgreSQL Ready
+
+### Authentication
+- Django Authentication
+- Supabase
+
+### AI Integration
+- Google Gemini API
+
+### Python Libraries
+- Pandas
+- NumPy
+- Scikit-learn
+- ReportLab
+- OpenPyXL
+- Pillow
+
+### Deployment
+- Render
+
+---
+
+## 📂 Project Structure
+
+```text
 TripEase/
+│
+├── accounts/
+├── ai_planner/
+├── bookings/
+├── contact/
+├── core/
+├── dashboard/
+├── flights/
+├── hotels/
+├── integrations/
+├── packages/
+├── payments/
+├── reviews/
+├── static/
+├── templates/
+├── media/
+├── data/
+├── tripease/
 ├── manage.py
-├── tripease/          # Main project settings
-├── core/              # Home page
-├── accounts/          # Authentication & user management
-├── flights/           # Flight search & management
-├── bookings/          # Booking flow
-├── payments/          # Payment processing
-├── contact/           # Contact form
-├── templates/         # Django templates
-├── static/           # Static files (CSS, images)
-└── media/            # User uploads
+├── requirements.txt
+└── README.md
 ```
 
-## Installation & Setup
+---
 
-### 1. Prerequisites
+## 📷 Project Screenshots
 
-- Python 3.8 or higher
-- pip (Python package manager)
+> Screenshots will be added soon.
 
-### 2. Clone/Download the Project
+- Home Page
+- Flight Search
+- Hotel Booking
+- AI Planner
+- User Dashboard
+- Payment Page
+- QR Boarding Pass
+- Admin Dashboard
+
+---
+
+## ⚙ Installation
+
+### Clone the Repository
 
 ```bash
-cd "D:\christ college\sem 2\full stack\final project"
+git clone https://github.com/Dhruvijhanjhri/TripEase.git
 ```
-
-### 3. Create Virtual Environment (Recommended)
 
 ```bash
-python -m venv venv
-
-# Windows
-venv\Scripts\activate
-
-# Linux/Mac
-source venv/bin/activate
+cd TripEase
 ```
 
-### 4. Install Dependencies
+---
+
+### Create Virtual Environment
+
+Windows
+
+```bash
+python -m venv .venv
+```
+
+```bash
+.venv\Scripts\activate
+```
+
+Linux / macOS
+
+```bash
+python3 -m venv .venv
+```
+
+```bash
+source .venv/bin/activate
+```
+
+---
+
+### Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 5. Run Migrations
+---
+
+### Run Database Migrations
 
 ```bash
-python manage.py makemigrations
 python manage.py migrate
 ```
 
-### 6. Create Superuser (Admin)
+---
+
+### Create Superuser
 
 ```bash
 python manage.py createsuperuser
 ```
 
-Follow the prompts to create an admin account.
+---
 
-### 7. Collect Static Files
-
-```bash
-python manage.py collectstatic --noinput
-```
-
-### 8. Run Development Server
+### Start Development Server
 
 ```bash
 python manage.py runserver
 ```
 
-The application will be available at `http://127.0.0.1:8000/`
+Visit
 
-## Admin Panel
-
-Access the admin panel at `http://127.0.0.1:8000/admin/`
-
-Login with the superuser credentials created in step 6.
-
-## Adding Sample Data
-
-### Add Airports
-
-1. Go to Admin Panel → Airports
-2. Click "Add Airport"
-3. Fill in:
-   - Code: e.g., "BLR" (IATA code)
-   - Name: e.g., "Kempegowda International Airport"
-   - City: e.g., "Bengaluru"
-   - Country: e.g., "India"
-
-### Add Flights
-
-1. Go to Admin Panel → Flights
-2. Click "Add Flight"
-3. Fill in flight details:
-   - Flight Number: e.g., "AI-101"
-   - Airline: e.g., "Air India"
-   - Source & Destination: Select airports
-   - Departure & Arrival times
-   - Prices for each cabin class
-   - Total and available seats
-
-## Usage Guide
-
-### For Users
-
-1. **Sign Up**: Create an account with email and password
-2. **Search Flights**: Use the search form on the home page
-3. **Select Flight**: Choose from available flights
-4. **Enter Passenger Details**: Fill in passenger information
-5. **Make Payment**: Complete payment using preferred method
-6. **View Bookings**: Check booking status in "My Bookings"
-
-### For Admins
-
-1. **Manage Airports**: Add/Edit airports
-2. **Manage Flights**: Create and update flight schedules
-3. **View Bookings**: Monitor all bookings
-4. **Contact Management**: Respond to user inquiries
-
-## Production Deployment
-
-### Database Configuration
-
-For production, update `settings.py` to use PostgreSQL:
-
-```python
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME'),
-        'USER': os.environ.get('DB_USER'),
-        'PASSWORD': os.environ.get('DB_PASSWORD'),
-        'HOST': os.environ.get('DB_HOST', 'localhost'),
-        'PORT': os.environ.get('DB_PORT', '5432'),
-    }
-}
 ```
-
-### Environment Variables
-
-Set these environment variables:
-
-- `SECRET_KEY`: Django secret key
-- `DEBUG`: Set to `False` in production
-- `ALLOWED_HOSTS`: Your domain name
-- Database credentials (if using PostgreSQL)
-
-### Security Checklist
-
-- [ ] Set `DEBUG = False`
-- [ ] Update `SECRET_KEY`
-- [ ] Configure `ALLOWED_HOSTS`
-- [ ] Use HTTPS
-- [ ] Set up proper database backups
-- [ ] Configure email settings for password reset
-
-## File Structure Details
-
-- **Models**: Database models for User, Airport, Flight, Booking, Payment, Contact
-- **Views**: Business logic and request handling
-- **Forms**: Form validation and user input handling
-- **Templates**: HTML templates with Django template language
-- **Static Files**: CSS, JavaScript, images
-- **Admin**: Django admin configurations
-
-## Notes
-
-- Payment processing is **simulated** for demonstration purposes
-- For production, integrate with real payment gateways (Razorpay, Stripe, etc.)
-- File uploads are stored in the `media/` directory
-- Static files are served from `static/` directory
-
-## Support
-
-For issues or questions, contact: support@tripease.example
-
-## License
-
-This project is for educational purposes.
+http://127.0.0.1:8000
+```
 
 ---
 
-**Built with ❤️ using Django**
+## 🌐 Deployment
 
+The project is deployed on **Render**.
 
+Live Demo
 
+https://tripease-y0yf.onrender.com
 
+> Note:
+> The deployed version uses a fresh cloud database and may not contain sample travel data. The complete application with full functionality and dataset is available in the local development environment.
 
+---
 
+## 🔮 Future Enhancements
+
+- Live Flight APIs
+- Live Hotel APIs
+- AI Budget Planner
+- AI Travel Assistant Chatbot
+- Personalized Recommendations
+- Multi-language Support
+- Mobile Application
+- Email & SMS Notifications
+- Travel Expense Tracker
+- Loyalty & Rewards Program
+
+---
+
+## 👨‍💻 Developer
+
+**Dhruvi Jhanjhri**
+
+M.Sc Data Science
+
+CHRIST (Deemed to be University)
+
+GitHub
+
+https://github.com/Dhruvijhanjhri
+
+LinkedIn
+
+(Add your LinkedIn profile here)
+
+---
+
+## ⭐ Support
+
+If you found this project useful, consider giving it a ⭐ on GitHub.
+
+---
+
+## 📜 License
+
+This project is developed for educational and portfolio purposes.
