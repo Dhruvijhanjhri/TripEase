@@ -4,32 +4,44 @@ __pycache__/
 *$py.class
 *.so
 .Python
-env/
+
+# Virtual Environment
+.venv/
 venv/
+env/
 ENV/
+
+# Build
 build/
-develop-eggs/
 dist/
 downloads/
-eggs/
 .eggs/
+*.egg
+*.egg-info/
+.installed.cfg
+develop-eggs/
 lib/
 lib64/
 parts/
 sdist/
 var/
 wheels/
-*.egg-info/
-.installed.cfg
-*.egg
 
 # Django
 *.log
 local_settings.py
-db.sqlite3
 db.sqlite3-journal
-/media
-/staticfiles
+
+# DON'T ignore database
+# db.sqlite3
+
+# Media & collected static
+media/
+staticfiles/
+
+# Environment Variables
+.env
+.env.local
 
 # IDE
 .vscode/
@@ -42,12 +54,13 @@ db.sqlite3-journal
 .DS_Store
 Thumbs.db
 
-# Environment
-.env
-.env.local
+# Python cache
+.pytest_cache/
+.mypy_cache/
 
-# Ignore datasets
+# Backup databases
+*_backup*
+backup/
+
+# Ignore large raw datasets only
 data/*.csv
-
-
-
