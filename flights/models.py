@@ -37,7 +37,7 @@ class Flight(models.Model):
         ("first", "First Class"),
     ]
 
-    flight_number = models.CharField(max_length=20, unique=True)
+    flight_number = models.CharField(max_length=20)
 
     # Internal TripEase ID (shown to users)
     tripease_flight_id = models.CharField(
@@ -84,6 +84,13 @@ class Flight(models.Model):
     class Meta:
         ordering = ["departure_time"]
 
+        constraints = [
+            models.UniqueConstraint(
+                fields=["flight_number", "departure_time"],
+                name="unique_flight_departure",
+            )
+        ]
+        
     def __str__(self):
         return f"{self.flight_number} - {self.source.code} to {self.destination.code}"
 

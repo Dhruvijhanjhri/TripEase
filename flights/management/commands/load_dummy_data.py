@@ -15,6 +15,43 @@ from flights.realism import (
 )
 import random
 import uuid
+import csv
+from pathlib import Path
+from django.conf import settings
+import csv
+import os
+from django.conf import settings
+
+ROUTES_CSV = settings.BASE_DIR / "data" / "routes.csv"
+
+def load_airports_csv():
+
+    file_path = os.path.join(
+        settings.BASE_DIR,
+        "data",
+        "indian_airports.csv"
+    )
+
+    airports = []
+
+    with open(file_path, newline="", encoding="utf-8") as file:
+
+        reader = csv.DictReader(file)
+
+        for row in reader:
+
+            airports.append({
+                "code": row["iata_code"],
+                "name": row["airport_name"],
+                "city": row["city"],
+                "country": "India",
+            })
+
+    return airports
+
+def load_routes():
+    with open(ROUTES_CSV, newline="", encoding="utf-8") as f:
+        return list(csv.DictReader(f))
 
 
 class Command(BaseCommand):
@@ -23,67 +60,13 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.stdout.write(self.style.SUCCESS("Starting to load dummy data..."))
 
-        # Indian Airports Data
-        airports_data = [
-            {
-                "code": "BLR",
-                "name": "Kempegowda International Airport",
-                "city": "Bengaluru",
-            },
-            {
-                "code": "DEL",
-                "name": "Indira Gandhi International Airport",
-                "city": "Delhi",
-            },
-            {
-                "code": "BOM",
-                "name": "Chhatrapati Shivaji Maharaj International Airport",
-                "city": "Mumbai",
-            },
-            {
-                "code": "CCU",
-                "name": "Netaji Subhas Chandra Bose International Airport",
-                "city": "Kolkata",
-            },
-            {"code": "MAA", "name": "Chennai International Airport", "city": "Chennai"},
-            {
-                "code": "HYD",
-                "name": "Rajiv Gandhi International Airport",
-                "city": "Hyderabad",
-            },
-            {"code": "PNQ", "name": "Pune Airport", "city": "Pune"},
-            {"code": "GOI", "name": "Dabolim Airport", "city": "Goa"},
-            {"code": "JAI", "name": "Jaipur International Airport", "city": "Jaipur"},
-            {
-                "code": "AMD",
-                "name": "Sardar Vallabhbhai Patel International Airport",
-                "city": "Ahmedabad",
-            },
-            {"code": "COK", "name": "Cochin International Airport", "city": "Kochi"},
-            {"code": "IXC", "name": "Chandigarh Airport", "city": "Chandigarh"},
-            {"code": "IDR", "name": "Devi Ahilya Bai Holkar Airport", "city": "Indore"},
-            {
-                "code": "LKO",
-                "name": "Chaudhary Charan Singh International Airport",
-                "city": "Lucknow",
-            },
-            {
-                "code": "VNS",
-                "name": "Lal Bahadur Shastri International Airport",
-                "city": "Varanasi",
-            },
-            {"code": "PAT", "name": "Jay Prakash Narayan Airport", "city": "Patna"},
-            {
-                "code": "GAU",
-                "name": "Lokpriya Gopinath Bordoloi International Airport",
-                "city": "Guwahati",
-            },
-            {
-                "code": "TRV",
-                "name": "Trivandrum International Airport",
-                "city": "Thiruvananthapuram",
-            },
-        ]
+        routes = load_routes()
+
+        self.stdout.write(
+            self.style.SUCCESS(f"Loaded {len(routes)} routes from routes.csv")
+        )
+
+        airports_data = load_airports_csv()
 
         # Airlines
         airlines = [
@@ -125,21 +108,42 @@ class Command(BaseCommand):
         flight_count = 0
         airport_codes = list(airports_dict.keys())
 
-        # Generate all possible routes (excluding same airport)
+        # Load routes from CSV
         all_routes = []
-        for source_code in airport_codes:
-            for dest_code in airport_codes:
-                if source_code != dest_code:
-                    all_routes.append((source_code, dest_code))
 
-        self.stdout.write(f"Total routes to create: {len(all_routes)}")
+        for route in routes:
+            source_code = route["source"].strip().upper()
+            destination_code = route["destination"].strip().upper()
+
+            if (
+                source_code in airports_dict
+                and destination_code in airports_dict
+                and source_code != destination_code
+            ):
+                all_routes.append(route)
+
+        self.stdout.write(
+            self.style.SUCCESS(f"Loaded {len(all_routes)} valid routes.")
+        )
 
         # Generate flights for the next 30 days
         for day in range(30):
             current_date = timezone.now().date() + timedelta(days=day)
 
             # Create flights for ALL routes - ensure at least 1-2 flights per route per day
-            for source_code, dest_code in all_routes:
+            for route in all_routes:
+
+                source_code = route["source"]
+                dest_code = route["destination"]
+
+                airline = route["airline"]
+                airline_code = get_airline_code(airline)
+
+                flight_number = (
+                    f"{airline_code}-"
+                    f"{random.randint(100, 999)}"
+                )
+
                 source = airports_dict[source_code]
                 destination = airports_dict[dest_code]
 
@@ -151,53 +155,117 @@ class Command(BaseCommand):
                 num_flights = random.randint(1, 2)
 
                 for flight_num in range(num_flights):
-                    # Random departure time between 6 AM and 10 PM
-                    hour = random.randint(6, 22)
-                    minute = random.choice([0, 15, 30, 45])
+                    # Airline-specific preferred departure windows
+                    departure_windows = {
+                        "IndiGo": [(5, 9), (10, 14), (17, 22)],
+                        "Air India": [(6, 10), (15, 22)],
+                        "Air India Express": [(5, 8), (18, 23)],
+                        "Akasa Air": [(6, 11), (16, 22)],
+                        "SpiceJet": [(5, 9), (16, 22)],
+                    }
+
+                    windows = departure_windows.get(
+                        airline,
+                        [(6, 22)]
+                    )
+
+                    start_hour, end_hour = random.choice(windows)
+
+                    hour = random.randint(start_hour, end_hour)
+                    minute = random.choice([0, 10, 15, 20, 30, 40, 45, 50])
 
                     departure_time = timezone.make_aware(
                         datetime.combine(
                             current_date,
-                            datetime.min.time().replace(hour=hour, minute=minute),
+                            datetime.min.time().replace(
+                                hour=hour,
+                                minute=minute,
+                            ),
                         )
                     )
 
                     # Realistic duration based on route band
-                    duration_minutes = get_route_duration_minutes(
-                        source_code, dest_code
-                    )
+                    duration_minutes = int(route["duration_minutes"])
                     arrival_time = departure_time + timedelta(minutes=duration_minutes)
 
-                    # Prices (in INR)
-                    base_price = get_route_base_fare(source_code, dest_code)
-                    economy_price = float(base_price)
-                    business_price = float(base_price * 1.8)
-                    first_class_price = float(base_price * 1.35)
+                    # Base fare from route
+                    base_price = float(route["base_fare"])
 
-                    # Flight number - make it unique by including date, route, and flight number
-                    airline = normalize_airline_name(random.choice(airlines))
-                    airline_code = get_airline_code(airline)
-                    route_code = f"{source_code}{dest_code}"
-                    flight_num = random.randint(100, 999)
-                    flight_number = (
-                        f"{airline_code}-{route_code}-{uuid.uuid4().hex[:8]}"
+                    # Weekend surcharge
+                    weekend_multiplier = (
+                        1.10 if current_date.weekday() >= 5 else 1.00
                     )
 
-                    tripease_flight_id = f"TP{100000 + flight_count}"
+                    # Peak hour surcharge
+                    peak_multiplier = (
+                        1.08 if hour in [7, 8, 9, 18, 19, 20] else 1.00
+                    )
+
+                    # Random market demand
+                    demand_multiplier = random.uniform(0.90, 1.18)
+
+                    economy_price = round(
+                        base_price
+                        * weekend_multiplier
+                        * peak_multiplier
+                        * demand_multiplier
+                    )
+
+                    business_price = round(
+                        economy_price * random.uniform(1.65, 1.90)
+                    )
+
+                    first_class_price = round(
+                        business_price * random.uniform(1.30, 1.55)
+                    )
+
+                    # Peak hour pricing
+                    if 6 <= hour <= 9:
+                        economy_price = round(economy_price * 1.15)
+                        business_price = round(business_price * 1.12)
+                        first_class_price = round(first_class_price * 1.10)
+
+                    elif 17 <= hour <= 21:
+                        economy_price = round(economy_price * 1.12)
+                        business_price = round(business_price * 1.10)
+                        first_class_price = round(first_class_price * 1.08)
+
+                    elif 22 <= hour or hour <= 5:
+                        economy_price = round(economy_price * 0.90)
+                        business_price = round(business_price * 0.92)
+                        first_class_price = round(first_class_price * 0.94)
+
+                    # Flight number - make it unique by including date, route, and flight number
+                    
+                    tripease_flight_id = f"TP{uuid.uuid4().hex[:10].upper()}"
 
                     tracking_flight_number = random.choice(
                         tracking_numbers.get(airline, [])
                     )
 
                     # Check if flight already exists
-                    if Flight.objects.filter(flight_number=flight_number).exists():
+                    if Flight.objects.filter(
+                        flight_number=flight_number,
+                        departure_time=departure_time,
+                    ).exists():
                         continue
 
                     # Seats
                     total_seats = random.choice([120, 150, 180, 200])
-                    available_seats = random.randint(
-                        int(total_seats * 0.3), total_seats
+
+                    # Realistic occupancy (45%–95% full)
+                    occupancy = random.uniform(0.45, 0.95)
+
+                    available_seats = max(
+                        5,
+                        int(total_seats * (1 - occupancy))
                     )
+
+                    # Last-seat premium
+                    if available_seats < 15:
+                        economy_price = round(economy_price * 1.15)
+                        business_price = round(business_price * 1.12)
+                        first_class_price = round(first_class_price * 1.10)
 
                     # Non-stop or with stop
                     is_non_stop = random.choice(

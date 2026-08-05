@@ -15,15 +15,17 @@ class FlightSearchForm(forms.Form):
     ]
 
     source = forms.ModelChoiceField(
-        queryset=Airport.objects.all(),
+        queryset=Airport.objects.order_by("city", "name"),
         empty_label="Select departure airport",
         widget=forms.Select(attrs={"class": "form-control", "id": "from"}),
     )
+
     destination = forms.ModelChoiceField(
-        queryset=Airport.objects.all(),
+        queryset=Airport.objects.order_by("city", "name"),
         empty_label="Select arrival airport",
         widget=forms.Select(attrs={"class": "form-control", "id": "to"}),
     )
+
     departure_date = forms.DateField(
         widget=forms.DateInput(
             attrs={

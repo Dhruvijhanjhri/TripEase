@@ -34,6 +34,14 @@
                                     <span class="chip">Standard Option</span>
                                 {% endif %}
                             </div>
+                            {% if flight.is_cheapest %}
+                                <span class="chip">🏷 Cheapest Today</span>
+                            {% endif %}
+
+                            {% if flight.is_fastest %}
+                                <span class="chip">⚡ Fastest Flight</span>
+                            {% endif %}
+                            
                             {% if flight.trending_badge %}
                                 <p class="mb-2">{{ flight.trending_badge }}</p>
                                 <small class="text-muted">Booked {{ flight.booking_count }} times</small>
@@ -53,7 +61,10 @@
                             </ul>
                             {% endif %}
                             <p class="mb-1">{{ flight.source.code }} → {{ flight.destination.code }}</p>
-                            <p class="mb-1">Seats: {{ flight.seat_display }}</p>
+                            <p>
+                                <strong>Seats:</strong>
+                                {{ flight.available_seats }} Seats Available
+                            </p>
                             <p class="mb-1">Departure: {{ flight.display_departure }}</p>
                             <p class="mb-1">Arrival: {{ flight.display_arrival }}</p>
                             <p class="mb-1">Duration: {{ flight.get_duration_display }}</p>

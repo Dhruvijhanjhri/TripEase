@@ -1,5 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from datetime import datetime, timedelta
+import random
+from numpy import random
 from .models import Flight, PriceAlert
 from .forms import FlightSearchForm, PriceAlertForm
 from .realism import format_duration_minutes
@@ -32,6 +34,7 @@ def flight_search(request):
     form = FlightSearchForm(request.GET or None)
 
     preferences = None
+    trending = {}
 
     if request.user.is_authenticated:
         preferences = get_user_preferences(request.user)
@@ -74,16 +77,24 @@ def flight_search(request):
 
             for flight in direct_flights:
 
+                flight.is_cheapest = False
+                flight.is_fastest = False
+
                 flight.display_departure = flight.departure_time.replace(
                     year=departure_date.year,
                     month=departure_date.month,
                     day=departure_date.day,
                 )
 
+                arrival_date = departure_date
+
+                if flight.arrival_time.time() < flight.departure_time.time():
+                    arrival_date += timedelta(days=1)
+
                 flight.display_arrival = flight.arrival_time.replace(
-                    year=departure_date.year,
-                    month=departure_date.month,
-                    day=departure_date.day,
+                    year=arrival_date.year,
+                    month=arrival_date.month,
+                    day=arrival_date.day,
                 )
 
                 flight.cabin_price = flight.get_price(cabin_class)
@@ -100,6 +111,13 @@ def flight_search(request):
                     rating=average_rating,
                     stops=0,
                     available_seats=flight.available_seats,
+                )
+
+                flight.recommendation_score += random.uniform(-1.5, 1.5)
+
+                flight.recommendation_score = round(
+                    max(0, min(99, flight.recommendation_score)),
+                    1,
                 )
 
                 (
@@ -175,6 +193,37 @@ def flight_search(request):
                 reverse=True,
             )
 
+            unique_flights = []
+            seen = set()
+
+            for flight in direct_flights:
+
+                key = (
+                    flight.airline,
+                    flight.flight_number,
+                )
+
+                if key not in seen:
+                    seen.add(key)
+                    unique_flights.append(flight)
+
+            direct_flights = unique_flights[:20]
+
+            if direct_flights:
+
+                cheapest_flight = min(
+                    direct_flights,
+                    key=lambda flight: flight.price,
+                )
+
+                fastest_flight = min(
+                    direct_flights,
+                    key=lambda flight: flight.duration_minutes,
+                )
+
+            cheapest_flight.is_cheapest = True
+            fastest_flight.is_fastest = True
+
             # ==================================
             # VIA FLIGHTS (REALISTIC)
             # ==================================
@@ -236,6 +285,13 @@ def flight_search(request):
                         available_seats=min(
                             first_leg.available_seats, second_leg.available_seats
                         ),
+                    )
+
+                    recommendation_score += random.uniform(-1.5, 1.5)
+
+                    recommendation_score = round(
+                        max(0, min(99, recommendation_score)),
+                        1,
                     )
 
                     route = {
@@ -498,23 +554,37 @@ def flight_detail(request, flight_id):
             abs(price_difference) / predicted_price * 100, 1
         )
 
-        if current_price <= predicted_price * 0.80:
+        difference_percent = (
+            (predicted_price - current_price) / predicted_price
+        ) * 100
+
+        if difference_percent >= 20:
+
             deal_status = "excellent"
-            deal_message = "Excellent Deal! This fare is significantly below the expected market price."
+            deal_message = (
+                "Excellent Deal! Much cheaper than expected."
+            )
 
-        elif current_price <= predicted_price * 0.95:
+        elif difference_percent >= 10:
+
             deal_status = "good"
-            deal_message = "Good Deal! This fare is below the expected market price."
+            deal_message = (
+                "Good Deal! Slightly cheaper than expected."
+            )
 
-        elif current_price <= predicted_price * 1.10:
+        elif difference_percent >= -5:
+
             deal_status = "fair"
             deal_message = (
-                "Fair Price. This fare is close to the expected market price."
+                "Fair Price. Close to expected market value."
             )
 
         else:
+
             deal_status = "expensive"
-            deal_message = "Expensive. This fare is above the expected market price."
+            deal_message = (
+                "Higher than expected. Consider another flight."
+            )
 
     booking_advice = None
 

@@ -1,3 +1,5 @@
+import random
+
 def calculate_recommendation_score(
     price,
     duration,
@@ -5,70 +7,99 @@ def calculate_recommendation_score(
     stops,
     available_seats,
 ):
-    score = 0
+    """
+    AI recommendation score (0-100)
+    """
 
-    # Price (40 points)
+    score = 90
+
+    # -----------------------
+    # Price
+    # -----------------------
+
     if price <= 5000:
-        score += 40
-    elif price <= 5500:
-        score += 35
-    elif price <= 6000:
-        score += 30
-    elif price <= 7000:
-        score += 25
-    else:
-        score += 15
-
-    # Duration (20 points)
-    if duration <= 180:
-        score += 20
-    elif duration <= 300:
-        score += 15
-    elif duration <= 420:
-        score += 10
-    else:
-        score += 5
-
-    # Stops (20 points)
-    if stops == 0:
-        score += 20
-    elif stops == 1:
-        score += 10
-    else:
-        score += 5
-
-    # Rating (15 points)
-    if rating:
-        score += rating * 3
-    else:
         score += 8
-
-    # Seat availability (5 points)
-    if available_seats >= 150:
+    elif price <= 6500:
         score += 5
-    elif available_seats >= 80:
-        score += 3
+    elif price <= 8000:
+        score += 2
+    elif price <= 10000:
+        score -= 3
+    elif price <= 12000:
+        score -= 8
     else:
-        score += 1
+        score -= 15
 
-    return round(min(score, 100), 1)
+    # -----------------------
+    # Duration
+    # -----------------------
+
+    if duration <= 90:
+        score += 6
+    elif duration <= 180:
+        score += 4
+    elif duration <= 300:
+        score += 1
+    elif duration <= 420:
+        score -= 5
+    else:
+        score -= 10
+
+    # -----------------------
+    # Stops
+    # -----------------------
+
+    if stops == 0:
+        score += 5
+    elif stops == 1:
+        score -= 8
+    else:
+        score -= 18
+
+    # -----------------------
+    # Seat availability
+    # -----------------------
+
+    if available_seats >= 120:
+        score += 4
+    elif available_seats >= 80:
+        score += 2
+    elif available_seats >= 50:
+        score += 0
+    elif available_seats >= 20:
+        score -= 3
+    else:
+        score -= 8
+
+    # -----------------------
+    # Reviews
+    # -----------------------
+
+    if rating:
+        if rating >= 4.7:
+            score += 3
+        elif rating >= 4.3:
+            score += 2
+        elif rating >= 4.0:
+            score += 1
+        elif rating < 3.5:
+            score -= 5
+
+    return max(50, min(round(score), 99))
 
 
 def get_confidence(score):
-    """
-    Converts recommendation score into AI confidence.
-    """
 
     if score >= 90:
         return ("★★★★★", "Very High")
 
-    elif score >= 80:
+    elif score >= 82:
         return ("★★★★☆", "High")
 
-    elif score >= 70:
+    elif score >= 74:
         return ("★★★☆☆", "Medium")
 
-    elif score >= 60:
+    elif score >= 66:
         return ("★★☆☆☆", "Low")
 
     return ("★☆☆☆☆", "Very Low")

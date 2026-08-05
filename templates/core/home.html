@@ -4,11 +4,11 @@
 {% block content %}
 <section id="home" class="hero" role="banner" aria-label="Explore the world with TripEase">
     <div class="container hero-content">
-        <div class="hero-badge"><i class="bi bi-stars"></i> AI-powered travel planning • instant booking</div>
-        <h1 class="hero-title">Plan smarter. Travel faster.</h1>
-        <p class="hero-subtitle">From sunrise flights to curated stays, TripEase blends smart recommendations with a seamless booking experience.</p>
+        <div class="hero-badge" data-reveal><i class="bi bi-stars"></i> AI-powered travel planning • instant booking</div>
+        <h1 class="hero-title" data-reveal>Plan Smarter. Travel Better.</h1>
+        <p class="hero-subtitle" data-reveal>Flights • Hotels • Packages • AI Planner — everything you need for your next trip, in one seamless place.</p>
 
-        <div class="glass-panel hero-search-shell">
+        <div class="glass-panel hero-search-shell" data-reveal>
             <form class="search-shell" method="GET" action="{% url 'flights:search' %}" aria-label="Search travel options">
                 <div class="form-group">
                     <label for="source">From</label>
@@ -32,7 +32,9 @@
                     <label for="departure_date">Date</label>
                     <input type="date" id="departure_date" name="departure_date" class="form-control" min="{{ today|date:'Y-m-d' }}" required aria-label="Departure date" />
                 </div>
-                <button type="submit" class="btn btn-primary" aria-label="Search">Search</button>
+                <button type="submit" class="btn btn-primary" aria-label="Search">
+                    <i class="bi bi-search"></i>&nbsp; Search
+                </button>
             </form>
         </div>
     </div>
@@ -40,27 +42,31 @@
 
 <section class="section section-surface">
     <div class="container">
-        <div class="section-heading">
+        <div class="section-heading" data-reveal>
             <div class="travel-pill"><i class="bi bi-shield-check"></i> Trusted by modern travelers</div>
             <h2 class="section-title">Everything you need for a polished getaway</h2>
             <p class="section-copy">Fast discovery, tailored recommendations, and support you can count on.</p>
         </div>
         <div class="stat-grid">
-            <div class="stat-card">
-                <div class="stat-value">4.9/5</div>
+            <div class="stat-card" data-reveal>
+                <div class="stat-icon"><i class="bi bi-star-fill"></i></div>
+                <div class="stat-value">4.9 <span class="stat-value-suffix">Rating</span></div>
                 <div class="stat-label">Guest satisfaction</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-value">24/7</div>
-                <div class="stat-label">Support team</div>
+            <div class="stat-card" data-reveal>
+                <div class="stat-icon"><i class="bi bi-signpost-split-fill"></i></div>
+                <div class="stat-value">120+ <span class="stat-value-suffix">Routes</span></div>
+                <div class="stat-label">Flight connections</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-value">50K+</div>
+            <div class="stat-card" data-reveal>
+                <div class="stat-icon"><i class="bi bi-building-fill"></i></div>
+                <div class="stat-value">500+ <span class="stat-value-suffix">Hotels</span></div>
+                <div class="stat-label">Curated stays</div>
+            </div>
+            <div class="stat-card" data-reveal>
+                <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
+                <div class="stat-value">50K <span class="stat-value-suffix">Travelers</span></div>
                 <div class="stat-label">Trips planned</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">AI</div>
-                <div class="stat-label">Trip recommendations</div>
             </div>
         </div>
     </div>
@@ -68,22 +74,23 @@
 
 <section class="section">
     <div class="container">
-        <div class="section-heading">
+        <div class="section-heading" data-reveal>
+            <div class="travel-pill"><i class="bi bi-award-fill"></i> Why choose TripEase</div>
             <h2 class="section-title">Built for the way you travel</h2>
             <p class="section-copy">Discover the essential TripEase experience from booking to departure.</p>
         </div>
         <div class="feature-grid">
-            <article class="feature-card">
+            <article class="feature-card" data-reveal>
                 <div class="feature-icon"><i class="bi bi-airplane"></i></div>
                 <h3 class="card-title">Smart flight search</h3>
                 <p class="card-text">Compare AI-ranked routes, fares, and timing in one vibrant view.</p>
             </article>
-            <article class="feature-card">
+            <article class="feature-card" data-reveal>
                 <div class="feature-icon"><i class="bi bi-building"></i></div>
                 <h3 class="card-title">Curated stays</h3>
                 <p class="card-text">Find the perfect hotel with value-driven recommendations and real guest signals.</p>
             </article>
-            <article class="feature-card">
+            <article class="feature-card" data-reveal>
                 <div class="feature-icon"><i class="bi bi-magic"></i></div>
                 <h3 class="card-title">AI trip planner</h3>
                 <p class="card-text">Generate polished itineraries tailored to your budget, interests, and timing.</p>
@@ -94,51 +101,93 @@
 
 <section id="popular" class="section section-alt">
     <div class="container">
-        <div class="section-heading">
+        <div class="section-heading" data-reveal>
             <h2 class="section-title">Popular destinations</h2>
             <p class="section-copy">Fresh inspiration for your next short escape or long-awaited break.</p>
         </div>
         <div class="card-grid">
-            <article class="destination-card">
-                <img src="{% static 'images/1.png' %}" alt="Pune city" />
+            <article class="destination-card" data-reveal>
+                <div class="destination-media">
+                    <img src="{% static 'images/1.png' %}" alt="Pune city" />
+                    <span class="destination-badge">Popular</span>
+                </div>
                 <div class="card-body">
-                    <h3 class="card-title">Pune</h3>
+                    <div class="destination-heading">
+                        <h3 class="card-title">Pune</h3>
+                        <span class="destination-price">from ₹3,499</span>
+                    </div>
                     <p class="card-text">Cafés, culture, and vibrant neighborhoods.</p>
+                    <a href="{% url 'flights:search' %}" class="destination-link">Explore <i class="bi bi-arrow-right"></i></a>
                 </div>
             </article>
-            <article class="destination-card">
-                <img src="{% static 'images/2.png' %}" alt="Surat city" />
+            <article class="destination-card" data-reveal>
+                <div class="destination-media">
+                    <img src="{% static 'images/2.png' %}" alt="Surat city" />
+                    <span class="destination-badge">Popular</span>
+                </div>
                 <div class="card-body">
-                    <h3 class="card-title">Surat</h3>
+                    <div class="destination-heading">
+                        <h3 class="card-title">Surat</h3>
+                        <span class="destination-price">from ₹3,899</span>
+                    </div>
                     <p class="card-text">Textiles, cuisine, and riverfront charm.</p>
+                    <a href="{% url 'flights:search' %}" class="destination-link">Explore <i class="bi bi-arrow-right"></i></a>
                 </div>
             </article>
-            <article class="destination-card">
-                <img src="{% static 'images/3.png' %}" alt="Kolkata city" />
+            <article class="destination-card" data-reveal>
+                <div class="destination-media">
+                    <img src="{% static 'images/3.png' %}" alt="Kolkata city" />
+                    <span class="destination-badge">Trending</span>
+                </div>
                 <div class="card-body">
-                    <h3 class="card-title">Kolkata</h3>
+                    <div class="destination-heading">
+                        <h3 class="card-title">Kolkata</h3>
+                        <span class="destination-price">from ₹4,299</span>
+                    </div>
                     <p class="card-text">Heritage, arts, and iconic flavors.</p>
+                    <a href="{% url 'flights:search' %}" class="destination-link">Explore <i class="bi bi-arrow-right"></i></a>
                 </div>
             </article>
-            <article class="destination-card">
-                <img src="{% static 'images/4.png' %}" alt="Jaipur city" />
+            <article class="destination-card" data-reveal>
+                <div class="destination-media">
+                    <img src="{% static 'images/4.png' %}" alt="Jaipur city" />
+                    <span class="destination-badge">Trending</span>
+                </div>
                 <div class="card-body">
-                    <h3 class="card-title">Jaipur</h3>
+                    <div class="destination-heading">
+                        <h3 class="card-title">Jaipur</h3>
+                        <span class="destination-price">from ₹4,799</span>
+                    </div>
                     <p class="card-text">Pink City palaces and royal history.</p>
+                    <a href="{% url 'flights:search' %}" class="destination-link">Explore <i class="bi bi-arrow-right"></i></a>
                 </div>
             </article>
-            <article class="destination-card">
-                <img src="{% static 'images/5.png' %}" alt="Indore city" />
+            <article class="destination-card" data-reveal>
+                <div class="destination-media">
+                    <img src="{% static 'images/5.png' %}" alt="Indore city" />
+                    <span class="destination-badge">Popular</span>
+                </div>
                 <div class="card-body">
-                    <h3 class="card-title">Indore</h3>
+                    <div class="destination-heading">
+                        <h3 class="card-title">Indore</h3>
+                        <span class="destination-price">from ₹3,299</span>
+                    </div>
                     <p class="card-text">Street food, markets, and heritage.</p>
+                    <a href="{% url 'flights:search' %}" class="destination-link">Explore <i class="bi bi-arrow-right"></i></a>
                 </div>
             </article>
-            <article class="destination-card">
-                <img src="{% static 'images/6.png' %}" alt="Bengaluru city" />
+            <article class="destination-card" data-reveal>
+                <div class="destination-media">
+                    <img src="{% static 'images/6.png' %}" alt="Bengaluru city" />
+                    <span class="destination-badge">Trending</span>
+                </div>
                 <div class="card-body">
-                    <h3 class="card-title">Bengaluru</h3>
+                    <div class="destination-heading">
+                        <h3 class="card-title">Bengaluru</h3>
+                        <span class="destination-price">from ₹4,199</span>
+                    </div>
                     <p class="card-text">Parks, tech hubs, and cool cafés.</p>
+                    <a href="{% url 'flights:search' %}" class="destination-link">Explore <i class="bi bi-arrow-right"></i></a>
                 </div>
             </article>
         </div>
@@ -147,27 +196,38 @@
 
 <section class="section">
     <div class="container">
-        <div class="section-heading">
+        <div class="section-heading" data-reveal>
             <h2 class="section-title">Explore TripEase</h2>
             <p class="section-copy">Move from inspiration to booking without changing tabs.</p>
         </div>
         <div class="row g-4 mt-2">
-            <div class="col-md-4">
-                <div class="feature-card h-100">
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card explore-card h-100" data-reveal>
+                    <div class="feature-icon"><i class="bi bi-airplane-fill"></i></div>
+                    <h4>Flights</h4>
+                    <p class="card-text">Search AI-ranked flights across routes with transparent, real-time fares.</p>
+                    <a href="{% url 'flights:search' %}" class="btn btn-primary mt-3">Explore Flights</a>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card explore-card h-100" data-reveal>
+                    <div class="feature-icon"><i class="bi bi-building-fill"></i></div>
                     <h4>Hotels</h4>
                     <p class="card-text">Search stays across cities with room details, pricing and reviews.</p>
                     <a href="{% url 'hotels:search' %}" class="btn btn-primary mt-3">Explore Hotels</a>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="feature-card h-100">
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card explore-card h-100" data-reveal>
+                    <div class="feature-icon"><i class="bi bi-bag-check-fill"></i></div>
                     <h4>Packages</h4>
                     <p class="card-text">Discover curated travel packages with itinerary, pricing and traveller reviews.</p>
                     <a href="{% url 'packages:search' %}" class="btn btn-primary mt-3">Explore Packages</a>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="feature-card h-100">
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card explore-card h-100" data-reveal>
+                    <div class="feature-icon"><i class="bi bi-magic"></i></div>
                     <h4>AI Travel Planner</h4>
                     <p class="card-text">Generate a smart travel plan based on destination, budget, trip duration and interests.</p>
                     <a href="{% url 'ai_planner:planner' %}" class="btn btn-outline mt-3">Plan with AI</a>
@@ -179,33 +239,78 @@
 
 <section id="testimonials" class="section section-alt">
     <div class="container">
-        <div class="section-heading">
+        <div class="section-heading" data-reveal>
             <h2 class="section-title">What our travelers say</h2>
             <p class="section-copy">Trusted by frequent flyers, weekend explorers, and luxury seekers.</p>
         </div>
         <div class="testimonials">
-            <article class="testimonial-card">
-                <img class="avatar" src="{% static 'images/10.jpg' %}" alt="Customer portrait" />
-                <div class="testimonial-body">
-                    <p class="testimonial-text">“TripEase made planning our honeymoon effortless. Great deals and smooth booking!”</p>
-                    <p class="testimonial-author">— Aisha K.</p>
+            <article class="testimonial-card" data-reveal>
+                <div class="testimonial-header">
+                    <img class="avatar" src="{% static 'images/10.jpg' %}" alt="Customer portrait" />
+                    <div>
+                        <p class="testimonial-author">Aisha K.</p>
+                        <p class="testimonial-role">Honeymoon traveler</p>
+                    </div>
                 </div>
+                <div class="rating-stars" aria-label="5 out of 5 stars">
+                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                </div>
+                <p class="testimonial-text">"TripEase made planning our honeymoon effortless. Great deals and smooth booking!"</p>
             </article>
-            <article class="testimonial-card">
-                <img class="avatar" src="{% static 'images/11.png' %}" alt="Customer portrait" />
-                <div class="testimonial-body">
-                    <p class="testimonial-text">“Loved the hotel recommendations. Everything was just as described.”</p>
-                    <p class="testimonial-author">— Daniel R.</p>
+            <article class="testimonial-card" data-reveal>
+                <div class="testimonial-header">
+                    <img class="avatar" src="{% static 'images/11.png' %}" alt="Customer portrait" />
+                    <div>
+                        <p class="testimonial-author">Daniel R.</p>
+                        <p class="testimonial-role">Frequent flyer</p>
+                    </div>
                 </div>
+                <div class="rating-stars" aria-label="5 out of 5 stars">
+                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                </div>
+                <p class="testimonial-text">"Loved the hotel recommendations. Everything was just as described."</p>
             </article>
-            <article class="testimonial-card">
-                <img class="avatar" src="{% static 'images/12.png' %}" alt="Customer portrait" />
-                <div class="testimonial-body">
-                    <p class="testimonial-text">“Reliable and easy to use. My go-to site for quick getaways.”</p>
-                    <p class="testimonial-author">— Priya S.</p>
+            <article class="testimonial-card" data-reveal>
+                <div class="testimonial-header">
+                    <img class="avatar" src="{% static 'images/12.png' %}" alt="Customer portrait" />
+                    <div>
+                        <p class="testimonial-author">Priya S.</p>
+                        <p class="testimonial-role">Weekend explorer</p>
+                    </div>
                 </div>
+                <div class="rating-stars" aria-label="5 out of 5 stars">
+                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                </div>
+                <p class="testimonial-text">"Reliable and easy to use. My go-to site for quick getaways."</p>
             </article>
         </div>
     </div>
 </section>
+
+<section class="cta-section">
+    <div class="container cta-content" data-reveal>
+        <h2 class="cta-title">Ready for your next adventure?</h2>
+        <p class="cta-copy">Let TripEase's AI planner map out flights, stays, and experiences in minutes.</p>
+        <a href="{% url 'ai_planner:planner' %}" class="btn btn-cta">Start Planning <i class="bi bi-arrow-right"></i></a>
+    </div>
+</section>
+
+<script>
+(function () {
+    var items = document.querySelectorAll('[data-reveal]');
+    if (!('IntersectionObserver' in window) || !items.length) {
+        items.forEach(function (el) { el.classList.add('in-view'); });
+        return;
+    }
+    var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('in-view');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+    items.forEach(function (el) { observer.observe(el); });
+})();
+</script>
 {% endblock %}
