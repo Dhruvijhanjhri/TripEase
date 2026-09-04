@@ -510,9 +510,12 @@ def user_dashboard(request):
     for a in recent_activity:
         print(a)
 
+
     # ─────────────────────────────────────────────────────────────
     # 13. AI DESTINATION RECOMMENDATIONS
     # ─────────────────────────────────────────────────────────────
+
+    print("===== BEFORE RECOMMENDATIONS =====")
 
     recommended_destinations = recommend_destinations(
         flight_bookings=flight_bookings,
@@ -520,6 +523,9 @@ def user_dashboard(request):
         package_bookings=package_bookings,
         limit=3,
     )
+
+    print("===== AFTER RECOMMENDATIONS =====")
+    print(recommended_destinations)
 
     # ─────────────────────────────────────────────────────────────
     # 14. CONTEXT — SINGLE DICTIONARY, NO DUPLICATES
@@ -573,4 +579,16 @@ def user_dashboard(request):
         "has_destinations": bool(destination_labels),
     }
 
-    return render(request, "dashboard/user_dashboard.html", context)
+    #return render(request, "dashboard/user_dashboard.html", context)
+    print("===== BEFORE DASHBOARD RENDER =====")
+    print("Context keys:", list(context.keys()))
+
+    try:
+        response = render(request, "dashboard/user_dashboard.html", context)
+        print("===== DASHBOARD RENDER SUCCESS =====")
+        return response
+    except Exception as e:
+        print("===== DASHBOARD RENDER ERROR =====")
+        print("ERROR TYPE:", type(e).__name__)
+        print("ERROR:", str(e))
+        raise
