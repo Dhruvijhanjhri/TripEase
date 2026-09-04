@@ -2,7 +2,7 @@ from decimal import Decimal
 from .gemini_service import generate_ai_itinerary
 from hotels.models import Hotel
 from packages.models import TravelPackage
-
+from flights.models import Airport, Flight
 
 def normalize_text(value):
     text = value.strip().lower() if value else ""
@@ -203,62 +203,71 @@ def get_best_season(destination):
 def get_nearest_airport(destination):
     destination = normalize_text(destination)
 
-    airport_map = {
-        "goa": "GOI (Dabolim Airport)",
-        "manali": "KUU (Kullu–Manali Airport)",
-        "srinagar": "SXR (Srinagar Airport)",
-        "udaipur": "UDR (Maharana Pratap Airport)",
-        "jaipur": "JAI (Jaipur International Airport)",
-        "leh": "IXL (Kushok Bakula Rimpochee Airport)",
-        "andaman": "IXZ (Veer Savarkar Airport)",
-        "kochi": "COK (Cochin International Airport)",
-    }
+    airport = Airport.objects.filter(
+        city__iexact=destination
+    ).first()
 
-    return airport_map.get(destination, "Nearest major airport")
+    if airport:
+        return f"{airport.code} - {airport.name}"
 
+    return "Nearest major airport"
 
 def get_route_suggestion(destination, origin=None):
     origin = origin or "Bengaluru"
     destination = normalize_text(destination)
 
-    routes = {
-        "udaipur": {
-            "airport": "UDR",
-            "duration": "2h 10m",
-            "fare_range": "₹3,500 – ₹7,500",
-        },
-        "goa": {
-            "airport": "GOI",
-            "duration": "1h 20m",
-            "fare_range": "₹2,500 – ₹6,000",
-        },
-        "manali": {
-            "airport": "KUU",
-            "duration": "3h 00m (via Delhi)",
-            "fare_range": "₹6,000 – ₹12,000",
-        },
-        "srinagar": {
-            "airport": "SXR",
-            "duration": "3h 15m",
-            "fare_range": "₹5,500 – ₹11,000",
-        },
-    }
+    source_airport = Airport.objects.filter(
+        city__iexact=origin
+    ).first()
 
-    route = routes.get(destination)
+    destination_airport = Airport.objects.filter(
+        city__iexact=destination
+    ).first()
 
-    if not route:
+    if not source_airport or not destination_airport:
         return {
             "origin": origin,
             "destination_airport": "Nearest major airport",
             "duration": "Varies",
-            "fare_range": "Check live fares",
+            "fare_range": "Check available flights",
         }
 
+    route_flights = Flight.objects.filter(
+        source=source_airport,
+        destination=destination_airport,
+        available_seats__gt=0,
+    )
+
+    if not route_flights.exists():
+        return {
+            "origin": origin,
+            "destination_airport": (
+                f"{destination_airport.code} - "
+                f"{destination_airport.name}"
+            ),
+            "duration": "No direct flights found",
+            "fare_range": "Check connecting flights",
+        }
+
+    cheapest_flight = route_flights.order_by("economy_price").first()
+    most_expensive_flight = route_flights.order_by(
+        "-economy_price"
+    ).first()
+
     return {
-        "origin": origin,
-        "destination_airport": route["airport"],
-        "duration": route["duration"],
-        "fare_range": route["fare_range"],
+        "origin": (
+            f"{source_airport.code} - "
+            f"{source_airport.name}"
+        ),
+        "destination_airport": (
+            f"{destination_airport.code} - "
+            f"{destination_airport.name}"
+        ),
+        "duration": cheapest_flight.get_duration_display(),
+        "fare_range": (
+            f"₹{cheapest_flight.economy_price:,.0f} – "
+            f"₹{most_expensive_flight.economy_price:,.0f}"
+        ),
     }
 
 
@@ -288,7 +297,7 @@ def infer_travel_style(interests):
     return "Leisure"
 
 
-def generate_trip_plan(destination, budget, days, interests, origin_city="Bengaluru"):
+def generate_trip_plan(destination, budget, days, interests, origin_city=None):
 
     hotels, hotel_ids, hotel_cost = get_matching_hotels(destination, budget, days)
 

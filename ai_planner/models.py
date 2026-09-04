@@ -4,7 +4,7 @@ from django.conf import settings
 
 class TripPlan(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-
+    origin_city = models.CharField(max_length=100, default="Bengaluru")
     destination = models.CharField(max_length=100)
     budget = models.IntegerField()
     days = models.IntegerField()

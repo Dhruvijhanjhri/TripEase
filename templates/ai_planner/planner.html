@@ -17,9 +17,18 @@
                     <form method="POST">
                         {% csrf_token %}
 
-                        <div class="mb-4">
-                            <label class="form-label fw-semibold">📍 Destination</label>
-                            {{ form.destination }}
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label fw-semibold">🛫 Starting City</label>
+                                {{ form.origin_city }}
+                                <div class="form-text">Where will your trip start?</div>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label fw-semibold">📍 Destination</label>
+                                {{ form.destination }}
+                                <div class="form-text">Where do you want to travel?</div>
+                            </div>
                         </div>
 
                         <div class="row">

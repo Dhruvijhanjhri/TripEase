@@ -132,6 +132,16 @@ for city, state in india_locations.items():
         if city in aliases:
             search_terms += f",{aliases[city]}"
 
+        descriptions = [
+            f"Located in the heart of {city} with easy access to major attractions.",
+            f"Premium stay offering modern rooms and exceptional hospitality in {city}.",
+            f"Perfect for business and leisure travellers visiting {city}.",
+            f"Luxury accommodation with excellent dining and premium facilities.",
+            f"One of the highest rated hotels in {city} offering a memorable experience.",
+        ]
+
+        star = random.choice([3.0, 3.5, 4.0, 4.5, 5.0])
+
         hotel = Hotel.objects.create(
             name=hotel_name,
             city=city,
@@ -139,15 +149,25 @@ for city, state in india_locations.items():
             area=random.choice(areas),
             search_keywords=search_terms,
             address=f"{random.randint(1,200)} Main Road, {city}",
-            description=f"Comfortable stay in {city}",
+
+            description=random.choice(descriptions),
+
             hotel_type=random.choice(["luxury", "budget", "business", "resort"]),
             property_type=random.choice(["hotel", "resort", "villa", "apartment"]),
-            star_rating=random.choice([3.0, 3.5, 4.0, 4.5, 5.0]),
-            user_rating=round(random.uniform(3.5, 4.9), 1),
+
+            star_rating=star,
+            user_rating=round(
+                random.uniform(max(3.5, star - 0.3), min(4.9, star + 0.2)),
+                1,
+            ),
+
             total_reviews=random.randint(100, 15000),
+
             image_url=random.choice(hotel_images),
+
             check_in_time=time(12, 0),
             check_out_time=time(11, 0),
+
             free_wifi=True,
             swimming_pool=random.choice([True, False]),
             spa=random.choice([True, False]),

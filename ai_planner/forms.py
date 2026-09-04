@@ -3,6 +3,16 @@ from django import forms
 
 class TripPlannerForm(forms.Form):
 
+    origin_city = forms.CharField(
+        max_length=100,
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control form-control-lg",
+                "placeholder": "e.g. Bengaluru, Mumbai, Delhi",
+            }
+        ),
+    )
+
     destination = forms.CharField(
         max_length=100,
         widget=forms.TextInput(

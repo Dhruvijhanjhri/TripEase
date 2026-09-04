@@ -14,6 +14,7 @@ def planner_home(request):
         form = TripPlannerForm(request.POST)
 
         if form.is_valid():
+            origin_city = form.cleaned_data["origin_city"]
             destination = form.cleaned_data["destination"]
             budget = form.cleaned_data["budget"]
             days = form.cleaned_data["days"]
@@ -24,11 +25,12 @@ def planner_home(request):
                 budget=budget,
                 days=days,
                 interests=interests,
-                origin_city="Bengaluru",  # temporary default
+                origin_city=origin_city,  
             )
 
             trip = TripPlan.objects.create(
                 user=request.user,
+                origin_city=origin_city,
                 destination=destination,
                 budget=budget,
                 days=days,
@@ -78,12 +80,24 @@ def planner_result(request, trip_id):
     for package in packages:
         package.is_budget_friendly = float(package.price) <= package_budget_limit
 
-    planner_output = generate_trip_plan(
-        destination=trip.destination,
-        budget=trip.budget,
-        days=trip.days,
-        interests=trip.interests,
+    from .services import (
+        get_best_season,
+        get_nearest_airport,
+        infer_travel_style,
+        get_route_suggestion,
     )
+
+    planner_output = {
+        "best_season": get_best_season(trip.destination),
+        "nearest_airport": get_nearest_airport(trip.destination),
+        "travel_style": infer_travel_style(trip.interests),
+        "route_suggestion": get_route_suggestion(
+            trip.destination,
+            trip.origin_city,
+        ),
+    }
+
+    import re
 
     itinerary_lines = trip.generated_plan.splitlines()
 
@@ -94,26 +108,46 @@ def planner_result(request, trip_id):
     for line in itinerary_lines:
         line = line.strip()
 
-        if line.startswith("## Day"):
+        # Match Markdown day headings such as:
+        # ### Day 1: Arrival, Heritage & Sarafa's Delights
+        # #### Day 1: Arrival, Heritage & Sarafa's Delights
+        # Day 1: Arrival, Heritage & Sarafa's Delights
+        day_match = re.match(
+            r"^\**#{0,6}\s*\**Day\s+(\d+)\s*:?\s*(.*?)\**$",
+            line,
+            re.IGNORECASE,
+        )
+
+        if day_match:
             if current_day:
                 timeline_items.append(
                     {
-                        "title": current_day.replace("## ", ""),
+                        "title": current_day,
                         "details": current_details,
                     }
                 )
 
-            current_day = line
+            day_number = day_match.group(1)
+            day_title = day_match.group(2).strip("*").strip()
+
+            current_day = (
+                f"Day {day_number}: {day_title}"
+                if day_title
+                else f"Day {day_number}"
+            )
+
             current_details = []
 
-        elif line and not line.startswith("#") and line.strip() != "---":
-            current_details.append(line.replace("**", ""))
+        elif line and not line.startswith("#") and line != "---":
+            cleaned_line = line.replace("**", "").strip()
 
-    # add last day
+            if cleaned_line:
+                current_details.append(cleaned_line)
+
     if current_day:
         timeline_items.append(
             {
-                "title": current_day.replace("## ", ""),
+                "title": current_day,
                 "details": current_details,
             }
         )

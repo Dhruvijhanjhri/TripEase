@@ -32,8 +32,8 @@ wheels/
 local_settings.py
 db.sqlite3-journal
 
-# DON'T ignore database
-# db.sqlite3
+# Local SQLite database
+db.sqlite3
 
 # Media & collected static
 media/
@@ -61,6 +61,11 @@ Thumbs.db
 # Backup databases
 *_backup*
 backup/
+db_before_*.sqlite3
 
 # Ignore large raw datasets only
 data/*.csv
+
+# Migration / temporary files
+sqlite_data.json
+fast_import.py
