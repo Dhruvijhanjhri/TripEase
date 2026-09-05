@@ -43,10 +43,10 @@ class FlightSearchForm(forms.Form):
     )
     passengers = forms.IntegerField(
         min_value=1,
-        max_value=9,
+        max_value=15,
         initial=1,
         widget=forms.NumberInput(
-            attrs={"class": "form-control", "min": "1", "max": "9"}
+            attrs={"class": "form-control", "min": "1", "max": "15"}
         ),
     )
 
