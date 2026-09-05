@@ -28,7 +28,7 @@ class PassengerForm(forms.ModelForm):
                     "class": "form-control",
                     "placeholder": "Age",
                     "min": "1",
-                    "max": "120",
+                    "max": "100",
                     "required": True,
                 }
             ),
