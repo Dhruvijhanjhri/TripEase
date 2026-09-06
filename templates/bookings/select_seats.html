@@ -8,75 +8,68 @@
 
     <div class="card shadow-lg p-4 rounded-4">
 
+        <!-- Flight Information -->
         <h2 class="text-center mb-2">
             ✈ Select Your Seat
         </h2>
 
-        <p class="text-center text-muted">
+        <p class="text-center text-muted mb-4">
 
             {{ booking.flight.airline }}
-
             •
-
             {{ booking.flight.get_display_flight_number }}
 
             <br>
 
             {{ booking.flight.source.city }}
-
             →
-
             {{ booking.flight.destination.city }}
 
         </p>
 
         <hr>
 
-        <div class="text-center mb-4">
+        <!-- Legend -->
+        <div class="seat-legend text-center mb-4">
 
-            <div class="legend">
-
-                <span>
-                🟩 Available
-                </span>
-
-                <span>
-                🟥 Booked
-                </span>
-
-                <span>
-                🟦 Selected
-                </span>
-
-                <span>
-                🪟 Window
-                </span>
-
-                <span>
-                🚶 Aisle
-                </span>
-
-                </div>
-
-            <div class="text-center mt-2 mb-4">
-
-                <small class="text-muted">
-
-                    🪟 Window Seat &nbsp;&nbsp;
-
-                    🚶 Aisle Seat
-
-                </small>
-
+            <div class="legend-title mb-3">
+                <strong>Seat Information</strong>
             </div>
 
-        </div>
+            <div class="legend-items">
 
-        <div class="text-center mb-4">
+                <span>
+                    <span class="legend-box available"></span>
+                    Available
+                </span>
 
-            <h5>Front of Aircraft</h5>
+                <span>
+                    <span class="legend-box booked"></span>
+                    Booked
+                </span>
 
-            ✈
+                <span>
+                    <span class="legend-box selected"></span>
+                    Selected
+                </span>
+
+                <span>
+                    🪟 Window
+                </span>
+
+                <span>
+                    🚶 Aisle
+                </span>
+
+                <span>
+                    🦵 Extra Legroom
+                </span>
+
+                <span>
+                    🚪 Emergency Exit
+                </span>
+
+            </div>
 
         </div>
 
@@ -86,83 +79,179 @@
 
             <div class="aircraft">
 
-            <div class="text-center front-icon">
+                <!-- Aircraft Nose -->
+                <div class="aircraft-front">
 
-            ✈
+                    <div class="cockpit-window"></div>
+                    <div class="cockpit-window"></div>
 
-            </div>
-
-            <div class="text-center mb-3">
-
-            <strong>Front of Aircraft</strong>
-
-            </div>
-
-            <div class="seat-map">
-
-                <div class="seat-header">
-
-                    <span>A</span>
-                    <span>B</span>
-                    <span>C</span>
-
-                    <span class="aisle-space"></span>
-
-                    <span>D</span>
-                    <span>E</span>
-                    <span>F</span>
+                    <div class="front-label">
+                        <span>✈</span>
+                        <strong>Front of Aircraft</strong>
+                    </div>
 
                 </div>
 
-                {% for row in seat_map %}
+                <!-- Seat Map -->
+                <div class="seat-map">
 
-                <div class="seat-row">
+                    <!-- Seat Letters -->
+                    <div class="seat-header">
 
-                    {% for seat in row %}
+                        <span>A</span>
+                        <span>B</span>
+                        <span>C</span>
 
-                        {% if forloop.counter == 4 %}
-                            <div class="aisle-space"></div>
+                        <span class="aisle-space"></span>
+
+                        <span>D</span>
+                        <span>E</span>
+                        <span>F</span>
+
+                    </div>
+
+
+                    {% for row in seat_map %}
+
+                        <!-- Extra Legroom Notice -->
+                        {% if forloop.counter == 11 %}
+
+                            <div class="special-row-label legroom-label">
+
+                                🦵
+                                <strong>Extra Legroom</strong>
+                                <span>Row 11</span>
+
+                            </div>
+
                         {% endif %}
 
-                        {% if seat.booked %}
 
-                            <button
-                                type="button"
-                                class="btn btn-danger seat-btn"
-                                disabled>
+                        <!-- Emergency Exit Notice -->
+                        {% if forloop.counter == 12 %}
 
-                                {% if seat.seat_number|slice:"-1:" == "A" or seat.seat_number|slice:"-1:" == "F" %}
-                                    🪟<br>
-                                {% elif seat.seat_number|slice:"-1:" == "C" or seat.seat_number|slice:"-1:" == "D" %}
-                                    🚶<br>
+                            <div class="special-row-label exit-label">
+
+                                <div>
+                                    🚪
+                                    <strong>Emergency Exit</strong>
+                                </div>
+
+                                <small>
+                                    Emergency exit row • Additional legroom
+                                </small>
+
+                            </div>
+
+                        {% endif %}
+
+
+                        <div class="seat-row
+                            {% if forloop.counter == 11 or forloop.counter == 14 %}
+                                extra-legroom-row
+                            {% endif %}
+                            {% if forloop.counter == 12 or forloop.counter == 13 %}
+                                emergency-row
+                            {% endif %}
+                        ">
+
+                            {% for seat in row %}
+
+                                {% if forloop.counter == 4 %}
+
+                                    <div class="aisle-space"></div>
+
                                 {% endif %}
 
-                                {{ seat.seat_number }}
 
-                            </button>
+                                {% if seat.booked %}
 
-                        {% else %}
+                                    <button
+                                        type="button"
+                                        class="btn btn-danger seat-btn"
+                                        disabled
+                                        title="Seat {{ seat.seat_number }} is already booked">
 
-                            <input
-                                type="checkbox"
-                                class="btn-check"
-                                name="seats"
-                                value="{{ seat.seat_number }}"
-                                id="{{ seat.seat_number }}">
+                                        {% if seat.seat_type == "window" %}
+                                            🪟
+                                        {% elif seat.seat_type == "aisle" %}
+                                            🚶
+                                        {% else %}
+                                            💺
+                                        {% endif %}
 
-                            <label
-                                class="btn btn-outline-success seat-btn"
-                                for="{{ seat.seat_number }}">
+                                        <span>
+                                            {{ seat.seat_number }}
+                                        </span>
 
-                                {% if seat.seat_number|slice:"-1:" == "A" or seat.seat_number|slice:"-1:" == "F" %}
-                                    🪟<br>
-                                {% elif seat.seat_number|slice:"-1:" == "C" or seat.seat_number|slice:"-1:" == "D" %}
-                                    🚶<br>
+                                    </button>
+
+
+                                {% else %}
+
+                                    <input
+                                        type="checkbox"
+                                        class="btn-check"
+                                        name="seats"
+                                        value="{{ seat.seat_number }}"
+                                        id="{{ seat.seat_number }}">
+
+                                    <label
+                                        class="btn btn-outline-success seat-btn
+                                        {% if seat.seat_type == 'window' %}
+                                            window-seat
+                                        {% elif seat.seat_type == 'aisle' %}
+                                            aisle-seat
+                                        {% else %}
+                                            middle-seat
+                                        {% endif %}"
+                                        for="{{ seat.seat_number }}"
+                                        title="Seat {{ seat.seat_number }}">
+
+                                        {% if seat.seat_type == "window" %}
+                                            🪟
+                                        {% elif seat.seat_type == "aisle" %}
+                                            🚶
+                                        {% else %}
+                                            💺
+                                        {% endif %}
+
+                                        <span>
+                                            {{ seat.seat_number }}
+                                        </span>
+
+                                    </label>
+
                                 {% endif %}
 
-                                {{ seat.seat_number }}
+                            {% endfor %}
 
-                            </label>
+                        </div>
+
+
+                        <!-- Second Emergency Exit Label -->
+                        {% if forloop.counter == 13 %}
+
+                            <div class="special-row-label exit-label exit-bottom">
+
+                                🚪
+                                <strong>Emergency Exit Row</strong>
+
+                            </div>
+
+                        {% endif %}
+
+
+                        <!-- Extra Legroom after Row 14 -->
+                        {% if forloop.counter == 14 %}
+
+                            <div class="special-row-label legroom-label">
+
+                                🦵
+                                <strong>Extra Legroom</strong>
+                                <span>Row 14</span>
+
+                            </div>
 
                         {% endif %}
 
@@ -170,16 +259,30 @@
 
                 </div>
 
-                {% endfor %}
+
+                <!-- Aircraft Rear -->
+                <div class="aircraft-rear">
+
+                    <div class="rear-label">
+                        <span>Lavatory</span>
+                        <span>Galley</span>
+                    </div>
+
+                    <div class="rear-line"></div>
+
+                </div>
 
             </div>
 
+
+            <!-- Continue -->
             <div class="text-center mt-5">
 
                 <button
-                    class="btn btn-primary btn-lg">
+                    type="submit"
+                    class="btn btn-primary btn-lg continue-btn">
 
-                    Continue to Payment
+                    Continue to Payment →
 
                 </button>
 
@@ -191,186 +294,577 @@
 
 </div>
 
+
 <style>
 
-.seat-map{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-}
+/* ============================= */
+/* Aircraft Container */
+/* ============================= */
 
-.seat-header{
+.aircraft {
 
-    display:grid;
-    grid-template-columns:repeat(3,70px) 45px repeat(3,70px);
-    gap:12px;
+    width: 560px;
+    max-width: 100%;
 
-    margin-bottom:18px;
+    margin: 30px auto;
 
-    font-weight:700;
-    color:#555;
-    text-align:center;
-}
+    background: #ffffff;
 
-.seat-row{
+    border: 2px solid #dfe3e8;
 
-    display:grid;
-    grid-template-columns:repeat(3,70px) 45px repeat(3,70px);
+    border-radius: 240px 240px 45px 45px;
 
-    gap:12px;
+    padding: 35px 22px 25px;
 
-    margin-bottom:14px;
+    box-shadow:
+        0 12px 30px rgba(0,0,0,.10);
 
 }
 
-.aisle-space{
 
-    width:45px;
+/* ============================= */
+/* Aircraft Front */
+/* ============================= */
 
-}
+.aircraft-front {
 
-.seat-btn{
+    text-align: center;
 
-    width:70px;
-    height:65px;
+    margin-bottom: 25px;
 
-    border-radius:14px;
-
-    font-size:12px;
-
-    font-weight:600;
-
-    display:flex;
-
-    flex-direction:column;
-
-    justify-content:center;
-
-    align-items:center;
-
-    transition:all .25s ease;
-
-    box-shadow:0 3px 8px rgba(0,0,0,.08);
+    padding-top: 5px;
 
 }
 
-.seat-btn:hover{
+.cockpit-window {
 
-    transform:translateY(-4px);
+    display: inline-block;
 
-    box-shadow:0 8px 18px rgba(0,0,0,.18);
+    width: 42px;
+    height: 18px;
 
-}
+    margin: 0 4px;
 
-.btn-outline-success{
+    border-radius: 50%;
 
-    background:#f8fff8;
+    background: #d9e2ec;
 
-}
-
-.btn-danger{
-
-    background:#dc3545 !important;
-
-    color:white !important;
+    border: 1px solid #c4ccd5;
 
 }
 
-.btn-check:checked + .seat-btn{
+.front-label {
 
-    background:#0d6efd !important;
+    display: flex;
 
-    color:white;
+    flex-direction: column;
 
-    border-color:#0d6efd;
+    align-items: center;
 
-    transform:scale(1.06);
+    gap: 5px;
 
-}
+    margin-top: 10px;
 
-.aircraft{
-
-    width:520px;
-
-    max-width:100%;
-
-    margin:auto;
-
-    background:white;
-
-    border-radius:220px 220px 35px 35px;
-
-    padding:35px 20px;
-
-    border:2px solid #e5e7eb;
-
-    box-shadow:0 10px 25px rgba(0,0,0,.08);
+    color: #555;
 
 }
 
-.front-icon{
+.front-label span {
 
-    font-size:34px;
-
-    margin-bottom:12px;
+    font-size: 25px;
 
 }
 
-.legend{
 
-    display:flex;
+/* ============================= */
+/* Seat Map */
+/* ============================= */
 
-    justify-content:center;
+.seat-map {
 
-    gap:20px;
+    display: flex;
 
-    flex-wrap:wrap;
+    flex-direction: column;
 
-    margin-bottom:25px;
-
-}
-
-.legend span{
-
-    font-size:14px;
-
-    color:#555;
+    align-items: center;
 
 }
 
-@media(max-width:768px){
 
-.seat-header{
+/* ============================= */
+/* Seat Header */
+/* ============================= */
 
-grid-template-columns:repeat(3,55px) 25px repeat(3,55px);
+.seat-header {
 
-gap:8px;
+    display: grid;
 
-}
+    grid-template-columns:
+        repeat(3, 62px)
+        48px
+        repeat(3, 62px);
 
-.seat-row{
+    gap: 10px;
 
-grid-template-columns:repeat(3,55px) 25px repeat(3,55px);
+    margin-bottom: 12px;
 
-gap:8px;
+    font-weight: 700;
 
-}
+    color: #555;
 
-.seat-btn{
-
-width:55px;
-
-height:52px;
-
-font-size:10px;
+    text-align: center;
 
 }
 
-.aircraft{
+.seat-header span {
 
-padding:20px;
+    font-size: 14px;
 
 }
+
+
+/* ============================= */
+/* Seat Row */
+/* ============================= */
+
+.seat-row {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 62px)
+        48px
+        repeat(3, 62px);
+
+    gap: 10px;
+
+    margin-bottom: 10px;
+
+}
+
+
+/* ============================= */
+/* Aisle */
+/* ============================= */
+
+.aisle-space {
+
+    width: 48px;
+
+}
+
+
+/* ============================= */
+/* Seats */
+/* ============================= */
+
+.seat-btn {
+
+    width: 62px;
+    height: 58px;
+
+    padding: 5px;
+
+    border-radius: 12px;
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 2px;
+
+    transition: all .2s ease;
+
+    box-shadow:
+        0 2px 6px rgba(0,0,0,.08);
+
+}
+
+.seat-btn span {
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+}
+
+.seat-btn:hover {
+
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 6px 14px rgba(0,0,0,.16);
+
+}
+
+
+/* Available */
+
+.btn-outline-success {
+
+    background: #f8fff8;
+
+}
+
+
+/* Booked */
+
+.btn-danger {
+
+    background: #dc3545 !important;
+
+    color: white !important;
+
+    border-color: #dc3545 !important;
+
+    opacity: .85;
+
+}
+
+
+/* Selected */
+
+.btn-check:checked + .seat-btn {
+
+    background: #0d6efd !important;
+
+    color: white;
+
+    border-color: #0d6efd;
+
+    transform: scale(1.05);
+
+    box-shadow:
+        0 5px 15px rgba(13,110,253,.30);
+
+}
+
+
+/* ============================= */
+/* Seat Types */
+/* ============================= */
+
+.window-seat {
+
+    border-width: 2px;
+
+}
+
+.aisle-seat {
+
+    border-width: 2px;
+
+}
+
+
+/* ============================= */
+/* Special Rows */
+/* ============================= */
+
+.extra-legroom-row .seat-btn {
+
+    height: 64px;
+
+}
+
+.emergency-row {
+
+    position: relative;
+
+    padding-top: 4px;
+    padding-bottom: 4px;
+
+}
+
+.emergency-row .seat-btn {
+
+    border: 2px solid #e0a800;
+
+}
+
+
+/* ============================= */
+/* Special Row Labels */
+/* ============================= */
+
+.special-row-label {
+
+    width: 100%;
+
+    max-width: 430px;
+
+    margin: 8px auto;
+
+    padding: 7px 12px;
+
+    border-radius: 8px;
+
+    text-align: center;
+
+    font-size: 12px;
+
+}
+
+.special-row-label span {
+
+    margin-left: 5px;
+
+}
+
+
+/* Extra Legroom */
+
+.legroom-label {
+
+    background: #f8f3df;
+
+    border: 1px solid #e0d39a;
+
+    color: #6b5b16;
+
+}
+
+
+/* Emergency Exit */
+
+.exit-label {
+
+    background: #fff0f0;
+
+    border: 1px solid #e2a7a7;
+
+    color: #9b1c1c;
+
+}
+
+.exit-label small {
+
+    display: block;
+
+    margin-top: 2px;
+
+    font-size: 10px;
+
+}
+
+.exit-bottom {
+
+    margin-top: 5px;
+
+}
+
+
+/* ============================= */
+/* Aircraft Rear */
+/* ============================= */
+
+.aircraft-rear {
+
+    margin-top: 25px;
+
+    text-align: center;
+
+}
+
+.rear-label {
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 25px;
+
+    font-size: 11px;
+
+    color: #777;
+
+}
+
+.rear-line {
+
+    width: 70%;
+
+    height: 3px;
+
+    margin: 8px auto 0;
+
+    background: #dfe3e8;
+
+    border-radius: 5px;
+
+}
+
+
+/* ============================= */
+/* Legend */
+/* ============================= */
+
+.seat-legend {
+
+    color: #555;
+
+}
+
+.legend-title {
+
+    font-size: 15px;
+
+}
+
+.legend-items {
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 18px;
+
+    flex-wrap: wrap;
+
+    font-size: 13px;
+
+}
+
+.legend-items > span {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+}
+
+.legend-box {
+
+    width: 16px;
+    height: 16px;
+
+    display: inline-block;
+
+    border-radius: 4px;
+
+    border: 1px solid #aaa;
+
+}
+
+.legend-box.available {
+
+    background: #f8fff8;
+
+    border-color: #198754;
+
+}
+
+.legend-box.booked {
+
+    background: #dc3545;
+
+    border-color: #dc3545;
+
+}
+
+.legend-box.selected {
+
+    background: #0d6efd;
+
+    border-color: #0d6efd;
+
+}
+
+
+/* ============================= */
+/* Continue Button */
+/* ============================= */
+
+.continue-btn {
+
+    padding: 12px 30px;
+
+    border-radius: 10px;
+
+}
+
+
+/* ============================= */
+/* Mobile */
+/* ============================= */
+
+@media (max-width: 768px) {
+
+    .aircraft {
+
+        padding: 25px 10px 20px;
+
+    }
+
+    .seat-header {
+
+        grid-template-columns:
+            repeat(3, 48px)
+            28px
+            repeat(3, 48px);
+
+        gap: 7px;
+
+    }
+
+    .seat-row {
+
+        grid-template-columns:
+            repeat(3, 48px)
+            28px
+            repeat(3, 48px);
+
+        gap: 7px;
+
+    }
+
+    .aisle-space {
+
+        width: 28px;
+
+    }
+
+    .seat-btn {
+
+        width: 48px;
+
+        height: 48px;
+
+        font-size: 9px;
+
+    }
+
+    .seat-btn span {
+
+        font-size: 9px;
+
+    }
+
+    .extra-legroom-row .seat-btn {
+
+        height: 52px;
+
+    }
+
+    .legend-items {
+
+        gap: 10px;
+
+        font-size: 12px;
+
+    }
 
 }
 

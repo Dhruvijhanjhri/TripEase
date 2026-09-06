@@ -1,6 +1,10 @@
 ROWS = 30
 SEATS_PER_ROW = ["A", "B", "C", "D", "E", "F"]
 
+# Generic narrow-body domestic aircraft layout
+EMERGENCY_EXIT_ROWS = {12, 13}
+EXTRA_LEGROOM_ROWS = {11, 14}
+
 
 def generate_seat_map(booked_seats=None):
 
@@ -17,10 +21,20 @@ def generate_seat_map(booked_seats=None):
 
             seat = f"{row}{letter}"
 
+            if letter in ["A", "F"]:
+                seat_type = "window"
+            elif letter in ["C", "D"]:
+                seat_type = "aisle"
+            else:
+                seat_type = "middle"
+
             row_seats.append(
                 {
                     "seat_number": seat,
                     "booked": seat in booked_seats,
+                    "seat_type": seat_type,
+                    "is_emergency_exit": row in EMERGENCY_EXIT_ROWS,
+                    "is_extra_legroom": row in EXTRA_LEGROOM_ROWS,
                 }
             )
 
