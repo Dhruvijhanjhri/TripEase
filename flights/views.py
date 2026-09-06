@@ -221,8 +221,8 @@ def flight_search(request):
                     key=lambda flight: flight.duration_minutes,
                 )
 
-            cheapest_flight.is_cheapest = True
-            fastest_flight.is_fastest = True
+                cheapest_flight.is_cheapest = True
+                fastest_flight.is_fastest = True
 
             # ==================================
             # VIA FLIGHTS (REALISTIC)
