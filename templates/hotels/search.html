@@ -21,10 +21,23 @@ Hotels - TripEase
                 <div class="form-group">
                     <label class="fw-bold text-dark mb-2 d-block">Check-in</label>
                     {{ form.check_in }}
+
+                    {% if form.check_in.errors %}
+                        <div class="text-danger small mt-1">
+                            {{ form.check_in.errors|striptags }}
+                        </div>
+                    {% endif %}
                 </div>
                 <div class="form-group">
                     <label class="fw-bold text-dark mb-2 d-block">Check-out</label>
                     {{ form.check_out }}
+
+                    {% if form.check_out.errors %}
+                        <div class="text-danger small mt-1">
+                            {{ form.check_out.errors|striptags }}
+                        </div>
+                    {% endif %}
+
                 </div>
                 <div class="form-group">
                     <label class="fw-bold text-dark mb-2 d-block">Guests</label>

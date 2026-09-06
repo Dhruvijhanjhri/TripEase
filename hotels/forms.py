@@ -1,4 +1,5 @@
 from django import forms
+from django.utils import timezone
 from django.forms import modelformset_factory
 
 from .models import HotelGuest
@@ -19,13 +20,21 @@ class HotelSearchForm(forms.Form):
 
     check_in = forms.DateField(
         widget=forms.DateInput(
-            attrs={"type": "date", "class": "form-control", "style": "height:55px;"}
+            attrs={
+                "type": "date",
+                "class": "form-control",
+                "style": "height:55px;",
+            }
         )
     )
 
     check_out = forms.DateField(
         widget=forms.DateInput(
-            attrs={"type": "date", "class": "form-control", "style": "height:55px;"}
+            attrs={
+                "type": "date",
+                "class": "form-control",
+                "style": "height:55px;",
+            }
         )
     )
 
@@ -44,6 +53,41 @@ class HotelSearchForm(forms.Form):
             attrs={"class": "form-control", "style": "height:55px;"}
         ),
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        today = timezone.localdate()
+
+        self.fields["check_in"].widget.attrs["min"] = today.isoformat()
+        self.fields["check_out"].widget.attrs["min"] = today.isoformat()
+
+    def clean_check_in(self):
+        check_in = self.cleaned_data["check_in"]
+        today = timezone.localdate()
+
+        if check_in < today:
+            raise forms.ValidationError(
+                "Check-in date cannot be in the past."
+            )
+
+        return check_in
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        check_in = cleaned_data.get("check_in")
+        check_out = cleaned_data.get("check_out")
+
+        if check_in and check_out:
+
+            if check_out <= check_in:
+                self.add_error(
+                    "check_out",
+                    "Check-out date must be after the check-in date.",
+                )
+
+        return cleaned_data
 
 
 class HotelGuestForm(forms.ModelForm):
