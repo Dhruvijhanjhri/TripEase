@@ -71,6 +71,22 @@ Hotel Booking
                             {{ check_out }}
                         </p>
 
+                        <hr class="my-3">
+
+                        <p class="mb-2">
+                            <strong>Hotel Check-in:</strong>
+                            {{ room.hotel.check_in_time|time:"g:i A" }}
+                        </p>
+
+                        <p class="mb-2">
+                            <strong>Hotel Check-out:</strong>
+                            {{ room.hotel.check_out_time|time:"g:i A" }}
+                        </p>
+
+                        <p class="text-muted small mb-3">
+                            Early check-in and late check-out are subject to hotel availability.
+                        </p>
+
                         <p>
                             <strong>Nights:</strong>
                             {{ nights }}
