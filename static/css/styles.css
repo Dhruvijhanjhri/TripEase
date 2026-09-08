@@ -1947,3 +1947,114 @@ img {
     transition: none;
   }
 }
+
+/* Mobile navigation - TripEase */
+.mobile-auth-links {
+    display: none;
+}
+
+.mobile-user {
+    display: none;
+}
+
+.mobile-auth-actions {
+    display: none;
+}
+
+@media (max-width: 760px) {
+
+    .nav {
+        position: relative;
+    }
+
+    .nav-links.open {
+        display: flex;
+    }
+
+    .mobile-auth-links {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        margin-top: 8px;
+        padding-top: 12px;
+        border-top: 1px solid var(--brand-border);
+    }
+
+    .mobile-user {
+        display: block;
+        padding: 8px 12px 12px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--brand-dark);
+    }
+
+    .mobile-auth-links .nav-link {
+        width: 100%;
+    }
+
+    .mobile-auth-actions {
+        display: flex;
+        gap: 8px;
+        padding: 10px 12px 4px;
+    }
+
+    .mobile-auth-actions .btn {
+        flex: 1;
+        text-align: center;
+    }
+
+    .mobile-admin-link {
+        color: var(--brand-primary);
+        font-weight: 600;
+    }
+
+    .mobile-logout {
+        color: #dc2626;
+    }
+}
+
+/* Desktop navbar - keep everything in one clean row */
+@media (min-width: 761px) {
+
+    .nav {
+        flex-wrap: nowrap;
+        gap: 12px;
+    }
+
+    .logo {
+        flex-shrink: 0;
+    }
+
+    .nav-links {
+        flex: 1 1 auto;
+        justify-content: center;
+        gap: 3px;
+        min-width: 0;
+        white-space: nowrap;
+    }
+
+    .nav-link {
+        padding: 7px 9px;
+        font-size: 0.92rem;
+    }
+
+    .auth-buttons {
+        flex: 0 0 auto;
+        gap: 6px;
+        white-space: nowrap;
+    }
+
+    .auth-buttons .btn {
+        padding: 8px 11px;
+        font-size: 0.85rem;
+    }
+
+    .user-menu {
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+
+    .mobile-auth-links {
+        display: none;
+    }
+}
