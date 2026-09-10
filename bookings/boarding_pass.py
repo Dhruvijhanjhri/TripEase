@@ -69,3 +69,4 @@ def generate_boarding_pass(booking):
     pdf.cell(0, 8, "Powered by TripEase", align="C")
 
     pdf.output(pdf_path)
+    return os.path.relpath(pdf_path, settings.MEDIA_ROOT)
