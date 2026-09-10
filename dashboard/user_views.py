@@ -503,19 +503,12 @@ def user_dashboard(request):
     recent_activity.sort(key=lambda x: x["date"], reverse=True)
     recent_activity = recent_activity[:10]
 
-    print("\n===== NEXT TRIP =====")
-    print(next_trip)
-
-    print("\n===== RECENT ACTIVITY =====")
-    for a in recent_activity:
-        print(a)
-
 
     # ─────────────────────────────────────────────────────────────
     # 13. AI DESTINATION RECOMMENDATIONS
     # ─────────────────────────────────────────────────────────────
 
-    print("===== BEFORE RECOMMENDATIONS =====")
+    
 
     recommended_destinations = recommend_destinations(
         flight_bookings=flight_bookings,
@@ -524,8 +517,6 @@ def user_dashboard(request):
         limit=3,
     )
 
-    print("===== AFTER RECOMMENDATIONS =====")
-    print(recommended_destinations)
 
     # ─────────────────────────────────────────────────────────────
     # 14. CONTEXT — SINGLE DICTIONARY, NO DUPLICATES
@@ -579,16 +570,4 @@ def user_dashboard(request):
         "has_destinations": bool(destination_labels),
     }
 
-    #return render(request, "dashboard/user_dashboard.html", context)
-    print("===== BEFORE DASHBOARD RENDER =====")
-    print("Context keys:", list(context.keys()))
-
-    try:
-        response = render(request, "dashboard/user_dashboard.html", context)
-        print("===== DASHBOARD RENDER SUCCESS =====")
-        return response
-    except Exception as e:
-        print("===== DASHBOARD RENDER ERROR =====")
-        print("ERROR TYPE:", type(e).__name__)
-        print("ERROR:", str(e))
-        raise
+    return render(request, "dashboard/user_dashboard.html", context)

@@ -235,13 +235,7 @@ def booking_detail(request, booking_reference):
     try:
         flight_number = booking.flight.get_display_flight_number()
 
-        print("=" * 50)
-        print("Flight Number Sent:", flight_number)
-        print("=" * 50)
-
         response = FlightStatusService.get_flight_status(flight_number)
-
-        print(response)
 
         if response.get("data"):
             live_status = response["data"][0]
@@ -334,17 +328,10 @@ def check_in(request, booking_reference):
 
     pdf_path = generate_boarding_pass(booking)
 
-    print("=" * 60)
-    print("Returned path:", pdf_path)
-    print("=" * 60)
-
     booking.boarding_pass.name = pdf_path
     booking.save()
 
     booking.refresh_from_db()
-
-    print("Saved in DB:", booking.boarding_pass.name)
-    print("=" * 60)
 
     messages.success(request, "Check-in completed successfully!")
 
