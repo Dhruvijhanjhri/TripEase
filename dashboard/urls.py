@@ -6,6 +6,11 @@ app_name = "dashboard"
 
 urlpatterns = [
     path("", views.dashboard_home, name="home"),
+    path(
+        "booking/<str:booking_reference>/",
+        views.admin_booking_detail,
+        name="admin_booking_detail",
+    ),
     path("my-dashboard/", user_views.user_dashboard, name="user_dashboard"),
     path(
         "export/csv/",

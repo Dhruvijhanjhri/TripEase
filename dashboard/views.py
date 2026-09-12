@@ -15,6 +15,58 @@ from .analytics import get_revenue_forecast_data
 from .analytics import get_booking_analytics
 from django.db.models.functions import TruncMonth
 
+@staff_member_required
+def admin_booking_detail(request, booking_reference):
+    booking = Booking.objects.filter(
+        booking_reference=booking_reference
+    ).select_related(
+        "user",
+        "flight__source",
+        "flight__destination",
+    ).prefetch_related("passengers").first()
+
+    if booking:
+        return render(
+            request,
+            "bookings/booking_detail.html",
+            {
+                "booking": booking,
+                "live_status": None,
+                "is_admin_view": True,
+            },
+        )
+
+    hotel_booking = HotelBooking.objects.filter(
+        booking_reference=booking_reference
+    ).select_related("user", "hotel", "room").first()
+
+    if hotel_booking:
+        return render(
+            request,
+            "hotels/booking_detail.html",
+            {
+                "booking": hotel_booking,
+                "is_admin_view": True,
+            },
+        )
+
+    package_booking = PackageBooking.objects.filter(
+        booking_reference=booking_reference
+    ).select_related("user", "package").first()
+
+    if package_booking:
+        return render(
+            request,
+            "packages/package_booking_detail.html",
+            {
+                "booking": package_booking,
+                "is_admin_view": True,
+            },
+        )
+
+    from django.http import Http404
+    raise Http404("Booking not found.")
+
 User = get_user_model()
 
 
@@ -344,7 +396,7 @@ def dashboard_home(request):
                 "amount": None,  # amount comes from payment
                 "booking_status": b.booking_status,
                 "date": b.created_at,
-                "detail_url": f"/bookings/{b.booking_reference}/",
+                "detail_url": f"/dashboard/booking/{b.booking_reference}/",
             }
         )
     for b in recent_hotel_bookings:
@@ -356,7 +408,7 @@ def dashboard_home(request):
                 "amount": b.total_price,
                 "booking_status": b.booking_status,
                 "date": b.created_at,
-                "detail_url": f"/hotels/booking/{b.booking_reference}/",
+                "detail_url": f"/dashboard/booking/{b.booking_reference}/",
             }
         )
     for b in recent_pkg_bookings:
@@ -368,7 +420,7 @@ def dashboard_home(request):
                 "amount": b.total_price,
                 "booking_status": b.booking_status,
                 "date": b.created_at,
-                "detail_url": f"/packages/booking/{b.booking_reference}/",
+                "detail_url": f"/dashboard/booking/{b.booking_reference}/",
             }
         )
 
