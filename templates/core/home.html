@@ -4,9 +4,17 @@
 {% block content %}
 <section id="home" class="hero" role="banner" aria-label="Explore the world with TripEase">
     <div class="container hero-content">
-        <div class="hero-badge" data-reveal><i class="bi bi-stars"></i> AI-powered travel planning • instant booking</div>
-        <h1 class="hero-title" data-reveal>Plan Smarter. Travel Better.</h1>
-        <p class="hero-subtitle" data-reveal>Flights • Hotels • Packages • AI Planner — everything you need for your next trip, in one seamless place.</p>
+        <div class="hero-badge" data-reveal>
+            <i class="bi bi-stars"></i> Welcome to TripEase
+        </div>
+
+        <h1 class="hero-title" data-reveal>
+            Plan Smarter. Travel Better.
+        </h1>
+
+        <p class="hero-subtitle" data-reveal>
+            Your all-in-one travel platform for flights, hotels, holiday packages, and AI-powered trip planning.
+        </p>
 
         <div class="glass-panel hero-search-shell" data-reveal>
             <form class="search-shell" method="GET" action="{% url 'flights:search' %}" aria-label="Search travel options">
@@ -43,31 +51,32 @@
 <section class="section section-surface">
     <div class="container">
         <div class="section-heading" data-reveal>
-            <div class="travel-pill"><i class="bi bi-shield-check"></i> Trusted by modern travelers</div>
+            <div class="travel-pill"><i class="bi bi-stars"></i> Your complete travel companion</div>
             <h2 class="section-title">Everything you need for a polished getaway</h2>
             <p class="section-copy">Fast discovery, tailored recommendations, and support you can count on.</p>
         </div>
-        <div class="stat-grid">
-            <div class="stat-card" data-reveal>
-                <div class="stat-icon"><i class="bi bi-star-fill"></i></div>
-                <div class="stat-value">4.9 <span class="stat-value-suffix">Rating</span></div>
-                <div class="stat-label">Guest satisfaction</div>
-            </div>
-            <div class="stat-card" data-reveal>
-                <div class="stat-icon"><i class="bi bi-signpost-split-fill"></i></div>
-                <div class="stat-value">120+ <span class="stat-value-suffix">Routes</span></div>
-                <div class="stat-label">Flight connections</div>
-            </div>
-            <div class="stat-card" data-reveal>
-                <div class="stat-icon"><i class="bi bi-building-fill"></i></div>
-                <div class="stat-value">500+ <span class="stat-value-suffix">Hotels</span></div>
-                <div class="stat-label">Curated stays</div>
-            </div>
-            <div class="stat-card" data-reveal>
-                <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
-                <div class="stat-value">50K <span class="stat-value-suffix">Travelers</span></div>
-                <div class="stat-label">Trips planned</div>
-            </div>
+        <div class="stat-card" data-reveal>
+            <div class="stat-icon"><i class="bi bi-geo-alt-fill"></i></div>
+            <div class="stat-value">100+ <span class="stat-value-suffix">&nbsp;Airports</span></div>
+            <div class="stat-label">Across India</div>
+        </div>
+
+        <div class="stat-card" data-reveal>
+            <div class="stat-icon"><i class="bi bi-airplane-fill"></i></div>
+            <div class="stat-value">90K+ <span class="stat-value-suffix">&nbsp;Flights</span></div>
+            <div class="stat-label">Available routes & schedules</div>
+        </div>
+
+        <div class="stat-card" data-reveal>
+            <div class="stat-icon"><i class="bi bi-building-fill"></i></div>
+            <div class="stat-value">500+ <span class="stat-value-suffix">&nbsp;Hotels</span></div>
+            <div class="stat-label">Available stays</div>
+        </div>
+
+        <div class="stat-card" data-reveal>
+            <div class="stat-icon"><i class="bi bi-stars"></i></div>
+            <div class="stat-value">AI <span class="stat-value-suffix">&nbsp;Powered</span></div>
+            <div class="stat-label">Personalized trip planning</div>
         </div>
     </div>
 </section>
@@ -201,14 +210,6 @@
             <p class="section-copy">Move from inspiration to booking without changing tabs.</p>
         </div>
         <div class="row g-4 mt-2">
-            <div class="col-md-6 col-lg-3">
-                <div class="feature-card explore-card h-100" data-reveal>
-                    <div class="feature-icon"><i class="bi bi-airplane-fill"></i></div>
-                    <h4>Flights</h4>
-                    <p class="card-text">Search AI-ranked flights across routes with transparent, real-time fares.</p>
-                    <a href="{% url 'flights:search' %}" class="btn btn-primary mt-3">Explore Flights</a>
-                </div>
-            </div>
             <div class="col-md-6 col-lg-3">
                 <div class="feature-card explore-card h-100" data-reveal>
                     <div class="feature-icon"><i class="bi bi-building-fill"></i></div>

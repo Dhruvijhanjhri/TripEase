@@ -2058,3 +2058,10 @@ img {
         display: none;
     }
 }
+
+/* Center hero introduction text */
+.hero-subtitle {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
