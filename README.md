@@ -1,311 +1,314 @@
-# ✈️ TripEase – AI Powered Travel Booking Platform
+# ✈️ TripEase – AI-Powered Travel Booking Platform
 
-![Django](https://img.shields.io/badge/Django-4.2-green)
-![Python](https://img.shields.io/badge/Python-3.x-blue)
-![Bootstrap](https://img.shields.io/badge/Bootstrap-5-purple)
-![SQLite](https://img.shields.io/badge/Database-SQLite-blue)
-![Supabase](https://img.shields.io/badge/Auth-Supabase-green)
-![Gemini AI](https://img.shields.io/badge/AI-Google_Gemini-orange)
-![Render](https://img.shields.io/badge/Deployment-Render-black)
-
----
-
-## 🌍 Overview
-
-TripEase is a full-stack AI-powered travel booking platform developed using **Django**. It provides a complete travel booking experience where users can search and book flights, hotels, and holiday packages, generate AI-powered travel itineraries, manage bookings, make secure payments, and access a personalized dashboard.
-
-The project is designed to simulate a real-world travel booking platform with modern features and scalable architecture.
+[![Django](https://img.shields.io/badge/Django-4.2-green)](https://www.djangoproject.com/)
+[![Python](https://img.shields.io/badge/Python-3.x-blue)](https://www.python.org/)
+[![Bootstrap](https://img.shields.io/badge/Bootstrap-5-purple)](https://getbootstrap.com/)
+[![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-blue)](https://www.postgresql.org/)
+[![Supabase](https://img.shields.io/badge/Backend%20Database-Supabase-green)](https://supabase.com/)
+[![Gemini AI](https://img.shields.io/badge/AI-Google%20Gemini-orange)](https://ai.google.dev/)
+[![Render](https://img.shields.io/badge/Deployment-Render-black)](https://render.com/)
 
 ---
 
-## 🚀 Features
+## 🌐 Live Demo
 
-### 🔐 Authentication
-- Secure User Registration & Login
-- Profile Management
-- Password Reset
-- Supabase Authentication Integration
+**Live Application:**
+https://tripease-y0yf.onrender.com/
+
+**GitHub Repository:**
+https://github.com/Dhruvijhanjhri/TripEase
 
 ---
+
+## 📌 Overview
+
+TripEase is a full-stack **AI-powered travel booking platform** developed using Django and Python.
+
+The platform provides an integrated travel experience where users can search and book **flights, hotels, and holiday packages**, generate personalized AI travel itineraries, manage bookings, complete simulated payments, and access personalized dashboards.
+
+The application is designed as a real-world travel platform with a production-oriented architecture, PostgreSQL database deployment, authentication, booking workflows, AI integration, and responsive web interfaces.
+
+---
+
+## 🚀 Key Features
 
 ### ✈️ Flight Booking
-- Smart Flight Search
-- Airport Search
-- Dynamic Flight Pricing
-- Flight Tracking
-- Seat Availability
-- Booking Management
-- QR Boarding Pass Generation
 
----
+* Search flights by source, destination, date, cabin class, and passengers
+* Airport-based flight search
+* Direct and connecting flight handling
+* AI-assisted fare insights
+* Flight availability and seat selection
+* Passenger management
+* Booking confirmation
+* Booking history
+* Flight tracking
+* QR-based boarding pass generation
+* Passenger and booking validation
 
 ### 🏨 Hotel Booking
-- Hotel Search
-- Hotel Details
-- Room Booking
-- Hotel Reviews
-- Booking History
 
----
+* Search hotels by destination and dates
+* Hotel and room availability
+* Room selection and booking
+* Hotel details and amenities
+* Check-in and check-out information
+* Weather information for destinations
+* Booking history and details
+* Hotel review support
 
-### 🎒 Travel Packages
-- Holiday Package Listings
-- Package Booking
-- Destination Information
+### 🎒 Holiday Packages
 
----
+* Browse holiday packages
+* Destination-based package search
+* Package details and itineraries
+* Traveller management
+* Package booking and confirmation
+* Booking history
 
 ### 🤖 AI Trip Planner
-- Google Gemini AI Integration
-- Personalized Travel Itinerary
-- Budget Suggestions
-- Travel Recommendations
 
----
+* Google Gemini AI integration
+* Personalized travel itinerary generation
+* Budget-based trip planning
+* Duration-based itinerary planning
+* Interest-based recommendations
+* Suggested travel style
+* Best-season information
+* Nearest airport information
+* Route suggestions
+* Map integration
 
-### 💳 Payment System
-- Secure Payment Workflow
-- Payment History
-- Booking Confirmation
-- Invoice Generation
+### 💳 Payment & Booking Workflow
 
----
+* Integrated simulated payment workflow
+* UPI, Card, Net Banking, and Wallet options
+* Transaction generation
+* Payment status tracking
+* Booking confirmation
+* Payment history
+* Booking references
+
+> **Note:** The payment system is implemented as a simulated application workflow for demonstration and portfolio purposes. It does not process real financial transactions.
 
 ### 📊 User Dashboard
-- Upcoming Trips
-- Booking History
-- Travel Statistics
-- Profile Summary
-- Quick Actions
+
+* Upcoming trips
+* Booking history
+* Flight, hotel, and package statistics
+* Total booking and spending information
+* Payment statistics
+* Quick actions
+* Personalized booking information
+
+### 🛠️ Admin Dashboard
+
+* Admin-only dashboard
+* Booking analytics
+* Revenue statistics
+* Booking statistics by category
+* Recent booking activity
+* User statistics
+* Top destinations
+* Top hotels and packages
+* Admin booking detail views
+* Revenue and booking analysis
 
 ---
 
-### ⭐ Reviews & Ratings
-- Flight Reviews
-- Hotel Reviews
-- Ratings System
-
----
-
-### 🛠 Admin Panel
-- Manage Flights
-- Manage Hotels
-- Manage Packages
-- Manage Users
-- Manage Payments
-- Manage Reviews
-- Analytics Dashboard
-
----
-
-## 🛠 Tech Stack
+## 🧠 Technology Stack
 
 ### Backend
-- Python
-- Django 4.2
 
-### Frontend
-- HTML5
-- CSS3
-- Bootstrap 5
-- JavaScript
+* Python
+* Django 4.2
+* Django ORM
+* Django Authentication
 
 ### Database
-- SQLite
-- PostgreSQL Ready
 
-### Authentication
-- Django Authentication
-- Supabase
+* PostgreSQL
+* Supabase PostgreSQL
+* SQLite for local development/backups
 
-### AI Integration
-- Google Gemini API
+### AI
 
-### Python Libraries
-- Pandas
-- NumPy
-- Scikit-learn
-- ReportLab
-- OpenPyXL
-- Pillow
+* Google Gemini API
+* AI-powered travel itinerary generation
+* AI-assisted flight fare insights
+
+### Frontend
+
+* HTML5
+* CSS3
+* Bootstrap 5
+* JavaScript
+* Responsive UI
+
+### APIs & Integrations
+
+* Weather API
+* Maps/location services
+* Google Gemini API
 
 ### Deployment
-- Render
+
+* Render
+* Gunicorn
+* PostgreSQL/Supabase
+* WhiteNoise/static file handling
 
 ---
 
-## 📂 Project Structure
+## 🗂️ Project Structure
 
 ```text
 TripEase/
 │
-├── accounts/
-├── ai_planner/
-├── bookings/
-├── contact/
-├── core/
-├── dashboard/
-├── flights/
-├── hotels/
-├── integrations/
-├── packages/
-├── payments/
-├── reviews/
-├── static/
-├── templates/
-├── media/
-├── data/
-├── tripease/
+├── accounts/              # Authentication and user management
+├── bookings/              # Flight booking and passenger management
+├── flights/               # Flight search and flight-related functionality
+├── hotels/                # Hotel and room booking
+├── packages/              # Holiday package management
+├── payments/              # Payment workflows
+├── dashboard/             # User and admin dashboards
+├── ai_planner/            # Gemini-powered travel planner
+├── integrations/          # External API integrations
+├── reviews/               # Review functionality
+│
+├── templates/             # HTML templates
+├── static/                # CSS, JavaScript and images
+├── tripease/              # Django project configuration
 ├── manage.py
 ├── requirements.txt
+├── render.yaml
 └── README.md
 ```
 
 ---
 
-## 📷 Project Screenshots
+## 🗄️ Database & Deployment
 
-> Screenshots will be added soon.
+TripEase was initially developed using SQLite for local development and testing.
 
-- Home Page
-- Flight Search
-- Hotel Booking
-- AI Planner
-- User Dashboard
-- Payment Page
-- QR Boarding Pass
-- Admin Dashboard
+The application was later migrated to **PostgreSQL using Supabase** for production deployment.
 
----
+The production deployment is hosted on **Render** and uses the PostgreSQL database for persistent application data.
 
-## ⚙ Installation
+The application includes multiple relational models covering:
 
-### Clone the Repository
-
-```bash
-git clone https://github.com/Dhruvijhanjhri/TripEase.git
-```
-
-```bash
-cd TripEase
-```
+* Users
+* Airports
+* Flights
+* Hotels
+* Rooms
+* Bookings
+* Passengers
+* Hotel bookings
+* Package bookings
+* Payments
+* Travel packages
 
 ---
 
-### Create Virtual Environment
+## 🔐 Authentication & Access Control
 
-Windows
+TripEase uses Django authentication for user access management.
 
-```bash
-python -m venv .venv
-```
+The application includes:
 
-```bash
-.venv\Scripts\activate
-```
-
-Linux / macOS
-
-```bash
-python3 -m venv .venv
-```
-
-```bash
-source .venv/bin/activate
-```
+* User registration/login
+* Authenticated booking workflows
+* User-specific booking access
+* Staff/admin access
+* Admin-only dashboard functionality
+* Protected booking details
 
 ---
 
-### Install Dependencies
+## 📱 Responsive Design
 
-```bash
-pip install -r requirements.txt
-```
+The application is designed to work across:
 
----
+* Desktop
+* Tablet
+* Mobile
 
-### Run Database Migrations
-
-```bash
-python manage.py migrate
-```
+The navigation, booking workflows, dashboards, search forms, and major travel features are adapted for responsive use.
 
 ---
 
-### Create Superuser
+## 🔄 Booking Workflow
 
-```bash
-python manage.py createsuperuser
+```text
+Search
+   ↓
+Select Flight / Hotel / Package
+   ↓
+Enter Traveller Details
+   ↓
+Review Booking
+   ↓
+Simulated Payment
+   ↓
+Booking Confirmation
+   ↓
+Manage Booking
+   ↓
+Boarding Pass / Booking Details
 ```
 
 ---
 
-### Start Development Server
+## 🤖 AI Trip Planning Workflow
 
-```bash
-python manage.py runserver
-```
-
-Visit
-
-```
-http://127.0.0.1:8000
+```text
+Destination + Budget + Duration + Interests
+                    ↓
+             Gemini AI Service
+                    ↓
+          Personalized Itinerary
+                    ↓
+      Travel Recommendations
+                    ↓
+     Maps / Hotels / Destination Info
 ```
 
 ---
 
-## 🌐 Deployment
+## 🎯 Project Highlights
 
-The project is deployed on **Render**.
-
-Live Demo
-
-https://tripease-y0yf.onrender.com
-
-> Note:
-> The deployed version uses a fresh cloud database and may not contain sample travel data. The complete application with full functionality and dataset is available in the local development environment.
+* Full-stack Django application
+* Relational database design
+* PostgreSQL production deployment
+* AI integration using Google Gemini
+* Multiple end-to-end booking workflows
+* Flight seat selection
+* QR boarding pass generation
+* Admin analytics dashboard
+* External API integrations
+* Responsive web interface
+* Production deployment using Render
 
 ---
 
 ## 🔮 Future Enhancements
 
-- Live Flight APIs
-- Live Hotel APIs
-- AI Budget Planner
-- AI Travel Assistant Chatbot
-- Personalized Recommendations
-- Multi-language Support
-- Mobile Application
-- Email & SMS Notifications
-- Travel Expense Tracker
-- Loyalty & Rewards Program
+Possible future improvements include:
+
+* Real payment gateway integration
+* Real-time flight status integration
+* Real hotel review integration
+* Advanced recommendation models
+* More comprehensive travel analytics
+* Additional travel providers and APIs
+* Automated email/SMS booking notifications
 
 ---
 
-## 👨‍💻 Developer
+## 📄 Project Status
 
-**Dhruvi Jhanjhri**
+**Status: Completed V1 / Production Deployed**
 
-M.Sc Data Science
-
-CHRIST (Deemed to be University)
-
-GitHub
-
-https://github.com/Dhruvijhanjhri
-
-LinkedIn
-
-(Add your LinkedIn profile here)
-
----
-
-## ⭐ Support
-
-If you found this project useful, consider giving it a ⭐ on GitHub.
-
----
-
-## 📜 License
-
-This project is developed for educational and portfolio purposes.
+TripEase V1 is deployed and available for demonstration through the live application link above.
+Future improvements can be developed incrementally without changing the current production workflow.
